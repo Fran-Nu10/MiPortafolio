@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+/* ENSAMBLE · design tokens */
+:root {
+  --graphite: #1f2220;
+  --graphite-2: #242826;
+  --graphite-3: #2e3330;
+  --plate: #1b1e1c;
+  --hairline: #3d423f;
+  --edge: #6a716c;
+  --edge-2: #7a817c;
+  --bone: #e6e2d8;
+  --bone-2: #bfc4bf;
+  --bone-3: #9aa19c;
+  --paper: #fbfaf6;
+  --orange: #f04e23;
+  --ink: #14120f;
+
+  --frame-inset: 48px;
+  --grid-size: 24px;
+
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-product: cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+/* one breakpoint for the whole site: below 1024px (phones, portrait tablets) the compact
+   layouts apply — accordion trays, vertical stations, one-column lab, flowing form */
+@theme {
+  --breakpoint-md: 1024px;
+}
+
+@theme inline {
+  --color-graphite: var(--graphite);
+  --color-graphite-2: var(--graphite-2);
+  --color-graphite-3: var(--graphite-3);
+  --color-plate: var(--plate);
+  --color-hairline: var(--hairline);
+  --color-edge: var(--edge);
+  --color-bone: var(--bone);
+  --color-bone-2: var(--bone-2);
+  --color-bone-3: var(--bone-3);
+  --color-paper: var(--paper);
+  --color-orange: var(--orange);
+  --color-ink: var(--ink);
+  --font-display: var(--font-archivo);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+/* the name and the frontal stack take less width as the viewport narrows */
+:root {
+  --hero-size: clamp(88px, 16vw, 250px);
+  --bench-scale: 1.25;
+}
+@media (max-width: 1023px) {
+  :root {
+    --frame-inset: 20px;
+    --grid-size: 20px;
+    --bench-scale: 0.78;
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  :root {
+    --hero-size: clamp(88px, 14vw, 280px);
+    --bench-scale: 0.95;
+  }
+}
+
+html {
+  background: var(--graphite);
+  color: var(--bone);
+  color-scheme: dark;
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Typography utilities */
+.t-display {
+  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+}
+.t-mono {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.t-dim {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+  white-space: nowrap;
+}
+.t-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--bone-3);
+}
+
+/* The T0 dot grid, painted once on a fixed layer */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(230, 226, 216, 0.14) 0.6px, transparent 0.9px);
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+/* Dashed construction axis */
+.axis-v {
+  width: 1px;
+  background: repeating-linear-gradient(to bottom, var(--orange) 0 6px, transparent 6px 12px);
+}
+.axis-h {
+  height: 1px;
+  background: repeating-linear-gradient(to right, var(--orange) 0 6px, transparent 6px 12px);
+}
+
+/* Captures: focus point per viewport */
+.capture { object-position: var(--pos); }
+@media (max-width: 1023px) { .capture { object-position: var(--pos-m, var(--pos)); } }
+
+/* Isometric helpers */
+.iso-space {
+  perspective: 2000px;
+  perspective-origin: 50% 40%;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Focus: brackets, the Magnet cursor's keyboard equivalent */
+:focus-visible {
+  outline: 1px solid var(--orange);
+  outline-offset: 4px;
+}
+
+/* Native cursor hidden only when the instrument is active */
+html[data-cursor-instrument="on"] body {
+  cursor: none;
+}
+html[data-cursor-instrument="on"] a,
+html[data-cursor-instrument="on"] button,
+html[data-cursor-instrument="on"] input,
+html[data-cursor-instrument="on"] label {
+  cursor: none;
+}
+
+/* Pinned scenes take the visual viewport height; fall back for older browsers */
+.vh {
+  height: 100vh;
+  height: 100svh;
+}
+
+/* Reduced motion: motion verbs collapse to their end states; GSAP checks the flag too */
+/* Reduced motion: CSS transitions on interactive parts collapse to their end state. GSAP scenes
+   snap between their states in useScene. Deliberately not `*`: a universal transition override
+   on pinned sections and pin spacers breaks ScrollTrigger's pin measurements. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  a,
+  button,
+  input,
+  label,
+  .part,
+  .tray,
+  .tray-d,
+  .lid,
+  .tech-key,
+  .cursor,
+  .frame-line,
+  .frame-grid {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background: var(--orange);
+  color: var(--graphite);
+}
+
+/* 10 · Build 05: on desktop the inner block is the frame */
+@media (min-width: 1024px) {
+  .final-inner {
+    inset: var(--frame-inset);
+    top: calc(var(--frame-inset) + 16px);
+  }
+}
