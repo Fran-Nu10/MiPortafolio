@@ -2,7 +2,16 @@
 
 Portfolio personal. Dirección creativa: **ENSAMBLE** (el sitio se construye delante del visitante).
 
-Estado: **fase de diseño cerrándose**. Este repositorio todavía no contiene la implementación; contiene la fuente de verdad estratégica, el mapa de contenido de Selected Work, el manifiesto de assets y los assets reales organizados para la implementación.
+Estado: **implementación de producción** (Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP). El sitio completo vive en `src/`; los documentos de `docs/` siguen siendo la fuente de verdad estratégica y de contenido.
+
+```
+npm install
+npm run dev      # http://localhost:3000
+npm run build && npm run start
+npm run lint
+```
+
+Entrega del brief (formulario final): copiar `.env.example` a `.env.local` y completar `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM`. Sin esas variables el formulario funciona y avisa honestamente que nada fue enviado.
 
 ## Estructura
 
@@ -11,6 +20,13 @@ docs/
   01-documento-maestro-v1.md            Estrategia, principios, arquitectura narrativa
   02-selected-work-content-map-v2.md    Los 4 Featured Builds y qué demuestra cada uno
   03-assets-manifest.md                 Qué asset es qué, dónde se usa, qué falta
+  04-implementation-notes.md            Qué se construyó, decisiones, motion, QA, pendientes
+src/
+  app/                                  layout, page, globals.css, actions/brief.ts
+  components/scenes/                    00–10: Opening · Work · Capabilities · Process · Lab · About · Technology · Final
+  components/system/                    Frame · Cota · Stack · Cursor · Capture · ReservedFace · Sheet · Preloader
+  data/                                 projects · site · system (sólo hechos documentados)
+  lib/                                  motion · store · useScene
 public/
   projects/
     travelsuite360/                     (pendiente: sin capturas todavía)
@@ -23,7 +39,7 @@ Convención de assets: `public/projects/<proyecto>/<proyecto>-<pantalla>[-<estad
 
 ## Diseño
 
-El sistema visual y todas las escenas viven en el canvas de Claude Design (páginas 01–04). El handoff a implementación (Next.js · TypeScript · Tailwind · GSAP · Three.js/R3F cuando esté justificado · Vercel) se hará con un Prompt Maestro una vez cerrado el diseño completo.
+El sistema visual y todas las escenas viven en el canvas de Claude Design (páginas 01–04) y están implementadas en `src/`. El objeto 3D es un stack CSS 3D (no WebGL): la cara superior es DOM vivo y las losas planas no necesitan iluminación — ver `docs/04-implementation-notes.md`.
 
 ## Reglas no negociables (resumen)
 
