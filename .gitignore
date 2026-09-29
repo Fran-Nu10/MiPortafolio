@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# builds
+.next/
+out/
+dist/
+build/
+
+# env
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+Thumbs.db
+*.log
+.vercel
+.turbo
+coverage/
+
+# editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
