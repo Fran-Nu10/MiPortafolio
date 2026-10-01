@@ -59,6 +59,35 @@ The handoff allowed Three.js/R3F "when justified". It is not justified here:
 the browser composites the transforms. Because GSAP reads a CSS custom property's start value
 as 0, every variable tween is a `fromTo` with `immediateRender: true`.
 
+## 00 · Preloader, 01 · Hero, 02 · Manifesto (master prompt §9–§11)
+
+- **Preloader** (`system/Preloader.tsx`): the hero's own world — frame, dot grid, header at
+  00 / 06 — and part 01 arriving (outline in `steps(6)`, then the paper surface) in the exact
+  box and centring of the hero bench. It leaves when the site is really ready: fonts loaded
+  **and** the opening scene built and measured (`store.ready`), with a 900 ms ceiling. It leaves
+  with a snap, never a fade: the hero underneath has the same part in the same place.
+- **Hero** (`scenes/Opening.tsx`): FRANCO filled, NÚÑEZ outline at 0 %, one frontal part. Scroll:
+  guides draw → the part turns to iso and its system appears as outlines → layers fill bottom-up,
+  each landing 25 % of the surname → 100 %. The cursor separates the layers (fine pointers only,
+  60–160 px, live readout on the explode cota) until the name lies down.
+- **The name becomes the base plate**: the real `h1` travels (CSS vars `--nx --ny --lay --ns`:
+  translate, rotateX 54.7°, rotateZ −45°, scale) onto the plate's engraving. The target and the
+  scale are measured from the DOM in the manifesto state (projected iso scale
+  `k = bboxWidth / ((w + h)·cos45)`), so it lands pixel-exact; ink fades to the engraved line on
+  the way and the engraving takes over with a snap. The plate arrives as an outline and fills its
+  surface only after the name has landed (lines before surfaces — and the name stays visible).
+- **Manifesto**: DESIGN / ENGINEERING / PRODUCT are three dimension lines drawn on the model
+  (SVG in frame coordinates, computed from each layer's projected right-hand vertex): 01 =
+  interface, 02–04 = the technical layers, Σ = the whole system, with dashed extension lines.
+  Each word lights the layers it measures (`data-hl` on the stack and the cotas) on scroll and on
+  hover / keyboard focus. On wide screens the words column starts right of the cotas.
+- **Reduced motion** snaps between named resting states (`rest…` labels): part frontal · system
+  outlined · 25 / 50 / 75 / 100 % · name on the plate · each word measured · assembled · frontal.
+- The hero stack explodes around its middle (`<Stack centered>`), so the exploded system stays
+  inside the frame; the hand-off slab ends at exactly Sheet 01's size (`--bench-scale`).
+- The construction world is now strictly orthographic (`.iso-space { perspective: none }`).
+- Any scene rebuilds on a width change; triggers are re-sorted by document order and refreshed.
+
 ## Motion grammar → code
 
 | verb | implementation |

@@ -23,6 +23,8 @@ export interface SystemState {
   tone: "graphite" | "paper";
   /** build 05 · the visitor's brief once sent */
   brief: { name: string; what: string; kind: string } | null;
+  /** the opening scene is built (fonts + layout measured) — the preloader may leave */
+  ready: boolean;
 }
 
 const initial: SystemState = {
@@ -34,6 +36,7 @@ const initial: SystemState = {
   grid: 1,
   tone: "graphite",
   brief: null,
+  ready: false,
 };
 
 let state: SystemState = initial;

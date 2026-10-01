@@ -30,6 +30,8 @@ interface StackProps {
   labels?: boolean;
   /** dashed outline layers (nothing built yet) */
   ghost?: boolean;
+  /** explode around the middle of the stack instead of upward from the base layer */
+  centered?: boolean;
 }
 
 /**
@@ -52,6 +54,7 @@ export function Stack({
   thickness = 4,
   labels = true,
   ghost = false,
+  centered = false,
 }: StackProps) {
   const count = layers.length;
   const vars: Record<string, string | number> = {
@@ -60,7 +63,10 @@ export function Stack({
     "--t": `${thickness}px`,
     "--w": `${width}px`,
     "--h": `${height}px`,
+    "--c": centered ? 1 : 0,
   };
+  // centred explode: everything shifts down by half the stack's height along the axis
+  const lift = `(var(--c) * (var(--explode) + var(--sep, 0px) + var(--t)) * ${(count - 1) / 2})`;
   layers.forEach((_, i) => {
     vars[`--fill-${i}`] = fills?.[i] ?? 1;
   });
@@ -86,7 +92,7 @@ export function Stack({
               top: -height * 0.5,
               width: width * 1.9,
               height: height * 2,
-              transform: `translateZ(calc(-1 * var(--t) - 24px))`,
+              transform: `translateZ(calc(-1 * var(--t) - 24px - ${lift}))`,
               border: "1px solid var(--edge)",
               background: "var(--plate)",
               opacity: "calc(1 - var(--rot))",
@@ -101,7 +107,7 @@ export function Stack({
             style={{
               width: 1,
               height: (count + 1) * (explode + thickness),
-              transform: "rotateX(90deg)",
+              transform: `translateZ(calc(-1 * ${lift})) rotateX(90deg)`,
               transformOrigin: "top center",
               background: "repeating-linear-gradient(to bottom, var(--orange) 0 6px, transparent 6px 12px)",
               opacity: "calc((1 - var(--rot)) * 0.9)",
@@ -122,7 +128,8 @@ export function Stack({
               className="layer absolute inset-0 preserve-3d"
               data-layer={layer.key}
               style={{
-                transform: `translateZ(calc(var(--explode) * ${b} + var(--t) * ${b}))`,
+                // --sep: the cursor separating the layers (Opening), 0 everywhere else
+                transform: `translateZ(calc((var(--explode) + var(--sep, 0px)) * ${b} + var(--t) * ${b} - ${lift}))`,
               }}
             >
               {/* sides (thickness) */}

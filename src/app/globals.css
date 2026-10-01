@@ -49,7 +49,7 @@
 
 /* the name and the frontal stack take less width as the viewport narrows */
 :root {
-  --hero-size: clamp(88px, 16vw, 250px);
+  --hero-size: clamp(88px, 14vw, 230px);
   --bench-scale: 1.25;
 }
 @media (max-width: 1023px) {
@@ -61,7 +61,7 @@
 }
 @media (min-width: 1024px) and (max-width: 1279px) {
   :root {
-    --hero-size: clamp(88px, 14vw, 280px);
+    --hero-size: clamp(88px, 12vw, 230px);
     --bench-scale: 0.95;
   }
 }
@@ -127,9 +127,10 @@ body {
 @media (max-width: 1023px) { .capture { object-position: var(--pos-m, var(--pos)); } }
 
 /* Isometric helpers */
+/* The construction world is a true isometric projection: orthographic, no perspective,
+   no vanishing point. It also makes every projected point computable (cotas, the plate). */
 .iso-space {
-  perspective: 2000px;
-  perspective-origin: 50% 40%;
+  perspective: none;
 }
 .preserve-3d {
   transform-style: preserve-3d;
@@ -195,3 +196,30 @@ html[data-cursor-instrument="on"] label {
     top: calc(var(--frame-inset) + 16px);
   }
 }
+
+/* 02 · Manifesto: a word highlights the layers it measures (scroll or hover/focus) */
+.stack .layer > .face { transition: outline-color .2s; outline: 1px solid transparent; outline-offset: 3px; }
+.stack[data-hl="design"] .layer[data-layer="interface"] > .face,
+.stack[data-hl="engineering"] .layer:not([data-layer="interface"]) > .face,
+.stack[data-hl="product"] .layer > .face { outline-color: var(--orange); }
+.stack[data-hl="product"] .plate { border-color: var(--orange) !important; }
+
+/* 00 · Preloader: the first part arrives — outline first, then the surface */
+@keyframes pl-draw { from { clip-path: inset(0 100% 100% 0); } 60% { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes pl-fill { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.pl-outline { animation: pl-draw .32s steps(6) both; }
+.pl-fill { animation: pl-fill .26s cubic-bezier(.22,1,.36,1) .3s both; }
+@media (prefers-reduced-motion: reduce) {
+  .pl-outline, .pl-fill { animation: none; }
+}
+
+/* 02 · Manifesto cotas (SVG drawn on the model) */
+.m-dims .dim { fill: none; stroke: var(--orange); stroke-width: 1; }
+.m-dims .dim-ext { fill: none; stroke: var(--edge); stroke-width: 1; stroke-dasharray: 3 4; }
+.m-dims .dim-label { fill: var(--bone); font-family: var(--font-plex-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+.m-dims[data-hl="design"] .dim-design,
+.m-dims[data-hl="engineering"] .dim-engineering,
+.m-dims[data-hl="product"] .dim-product { stroke-width: 2; }
+.m-dims[data-hl="design"] .dim-label-design,
+.m-dims[data-hl="engineering"] .dim-label-engineering,
+.m-dims[data-hl="product"] .dim-label-product { fill: var(--orange); }
