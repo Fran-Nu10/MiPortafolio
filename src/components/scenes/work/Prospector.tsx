@@ -40,8 +40,8 @@ export function Prospector() {
     pinVh: { desktop: 3.0, compact: 2.2 },
     states: 7,
     onProgress: (p) => {
-      const note = p < 0.14 ? "technical outline · six real parts" : p < 0.3 ? "each outline fills with its real ingredient" : p < 0.44 ? "the parts are the real hero" : p < 0.56 ? "assemble · snap" : p < 0.78 ? "menu · tracklist" : "product · clásica · interact with the demo";
-      setSystem({ step: 4, status: "Sheet 02 / 04", section: "03 — Selected work · Prospector", note, frame: 1, grid: p < 0.3 ? 0.4 : 0, tone: "graphite" });
+      const note = p < 0.14 ? "trazo técnico · seis piezas reales" : p < 0.3 ? "cada trazo se llena con su ingrediente" : p < 0.44 ? "las piezas eran el hero real" : p < 0.56 ? "ensamble · encastre" : p < 0.78 ? "menú · tracklist" : "producto · clásica · probá la demo";
+      setSystem({ step: 4, status: "Lámina 02 / 04", section: "03 — Proyectos · Prospector", note, frame: 1, grid: p < 0.3 ? 0.4 : 0, tone: "graphite" });
     },
     build: ({ q, gsap, compact }) => {
       const tl = gsap.timeline({ defaults: { ease: "none" } });
@@ -128,7 +128,7 @@ export function Prospector() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Selected work 02 — Prospector" className="vh relative w-full overflow-hidden">
+      <section ref={ref} aria-label="Proyecto 02 — Prospector" className="vh relative w-full overflow-hidden">
         <div className="area area-cq absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
           <SheetHead project={pr} />
           <ProjectWindow project={pr} tone="ink" label="RAYO SMASH · demo · hero → menú → producto">
@@ -172,7 +172,7 @@ export function Prospector() {
             </Screen>
             {/* what the window is showing, in the system's own voice */}
             <div className="t-mono pointer-events-none absolute bottom-2 left-3 text-bone-3" style={{ fontSize: 9, textShadow: "0 1px 2px #000" }} aria-hidden="true">
-              {["outline · 6 parts · real positions", "layers · cut from the real hero", "hero · capa por capa · 1:1", "assemble · snap", "menu · tracklist", "product · clásica"].map((c, i) => (
+              {["trazo · 6 piezas · posición real", "capas · recortadas del hero real", "hero · capa por capa · 1:1", "ensamble · encastre", "menú · tracklist", "producto · clásica"].map((c, i) => (
                 <span key={c} className="rs-cap absolute bottom-0 left-0 whitespace-nowrap" style={{ visibility: i === 0 ? "visible" : "hidden" }}>{c}</span>
               ))}
             </div>

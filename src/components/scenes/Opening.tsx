@@ -66,12 +66,12 @@ export function Opening() {
       if (was < sepUntil.current && p >= sepUntil.current) resetSeparation();
       // the six-step counter follows the construction
       const m = marks.current;
-      if (p < m.drawing) setSystem({ step: 0, status: "Assembling", section: "01 — Hero", note: "scroll draws the guides" });
-      else if (p < m.build) setSystem({ step: 1, status: "Drawing", section: "01 — Hero", note: "lines before surfaces" });
-      else if (p < m.plate) setSystem({ step: 2, status: "Assembling", section: "01 — Hero", note: "each part = 25 % of the surname" });
-      else if (p < m.manifesto) setSystem({ step: 3, status: "Assembling", section: "01 — Hero → Manifesto", note: "the name becomes the base plate" });
-      else if (p < m.assembly + 0.04) setSystem({ step: 4, status: "Assembled", section: "02 — Manifesto", note: "three cotas measure one object" });
-      else setSystem({ step: 4, status: "Assembled", section: "03 — Selected work · 01 / 04", note: "construction explains · product proves" });
+      if (p < m.drawing) setSystem({ step: 0, status: "Armando", section: "01 — Inicio", note: "el scroll traza las guías" });
+      else if (p < m.build) setSystem({ step: 1, status: "Trazando", section: "01 — Inicio", note: "líneas antes que superficies" });
+      else if (p < m.plate) setSystem({ step: 2, status: "Armando", section: "01 — Inicio", note: "cada pieza = 25 % del apellido" });
+      else if (p < m.manifesto) setSystem({ step: 3, status: "Armando", section: "01 — Inicio → Manifiesto", note: "el nombre se vuelve placa base" });
+      else if (p < m.assembly + 0.04) setSystem({ step: 4, status: "Ensamblado", section: "02 — Manifiesto", note: "tres cotas miden un objeto" });
+      else setSystem({ step: 4, status: "Ensamblado", section: "03 — Proyectos · 01 / 04", note: "la construcción explica · el producto demuestra" });
     },
     build: ({ q, gsap, rm, root, compact }) => {
       if (!fontsReady) return null;
@@ -96,7 +96,7 @@ export function Opening() {
       const dims = root.querySelector<SVGSVGElement>(".m-dims")!;
       const handoff = q(".handoff")[0];
       const explodeIso = compact ? ISO_EXPLODE_COMPACT : ISO_EXPLODE;
-      q(".explode-val").forEach((n) => (n.textContent = `explode · ${explodeIso}`));
+      q(".explode-val").forEach((n) => (n.textContent = `despiece · ${explodeIso}`));
       // the assembled slab hands over at exactly the size Sheet 01 shows it (--bench-scale)
       const inner = q(".bench-inner")[0];
       const innerScale = inner.getBoundingClientRect().width / inner.offsetWidth || 1;
@@ -120,10 +120,10 @@ export function Opening() {
       [3, 2, 1].forEach((i, n) => {
         tl.to(stack, { [`--fill-${i}`]: 1, duration: 0.7, ease: rm ? EASE.linear : EASE.product }, `build+=${n * 0.75}`);
         tl.to(nameFill, { clipPath: `inset(0 ${100 - (n + 1) * 25}% 0 0)`, duration: 0.7, ease: EASE.linear }, `build+=${n * 0.75}`);
-        tl.set(nameCota, { attr: { "data-text": `Núñez · ${(n + 1) * 25} % · part 0${i + 1} landed` } }, `build+=${n * 0.75 + 0.7}`);
+        tl.set(nameCota, { attr: { "data-text": `Núñez · ${(n + 1) * 25} % · pieza 0${i + 1} colocada` } }, `build+=${n * 0.75 + 0.7}`);
       });
       tl.to(nameFill, { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: EASE.linear }, "build+=2.25");
-      tl.set(nameCota, { attr: { "data-text": "Núñez · 100 % · the system is understood" } }, "build+=2.95");
+      tl.set(nameCota, { attr: { "data-text": "Núñez · 100 % · el sistema se entiende" } }, "build+=2.95");
 
       // ── 01 → 02 · the name changes function: it becomes the base plate under the system
       tl.addLabel("plate", "build+=3.2");
@@ -219,7 +219,7 @@ export function Opening() {
       // phones: the words column already names them, the cotas carry only their codes
       const D = compact
         ? [dim("design", X1, y0, y1, "01"), dim("engineering", X1, y1, y3, "02–04"), dim("product", X2, y0, y3, "Σ")]
-        : [dim("design", X1, y0, y1, "01 · design"), dim("engineering", X1, y1, y3, "02–04 · engineering"), dim("product", X2, y0, y3, "Σ · product")];
+        : [dim("design", X1, y0, y1, "01 · diseño"), dim("engineering", X1, y1, y3, "02–04 · ingeniería"), dim("product", X2, y0, y3, "Σ · producto")];
       const extsFor: number[][] = [[0, 1], [1, 3], [0, 3]];
 
       // the words column starts right of the cotas on wide screens; on compact layouts it stays on top
@@ -280,7 +280,7 @@ export function Opening() {
         if (!stack) return;
         stack.style.setProperty("--sep", `${proxy.v.toFixed(1)}px`);
         const base = parseFloat(stack.style.getPropertyValue("--explode")) || 0;
-        if (readout) readout.textContent = `explode · ${Math.round(base + proxy.v)}`;
+        if (readout) readout.textContent = `despiece · ${Math.round(base + proxy.v)}`;
       },
     });
     sep.current.to = (v: number) => tween(v);
@@ -310,7 +310,7 @@ export function Opening() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Hero and manifesto" className="vh relative w-full overflow-hidden">
+      <section ref={ref} aria-label="Inicio y manifiesto" className="vh relative w-full overflow-hidden">
         <div className="op-frame absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
           {/* construction guides */}
           <div className="guide absolute left-0 right-0 origin-left scale-x-0" style={{ top: "12%", height: 1, background: "repeating-linear-gradient(to right,#6a716c 0 4px,transparent 4px 10px)" }} />
@@ -342,7 +342,7 @@ export function Opening() {
             <div className="name-rule mt-3 flex items-center gap-4">
               <Cota length="min(44vw, 620px)" tone="orange" />
             </div>
-            <div className="name-cota t-dim mt-3 before:content-[attr(data-text)]" data-text="Núñez · 0 % · awaiting parts 02–04" data-cursor="measure" data-measure="surname · built by the parts" aria-live="polite" />
+            <div className="name-cota t-dim mt-3 before:content-[attr(data-text)]" data-text="Núñez · 0 % · faltan las piezas 02–04" data-cursor="measure" data-measure="apellido · lo arman las piezas" aria-live="polite" />
           </div>
 
           {/* positioning */}
@@ -365,7 +365,7 @@ export function Opening() {
             onPointerMove={onBenchMove}
             onPointerLeave={resetSeparation}
           >
-            <div className="part-label t-mono absolute left-[12%] top-0 text-bone-3 md:left-0">Part 01 · interface · frontal</div>
+            <div className="part-label t-mono absolute left-[12%] top-0 text-bone-3 md:left-0">Pieza 01 · interfaz · frontal</div>
             <div className="bench-inner absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-[0.62] sm:scale-[0.85] md:scale-100">
               <Stack
                 layers={ts.layers}
@@ -383,7 +383,7 @@ export function Opening() {
                       <span className="block">{site.last}</span>
                     </div>
                     <div className="plate-tag t-mono mt-2" style={{ color: "var(--edge)", fontSize: 9, opacity: 0 }}>
-                      base plate · engraved
+                      placa base · grabada
                     </div>
                   </div>
                 }
@@ -393,8 +393,8 @@ export function Opening() {
               <Cota
                 dir="v"
                 length={120}
-                label={<span className="explode-val">explode · {ISO_EXPLODE}</span>}
-                sub={<span className="hidden [@media(hover:hover)]:inline">cursor drags 60–160</span>}
+                label={<span className="explode-val">despiece · {ISO_EXPLODE}</span>}
+                sub={<span className="hidden [@media(hover:hover)]:inline">el cursor separa 60–160</span>}
               />
             </div>
           </div>
@@ -416,7 +416,7 @@ export function Opening() {
                   onFocus={() => hover(HL_BY_WORD[i])}
                   onBlur={() => hover(null)}
                   data-cursor="measure"
-                  data-measure={`measures ${m.measures}`}
+                  data-measure={`mide ${m.measures}`}
                 >
                   {m.word}
                   {i < 2 && <span style={{ color: "var(--orange)", WebkitTextStroke: 0 }}> ×</span>}
@@ -426,7 +426,7 @@ export function Opening() {
                   </span>
                 </button>
                 <p id={`m-clause-${i}`} className="m-clause m-0 mt-2 max-w-[420px] text-[13px] leading-[1.5] text-bone-2" style={{ visibility: "hidden" }}>
-                  <span className="t-dim">§{i + 1} · measures {m.measures}</span>&nbsp; {m.clause}
+                  <span className="t-dim">§{i + 1} · mide {m.measures}</span>&nbsp; {m.clause}
                 </p>
               </div>
             ))}
@@ -435,7 +435,7 @@ export function Opening() {
           {/* handoff note into sheet 01 */}
           <div className="handoff t-mono absolute bottom-0 left-0 flex items-center gap-3 text-bone-3 opacity-0">
             <span className="text-orange">↓</span>
-            <span>the object you watched being built is sheet 01 · TravelSuite360</span>
+            <span>lo que viste armarse es la lámina 01 · TravelSuite360</span>
           </div>
         </div>
       </section>

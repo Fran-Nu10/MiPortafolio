@@ -8,7 +8,7 @@ import { trays, type Tray } from "@/data/system";
 import { projectById, projects } from "@/data/projects";
 import { EASE, ScrollTrigger, prefersReducedMotion } from "@/lib/motion";
 
-const usedIn = (tray: Tray) => Array.from(new Set(tray.parts.map((p) => `sheet 0${projectById[p.from].index}`))).join(" · ");
+const usedIn = (tray: Tray) => Array.from(new Set(tray.parts.map((p) => `lámina 0${projectById[p.from].index}`))).join(" · ");
 
 /**
  * 05 · Capabilities — parts, not services. The four slabs left on the plate are an inventory:
@@ -36,7 +36,7 @@ export function Capabilities() {
         activeRef.current = i;
         setActive(i);
       }
-      setSystem({ step: 5, status: "Assembled", section: "05 — Capabilities", note: p < marks.current[0] + 0.1 ? "the four slabs are an inventory" : `bin 0${i + 1} · ${trays[i].title.toLowerCase()}`, frame: 1, grid: 1, tone: "graphite" });
+      setSystem({ step: 5, status: "Ensamblado", section: "05 — Capacidades", note: p < marks.current[0] + 0.1 ? "las cuatro piezas son un inventario" : `bandeja 0${i + 1} · ${trays[i].title.toLowerCase()}`, frame: 1, grid: 1, tone: "graphite" });
     },
     build: ({ q, gsap, flow }) => {
       const tl = gsap.timeline({ defaults: { ease: "none" } });
@@ -86,18 +86,18 @@ export function Capabilities() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Capabilities" className="relative w-full md:h-[100svh] md:overflow-hidden">
+      <section ref={ref} aria-label="Capacidades" className="relative w-full md:h-[100svh] md:overflow-hidden">
         <div className="relative px-[var(--frame-inset)] pb-16 pt-[calc(var(--frame-top)+24px)] md:absolute md:inset-[var(--frame-inset)] md:top-[var(--frame-top)] md:p-0">
           <div className="cap-head flex flex-col gap-3 md:absolute md:left-[1%] md:top-[3%] md:w-[30%] md:gap-4">
-            <div className="t-dim">05 · Capabilities</div>
-            <h2 className="t-display m-0" style={{ fontSize: "clamp(40px, 5vw, 84px)" }}>Parts,<br />not services</h2>
+            <div className="t-dim">05 · Capacidades</div>
+            <h2 className="t-display m-0" style={{ fontSize: "clamp(40px, 5vw, 84px)" }}>Despiece</h2>
             <p className="m-0 max-w-[420px] text-[15px] leading-[1.5] text-bone-2" style={{ textWrap: "pretty" }}>
-              You just saw four finished products. These are the parts they were built from — sorted into four bins. A part that has no capture stays an empty slot.
+              Cuatro productos terminados, desarmados. No es una lista de servicios: son las piezas que combino para construir un producto entero.
             </p>
           </div>
 
           {/* ── desktop: the inventory (iso, small) + the bin being looked at (frontal, large) */}
-          <div className="absolute bottom-[4%] left-[1%] hidden w-[30%] md:block" style={{ aspectRatio: "1.25" }} role="tablist" aria-label="Part bins">
+          <div className="absolute bottom-[4%] left-[1%] hidden w-[30%] md:block" style={{ aspectRatio: "1.25" }} role="tablist" aria-label="Bandejas de piezas">
             {trays.map((t, i) => {
               const on = active === i;
               const lid = projects[i];
@@ -125,14 +125,14 @@ export function Capabilities() {
                 </div>
               );
             })}
-            <div className="t-dim absolute -bottom-1 left-[4%]" style={{ color: "var(--bone-3)" }}>inventory · iso · click a bin</div>
+            <div className="t-dim absolute -bottom-1 left-[4%]" style={{ color: "var(--bone-3)" }}>inventario · iso · elegí una bandeja</div>
           </div>
 
           <div className="cap-panel-pos absolute right-0 top-[2%] hidden h-[94%] w-[66%] md:block" style={{ perspective: "none" }}>
             <div id="cap-panel" role="tabpanel" aria-label={tray.title} className="cap-panel pw relative flex h-full w-full flex-col border border-bone bg-graphite-2" style={{ ["--rot" as string]: 1, ["--s" as string]: 1 }}>
               <div className="t-mono flex items-center justify-between border-b border-edge px-4 py-3">
                 <span className="text-bone">0{active + 1} · {tray.title} <span className="text-bone-3">· {tray.sub}</span></span>
-                <span className="text-bone-3">used in · {usedIn(tray)}</span>
+                <span className="text-bone-3">usado en · {usedIn(tray)}</span>
               </div>
               <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-3 p-3">
                 {/* keyed by slot: the same four nodes are re-filled, so the scene's masks stay attached */}
@@ -172,7 +172,7 @@ function Part({ part, sizes, compact = false }: { part: Tray["parts"][number]; s
     return (
       <figure className={`cap-part part relative m-0 flex ${h} min-w-0 flex-col justify-end overflow-hidden border border-dashed border-edge p-3`}>
         <figcaption className="t-mono text-bone-3" style={{ fontSize: compact ? 10 : 11 }}>{part.label}</figcaption>
-        <span className="t-dim mt-1" style={{ color: "var(--edge-2)", whiteSpace: "normal" }}>empty slot · {projectById[part.from].name}</span>
+        <span className="t-dim mt-1" style={{ color: "var(--edge-2)", whiteSpace: "normal" }}>espacio vacío · {projectById[part.from].name}</span>
       </figure>
     );
   }

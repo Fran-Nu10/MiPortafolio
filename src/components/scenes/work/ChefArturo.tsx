@@ -20,7 +20,7 @@ const pages = [
   { c: ca.captures[0], fx: 0.12, zm: 1, fy: 0.5, label: "hero · pastelería, merienda y lunch para fiestas" },
   { c: ca.captures[5], fx: 0.2, zm: 1, fy: 0.5, pan: [0.2, 0.8], label: "fechas que importan · 3 rutas de compra" },
   { c: ca.captures[6], fx: 0.25, zm: 1, fy: 0.5, pan: [0.25, 0.75], label: "elegí tu ocasión" },
-  { c: ca.captures[8], fx: 0.495, zm: 1.7, fy: 0.74, label: "pdp · cookie levain · stock del día · mercado pago" },
+  { c: ca.captures[8], fx: 0.495, zm: 1.7, fy: 0.74, label: "ficha · cookie levain · stock del día · mercado pago" },
 ] as const;
 
 /**
@@ -42,14 +42,14 @@ export function ChefArturo() {
       if (p < 0.86)
         setSystem({
           step: 4,
-          status: p < 0.06 ? "Sheet 03 → 04" : "Sheet 04 / 04",
-          section: "03 — Selected work · Chef Arturo",
-          note: p < 0.24 ? "build → rotate → present" : p < 0.45 ? "the image crosses the frame" : p < 0.7 ? "commerce architecture" : "inspect the transaction layer",
+          status: p < 0.06 ? "Lámina 03 → 04" : "Lámina 04 / 04",
+          section: "03 — Proyectos · Chef Arturo",
+          note: p < 0.24 ? "construir → girar → presentar" : p < 0.45 ? "la imagen cruza el marco" : p < 0.7 ? "arquitectura de compra" : "inspeccioná la capa de compra",
           frame: p > 0.2 && p < 0.42 ? 0 : 0.6,
           grid: 0,
           tone: "paper",
         });
-      else setSystem({ status: "Assembled", section: "03 — Selected work · exit", note: "four builds on the plate", frame: 1, grid: 1, tone: "graphite" });
+      else setSystem({ status: "Ensamblado", section: "03 — Proyectos · salida", note: "cuatro proyectos sobre la placa", frame: 1, grid: 1, tone: "graphite" });
     },
     build: ({ q, gsap, compact, root }) => {
       const tl = gsap.timeline({ defaults: { ease: "none" } });
@@ -148,7 +148,7 @@ export function ChefArturo() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Selected work 04 — Chef Arturo" className="vh relative w-full overflow-hidden">
+      <section ref={ref} aria-label="Proyecto 04 — Chef Arturo" className="vh relative w-full overflow-hidden">
         <div className="ca-cream absolute inset-0 bg-[#f3eee4]" style={{ transform: "scaleY(0)" }} />
         <div className="ca-dark absolute inset-0 bg-graphite" style={{ transform: "scaleY(0)" }} />
         <div className="area area-cq absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
@@ -165,7 +165,7 @@ export function ChefArturo() {
               ),
             )}
           </div>
-          <ProjectWindow project={ca} tone="paper" label="the store · 1:1">
+          <ProjectWindow project={ca} tone="paper" label="la tienda · 1:1">
             {pages.map((p, i) => (
               <div key={p.label} className="ca-page absolute inset-0 bg-[#f3eee4]" style={i ? { visibility: "hidden" } : undefined}>
                 <Screen capture={p.c} fx={p.fx} fy={p.fy} zm={p.zm} />
@@ -190,7 +190,7 @@ function PdpMarkers() {
   const items = [
     { y: 79, title: "Stock del día", detail: "catálogo · inventario · capa 04" },
     { y: 84, title: "Agregar al carrito", detail: "carrito → Mercado Pago · capa 03" },
-    { y: 88.5, title: "Consultar por WhatsApp", detail: "segunda ruta · misma PDP" },
+    { y: 88.5, title: "Consultar por WhatsApp", detail: "segunda ruta · misma ficha" },
   ];
   return (
     <div className="ca-markers absolute inset-0" style={{ visibility: "hidden" }}>

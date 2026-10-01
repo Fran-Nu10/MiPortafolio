@@ -32,9 +32,9 @@ export function ModuleFace({ project, active = 0, panels = true }: { project: Pr
 function DrawnFace({ project, active }: { project: Project; active: number }) {
   const modules = project.modules ?? [];
   const m = modules[active];
-  const rows: Array<[string, string]> = [["01 · interface", `${m.name} · screen`]];
+  const rows: Array<[string, string]> = [["01 · interfaz", `${m.name} · pantalla`]];
   if (m.api.length) rows.push(["03 · api", m.api.join(" · ")]);
-  rows.push(["04 · data", m.data.join(" · ")]);
+  rows.push(["04 · datos", m.data.join(" · ")]);
   return (
     <div className="mf relative h-full w-full">
       <div className="mf-body">
@@ -52,7 +52,7 @@ function DrawnFace({ project, active }: { project: Project; active: number }) {
           <div className="mf-panel-in">
             <div className="flex items-baseline justify-between gap-3">
               <div className="mf-title t-display">{m.name}</div>
-              <div className="mf-meta t-mono shrink-0">module 0{active + 1} / 0{modules.length}</div>
+              <div className="mf-meta t-mono shrink-0">módulo 0{active + 1} / 0{modules.length}</div>
             </div>
             {/* the layers this screen runs through, drawn as dimension lines */}
             <div className="mf-rows">
@@ -66,7 +66,7 @@ function DrawnFace({ project, active }: { project: Project; active: number }) {
             </div>
             {/* the screen itself: reserved until its capture lands (public/projects/travelsuite360/) */}
             <div className="mf-slot">
-              <span className="mf-meta t-mono">{m.name.toLowerCase()} · capture · reserved slot</span>
+              <span className="mf-meta t-mono">{m.name.toLowerCase()} · captura · espacio reservado</span>
             </div>
           </div>
         </div>

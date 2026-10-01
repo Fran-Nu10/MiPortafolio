@@ -81,12 +81,15 @@ function LiveWindowOpen({ project, from }: { project: Project; from: { x: number
   useEffect(() => {
     if (phase !== "probing") return;
     const ctl = new AbortController();
+    // an abort from this effect's own cleanup (unmount, StrictMode re-run) is not a failure
+    let disposed = false;
     const t = window.setTimeout(() => ctl.abort(), PROBE_MS);
     fetch(build.url, { mode: "no-cors", cache: "no-store", signal: ctl.signal, referrerPolicy: "strict-origin-when-cross-origin" })
-      .then(() => setPhase((p) => (p === "probing" ? "loading" : p)))
-      .catch(() => setPhase((p) => (p === "probing" ? "failed" : p)))
+      .then(() => !disposed && setPhase((p) => (p === "probing" ? "loading" : p)))
+      .catch(() => !disposed && setPhase((p) => (p === "probing" ? "failed" : p)))
       .finally(() => window.clearTimeout(t));
     return () => {
+      disposed = true;
       window.clearTimeout(t);
       ctl.abort();
     };
@@ -141,31 +144,31 @@ function LiveWindowOpen({ project, from }: { project: Project; from: { x: number
   const phone = !compact && device === "phone";
 
   return (
-    <div ref={rootRef} role="dialog" aria-modal="true" aria-label={`${project.name} · live build`} className="live fixed inset-0 z-[55] bg-graphite" style={{ overscrollBehavior: "contain" }}>
+    <div ref={rootRef} role="dialog" aria-modal="true" aria-label={`${project.name} · en vivo`} className="live fixed inset-0 z-[55] bg-graphite" style={{ overscrollBehavior: "contain" }}>
       <div className="dot-grid absolute inset-0" aria-hidden="true" />
       <div ref={frameRef} className="live-frame absolute flex flex-col">
         {/* the strip: what is open, and the way back */}
         <div className="live-strip t-mono flex items-stretch justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2 px-3">
             <span className="inline-block h-2 w-2 shrink-0" style={{ background: phase === "ready" ? "var(--orange)" : "var(--edge)" }} aria-hidden="true" />
-            <span className="shrink-0 text-bone">0{project.index} · {project.name}</span>
-            <span className="hidden truncate text-bone-3 sm:inline">· {phase === "ready" ? "live · interact" : phase === "failed" ? "the live build did not answer" : "connecting to the live build"} · {build.host}</span>
+            <span className="truncate text-bone">0{project.index} · {project.name}</span>
+            <span className="hidden truncate text-bone-3 sm:inline">· {phase === "ready" ? "en vivo" : phase === "failed" ? "el sitio no respondió" : "conectando con el sitio"} · {build.host}</span>
           </div>
-          <div className="flex items-stretch">
+          <div className="flex shrink-0 items-stretch">
             {!compact && build.responsive && phase !== "failed" && (
-              <div className="hidden items-stretch md:flex" role="group" aria-label="Viewport">
+              <div className="hidden items-stretch md:flex" role="group" aria-label="Ancho de pantalla">
                 {(["full", "phone"] as const).map((d) => (
                   <button key={d} type="button" className="live-btn" aria-pressed={device === d} onClick={() => setDevice(d)} style={{ color: device === d ? "var(--bone)" : "var(--bone-3)" }} data-cursor="magnet">
-                    {d === "full" ? "Desktop" : "390 px"}
+                    {d === "full" ? "Escritorio" : "390 px"}
                   </button>
                 ))}
               </div>
             )}
-            <a href={build.url} target="_blank" rel="noopener noreferrer" className="live-btn text-bone" data-cursor="magnet">
-              Open live <span aria-hidden="true">↗</span>
+            <a href={build.url} target="_blank" rel="noopener noreferrer" className="live-btn text-bone" data-cursor="magnet" aria-label={`Abrir ${project.name} en una pestaña nueva`}>
+              Abrir<span className="hidden sm:inline"> sitio</span> <span aria-hidden="true">↗</span>
             </a>
             <button ref={backRef} type="button" onClick={close} className="live-btn live-back" data-cursor="magnet">
-              <span aria-hidden="true">←</span> Back to portfolio
+              <span aria-hidden="true">←</span> Volver al portfolio
             </button>
           </div>
         </div>
@@ -184,7 +187,7 @@ function LiveWindowOpen({ project, from }: { project: Project; from: { x: number
               )}
               <iframe
                 src={build.url}
-                title={`${project.name} — live build`}
+                title={`${project.name} — sitio en vivo`}
                 className="live-iframe h-full w-full border-0 bg-[#0b0b0d]"
                 style={{ opacity: phase === "ready" ? 1 : 0 }}
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
@@ -200,14 +203,14 @@ function LiveWindowOpen({ project, from }: { project: Project; from: { x: number
               <div className="live-loading-bar h-full w-1/3 bg-orange" />
             </div>
           )}
-          {(phase === "probing" || phase === "loading") && <p className="sr-only" role="status">Loading the live {project.name} build</p>}
+          {(phase === "probing" || phase === "loading") && <p className="sr-only" role="status">Cargando {project.name} en vivo</p>}
           {phase === "failed" && (
             <div role="status" className="absolute inset-x-0 bottom-0 flex flex-col gap-3 border-t border-edge bg-[rgba(31,34,32,.94)] p-5 md:flex-row md:items-center md:justify-between">
               <p className="m-0 max-w-[560px] text-[14px] leading-[1.45] text-bone-2">
-                The live build did not answer inside the window. The capture above is the real screen; the build itself opens in a new tab.
+                El sitio no respondió dentro de la ventana. La captura es la pantalla real; el sitio abre en una pestaña nueva.
               </p>
               <a href={build.url} target="_blank" rel="noopener noreferrer" className="pw-btn t-mono shrink-0 justify-center" style={{ background: "var(--orange)", color: "var(--graphite)", minHeight: 44 }}>
-                Open live <span aria-hidden="true">↗</span>
+                Abrir sitio <span aria-hidden="true">↗</span>
               </a>
             </div>
           )}

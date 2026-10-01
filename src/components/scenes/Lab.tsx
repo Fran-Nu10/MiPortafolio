@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useSceneEnter } from "@/lib/useScene";
 import { setSystem } from "@/lib/store";
-import { experiments, labKindLabel, type Experiment } from "@/data/system";
+import { experiments, labKindLabel, labStateLabel, type Experiment } from "@/data/system";
 
 /**
  * 07 · Lab — loose parts on the bench. Built from data; reserved slots stay reserved.
@@ -12,7 +12,7 @@ import { experiments, labKindLabel, type Experiment } from "@/data/system";
 export function Lab() {
   const ref = useRef<HTMLElement>(null);
   const [openId, setOpenId] = useState<string | null>(null);
-  useSceneEnter(ref, () => setSystem({ step: 5, status: "Loose parts", section: "07 — Lab", note: `${experiments.filter((e) => e.state === "running").length} running · ${experiments.filter((e) => e.state === "reserved").length} reserved`, frame: 1, grid: 1, tone: "graphite" }));
+  useSceneEnter(ref, () => setSystem({ step: 5, status: "Piezas sueltas", section: "07 — Lab", note: `${experiments.filter((e) => e.state === "running").length} en curso · ${experiments.filter((e) => e.state === "reserved").length} reservados`, frame: 1, grid: 1, tone: "graphite" }));
 
   const running = experiments.filter((e) => e.state !== "reserved");
   const reserved = experiments.filter((e) => e.state === "reserved");
@@ -23,9 +23,9 @@ export function Lab() {
         <div className="relative mx-auto" style={{ padding: "calc(var(--frame-inset) + 32px) var(--frame-inset) var(--frame-inset)" }}>
           <div className="flex max-w-[520px] flex-col gap-3">
             <div className="t-dim">07 · Lab</div>
-            <h2 className="t-display m-0" style={{ fontSize: "clamp(36px, 5vw, 72px)" }}>Parts that don&apos;t<br />belong to a build yet</h2>
+            <h2 className="t-display m-0" style={{ fontSize: "clamp(36px, 5vw, 72px)" }}>Piezas sin<br />proyecto</h2>
             <p className="m-0 text-[15px] leading-[1.5] text-bone-2" style={{ textWrap: "pretty" }}>
-              Experiments lie where they were left, in whatever camera they need. Slots are reserved by kind and stay empty until a real experiment lands — nothing here is filled to make the composition prettier.
+              Motion, interacción, 3D, conceptos: pruebas que todavía no pertenecen a un proyecto. Quedan donde se dejaron; cada espacio vacío espera un experimento real.
             </p>
           </div>
 
@@ -43,7 +43,7 @@ export function Lab() {
                 <Slot e={{ ...e, camera: "frontal", slot: { x: 0, y: 0, w: 100, h: 100 } }} open={openId === e.id} onToggle={() => setOpenId(openId === e.id ? null : e.id)} />
               </div>
             ))}
-            <div className="t-dim mt-2" style={{ color: "var(--bone-3)" }}>+ {reserved.length - 3} reserved slots on the desktop bench</div>
+            <div className="t-dim mt-2" style={{ color: "var(--bone-3)" }}>+ {reserved.length - 3} espacios reservados en la versión de escritorio</div>
           </div>
         </div>
       </section>
@@ -64,17 +64,17 @@ function Slot({ e, open, onToggle }: { e: Experiment; open: boolean; onToggle: (
     background: reserved ? "transparent" : "rgba(251,250,246,.06)",
     transform: iso ? "skewX(-14deg)" : undefined,
   };
-  const label = `${labKindLabel[e.kind]} · ${reserved ? "reserved" : e.state}`;
+  const label = `${labKindLabel[e.kind]} · ${labStateLabel[e.state]}`;
   if (reserved) {
     return (
       <div className="absolute box-border flex items-end p-2.5" style={style} aria-label={label}>
-        <span className="t-mono text-bone-3" style={{ fontSize: 9, transform: iso ? "skewX(14deg)" : undefined }}>{labKindLabel[e.kind]} · reserved</span>
+        <span className="t-mono text-bone-3" style={{ fontSize: 9, transform: iso ? "skewX(14deg)" : undefined }}>{labKindLabel[e.kind]} · {labStateLabel.reserved}</span>
       </div>
     );
   }
   return (
     <button type="button" className="absolute box-border flex items-end p-2.5 text-left" style={style} onClick={onToggle} aria-expanded={open} data-cursor="inspect">
-      <span className="t-dim absolute right-2.5 top-2.5">{e.date} · {e.state}</span>
+      <span className="t-dim absolute right-2.5 top-2.5">{e.date} · {labStateLabel[e.state]}</span>
       <span className="t-mono text-bone" style={{ fontSize: 9 }}>{labKindLabel[e.kind]}</span>
       {open && e.note && <span className="absolute left-2.5 top-8 max-w-[90%] text-[12px] leading-[1.4] text-bone-2">{e.note}</span>}
     </button>

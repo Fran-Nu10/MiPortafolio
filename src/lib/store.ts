@@ -31,8 +31,8 @@ export interface SystemState {
 
 const initial: SystemState = {
   step: 0,
-  status: "Assembling",
-  section: "00 — Preloader",
+  status: "Armando",
+  section: "00 — Carga",
   note: "",
   frame: 1,
   grid: 1,

@@ -36,9 +36,9 @@ export function TravelSuite() {
       const i = Math.max(0, m.modules.filter((s) => p >= s).length - 1);
       setSystem({
         step: 4,
-        status: p < m.exit ? "Sheet 01 / 04" : "Sheet 01 → 02",
-        section: "03 — Selected work · TravelSuite360",
-        note: p < m.modules[0] ? "construction explains · product proves" : p < m.exit ? `module 0${i + 1} · ${modules[i]?.name.toLowerCase()}` : "the system leaves as an outline",
+        status: p < m.exit ? "Lámina 01 / 04" : "Lámina 01 → 02",
+        section: "03 — Proyectos · TravelSuite360",
+        note: p < m.modules[0] ? "la construcción explica · el producto demuestra" : p < m.exit ? `módulo 0${i + 1} · ${modules[i]?.name.toLowerCase()}` : "el sistema sale en trazo",
         frame: 1,
         grid: p < 0.2 ? 1 : 0.4,
         tone: "graphite",
@@ -104,10 +104,10 @@ export function TravelSuite() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Selected work 01 — TravelSuite360" className="vh relative w-full overflow-hidden">
+      <section ref={ref} aria-label="Proyecto 01 — TravelSuite360" className="vh relative w-full overflow-hidden">
         <div className="area area-cq absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
           <SheetHead project={ts} />
-          <ProjectWindow project={ts} tone="graphite" label="the system · its modules">
+          <ProjectWindow project={ts} tone="graphite" label="el sistema · módulo por módulo">
             <ModuleFace project={ts} active={0} />
           </ProjectWindow>
         </div>

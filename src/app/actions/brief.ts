@@ -33,7 +33,7 @@ export async function submitBrief(input: BriefInput): Promise<BriefResult> {
 
   const key = process.env.RESEND_API_KEY;
   const to = process.env.CONTACT_TO;
-  const from = process.env.CONTACT_FROM ?? "Build 05 <onboarding@resend.dev>";
+  const from = process.env.CONTACT_FROM ?? "Lámina 05 <onboarding@resend.dev>";
   if (!key || !to) return { ok: true, delivered: false };
 
   try {
@@ -43,8 +43,8 @@ export async function submitBrief(input: BriefInput): Promise<BriefResult> {
       body: JSON.stringify({
         from,
         to: [to],
-        subject: `Build 05 · ${kind} · ${name}`,
-        text: `Name: ${name}\nKind: ${kind}\n\n${what}\n`,
+        subject: `Lámina 05 · ${kind} · ${name}`,
+        text: `Nombre: ${name}\nTipo: ${kind}\n\n${what}\n`,
       }),
       cache: "no-store",
     });
