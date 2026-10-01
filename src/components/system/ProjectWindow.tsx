@@ -41,19 +41,21 @@ export function ProjectWindow({
   const t = tones[tone];
   return (
     <div className={`pw-pos ${className}`} style={style}>
-      <div className="pw preserve-3d" style={{ ["--rot" as string]: 1, ["--s" as string]: 1, color: t.text }}>
-        <div className="pw-strip t-mono flex items-center justify-between gap-3" style={{ borderColor: t.line, background: t.bg }}>
-          <span className="flex min-w-0 items-center gap-2 truncate">
-            <span style={{ color: t.strong }}>0{project.index} · {project.name}</span>
-            <span className="pw-label hidden truncate sm:inline">{label}</span>
-          </span>
-          {controls && <LiveControls project={project} tone={tone} variant="strip" />}
+      <div className="pw-move">
+        <div className="pw preserve-3d" style={{ ["--rot" as string]: 1, ["--s" as string]: 1, color: t.text }}>
+          <div className="pw-strip t-mono flex items-center justify-between gap-3" style={{ borderColor: t.line, background: t.bg }}>
+            <span className="flex min-w-0 items-center gap-2 truncate">
+              <span style={{ color: t.strong }}>0{project.index} · {project.name}</span>
+              <span className="pw-label hidden truncate sm:inline">{label}</span>
+            </span>
+            {controls && <LiveControls project={project} tone={tone} variant="strip" />}
+          </div>
+          <div className="pw-screen relative overflow-hidden" style={{ borderColor: t.line }}>
+            {/* lines before surfaces: the outline is the border, the surface fills with --fill */}
+            <div className="pw-fill absolute inset-0" style={{ background: t.bg }}>{children}</div>
+          </div>
+          {controls && <LiveControls project={project} tone={tone} variant="bar" />}
         </div>
-        <div className="pw-screen relative overflow-hidden" style={{ borderColor: t.line }}>
-          {/* lines before surfaces: the outline is the border, the surface fills with --fill */}
-          <div className="pw-fill absolute inset-0" style={{ background: t.bg }}>{children}</div>
-        </div>
-        {controls && <LiveControls project={project} tone={tone} variant="bar" />}
       </div>
     </div>
   );

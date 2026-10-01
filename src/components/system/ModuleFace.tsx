@@ -32,6 +32,8 @@ export function ModuleFace({ project, active = 0, panels = true }: { project: Pr
                 {m.capture ? <Screen capture={m.capture} fx={0.5} fy={0} sizes="(max-width: 1023px) 100vw, 70vw" /> : <ModulePanel project={project} index={i} />}
               </div>
             ))
+          ) : modules[active]?.capture ? (
+            <Screen capture={modules[active].capture!} fx={0.5} fy={0} sizes="420px" />
           ) : (
             <ModulePanel project={project} index={active} />
           )}

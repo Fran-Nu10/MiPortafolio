@@ -21,15 +21,18 @@ docs/
   02-selected-work-content-map-v2.md    Los 4 Featured Builds y qué demuestra cada uno
   03-assets-manifest.md                 Qué asset es qué, dónde se usa, qué falta
   04-implementation-notes.md            Qué se construyó, decisiones, motion, QA, pendientes
+  05-v2-audit-and-decisions.md          V2: auditoría, KEEP/ADAPT/REBUILD, scroll, Live Project Windows
 src/
   app/                                  layout, page, globals.css, actions/brief.ts
-  components/scenes/                    00–10: Opening · Work · Capabilities · Process · Lab · About · Technology · Final
-  components/system/                    Frame · Cota · Stack · Cursor · Capture · ReservedFace · Sheet · Preloader
-  data/                                 projects · site · system (sólo hechos documentados)
+  components/scenes/                    00–10: Opening · Work (work/: TravelSuite · Prospector · SantiNuca · ChefArturo)
+                                        · Capabilities · Process · Lab · About · Technology · Final
+  components/system/                    Frame · Cota · Stack · Cursor · Capture · Screen · ProjectWindow · ModuleFace
+                                        · LiveWindow · Sheet · Preloader
+  data/                                 projects · live · site · system (sólo hechos documentados)
   lib/                                  motion · store · useScene
 public/
   projects/
-    travelsuite360/                     (pendiente: sin capturas todavía)
+    travelsuite360/                     (pendiente: sin capturas todavía — ver docs/05)
     prospector/                         6 capturas · demo RAYO SMASH
     santi-nuca/                         8 capturas · portfolio editorial
     chef-arturo/                        10 capturas · ecommerce editorial

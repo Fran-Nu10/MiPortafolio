@@ -22,7 +22,13 @@ Capturas necesarias (según Content Map V2, en orden de prioridad):
 | `travelsuite360-crm.png` | CRM | Rack |
 | `travelsuite360-cotizaciones.png` | Cotizaciones | Rack |
 | `travelsuite360-viajes-reservas.png` | Viajes / reservas | Rack |
+| `travelsuite360-reportes-financieros.png` | Reportes financieros (Master Prompt V2) | Módulo 05 de la ventana |
+| `travelsuite360-automations.png` | Automations | Módulo 06 de la ventana |
 | `travelsuite360-usuarios-permisos.png` | Usuarios · permisos (opcional) | Capa 04 · data |
+
+**V2:** cada captura se conecta en `src/data/projects.ts` → `modules[].capture` (import estático como
+las demás). La ventana de Sheet 01 y la cara del hero la muestran en lugar del dibujo del módulo.
+`travelsuite360-cotizaciones.png` puede ser la vista del AI assistant de cotizaciones.
 
 También pendiente: stack real, rol exacto de Franco, nombre público, URL.
 

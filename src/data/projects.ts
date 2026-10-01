@@ -27,6 +27,10 @@ import caOcasion from "../../public/projects/chef-arturo/chef-arturo-elegi-tu-oc
 import caCatalogo from "../../public/projects/chef-arturo/chef-arturo-catalogo-merienda.png";
 import caPdp from "../../public/projects/chef-arturo/chef-arturo-pdp-cookie-levain.png";
 
+import { LIVE, type LiveBuild } from "./live";
+
+export type { LiveBuild };
+
 export type LayerKey = "interface" | "components" | "api" | "data";
 
 export interface Layer {
@@ -41,23 +45,6 @@ export interface Capture {
   alt: string;
   /** Short caption used in the sheet, never a claim. */
   label: string;
-}
-
-/**
- * A live build that can open inside the portfolio (Live Project Window).
- * Only URLs taken from the project's own repository (GitHub homepage field) and verified to
- * answer 200 without X-Frame-Options / CSP frame-ancestors. Anything else stays null.
- */
-export interface LiveBuild {
-  url: string;
-  /** host shown in the window strip */
-  host: string;
-  /** verified embeddable (no X-Frame-Options, no frame-ancestors) — else the window only offers OPEN LIVE */
-  embeddable: boolean;
-  /** the build is responsive: on desktop the window can also show it at phone width */
-  responsive: boolean;
-  /** date the headers were last checked */
-  checked: string;
 }
 
 /** A module of a product system. capture null = documented but not captured yet. */
@@ -127,7 +114,7 @@ export const projects: Project[] = [
     world: "product",
     faceColor: "#f6f7f9",
     pending: ["dashboard", "TravelChat · inbox", "CRM", "cotizaciones · AI assistant", "viajes · reservas", "reportes financieros"],
-    live: null,
+    live: LIVE.travelsuite360,
   },
   {
     id: "prospector",
@@ -158,7 +145,7 @@ export const projects: Project[] = [
     world: "demo",
     faceColor: "#0b0b0b",
     pending: ["real mobile capture"],
-    live: { url: "https://prospector-phi-virid.vercel.app/rayo-smash", host: "prospector · rayo-smash", embeddable: true, responsive: true, checked: "2026-10-01" },
+    live: LIVE.prospector,
   },
   {
     id: "santi-nuca",
@@ -189,7 +176,7 @@ export const projects: Project[] = [
     world: "editorial",
     faceColor: "#f4f3f0",
     pending: ["typeface name"],
-    live: { url: "https://hair-portfolio-two.vercel.app", host: "santi nuca · live", embeddable: true, responsive: true, checked: "2026-10-01" },
+    live: LIVE["santi-nuca"],
   },
   {
     id: "chef-arturo",
@@ -221,7 +208,7 @@ export const projects: Project[] = [
     world: "commerce",
     faceColor: "#f3eee4",
     pending: ["cart capture", "stack"],
-    live: { url: "https://chef-arturoprod.vercel.app", host: "chef arturo · live", embeddable: true, responsive: true, checked: "2026-10-01" },
+    live: LIVE["chef-arturo"],
   },
 ];
 
@@ -241,8 +228,9 @@ export const rayoLayers = [
   { label: "06 · pan inferior", short: "06 · pan", cx: 49.4, cy: 96.4, rx: 9.6, ry: 5.2 },
 ] as const;
 
-/** where the assembled CLÁSICA sits in the menu capture (prospector-menu-tracklist.png), % of the capture */
-export const rayoAssembled = { cx: 49.4, cy: 53.2, w: 14.6, h: 24.4 } as const;
+/** the assembled CLÁSICA in the menu capture (prospector-menu-tracklist.png): an ellipse that hugs the
+ *  burger and leaves out the letters of the title behind it, % of the capture */
+export const rayoAssembled = { cx: 49.5, cy: 53.4, rx: 7.4, ry: 12.3 } as const;
 
 /** the captures are all ~2550 × 1320 */
 export const CAPTURE_RATIO = 2550 / 1320;

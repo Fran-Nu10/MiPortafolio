@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition, type FormEvent } from "react";
+import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { useScene } from "@/lib/useScene";
 import { setSystem, useSystem } from "@/lib/store";
 import { site } from "@/data/site";
@@ -77,13 +77,18 @@ export function Final() {
       }
       setDelivered(res.delivered);
       setSystem({ brief: { name, what, kind }, step: 1, status: "Build 05 · Understand", section: "10 — Build 05", note: "brief received · station 01 of 06" });
-      // the brief rotates into construction; layers 02–04 draw as outlines
-      const root = ref.current;
-      if (root && !prefersReducedMotion()) {
-        gsap.fromTo(root.querySelector(".received"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: EASE.settle, delay: 0.1 });
-      }
     });
   }
+
+  // the brief rotates into construction once it is on screen (layers 02–04 draw as outlines)
+  useEffect(() => {
+    const received = brief ? ref.current?.querySelector(".received") : null;
+    if (!received || prefersReducedMotion()) return;
+    const tw = gsap.fromTo(received, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: EASE.settle, delay: 0.1 });
+    return () => {
+      tw.kill();
+    };
+  }, [brief]);
 
   const hasRoutes = site.contact.email || site.contact.whatsapp || site.contact.booking;
 

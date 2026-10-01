@@ -61,8 +61,9 @@ export function Capabilities() {
       const parts = q(".cap-panel .cap-part");
       [1, 2, 3].forEach((i) => {
         const at = 0.45 + i * 0.95;
-        tl.fromTo(parts, { clipPath: "inset(0 0 0% 0)" }, { clipPath: "inset(0 0 100% 0)", duration: 0.15, ease: EASE.linear, immediateRender: false }, at - 0.18);
-        tl.fromTo(parts, { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 0.25, stagger: 0.04, ease: EASE.snap(3), immediateRender: false }, at);
+        // the bin closes and refills fast: the parts are what you read, not the swap
+        tl.fromTo(parts, { clipPath: "inset(0 0 0% 0)" }, { clipPath: "inset(0 0 100% 0)", duration: 0.1, ease: EASE.linear, immediateRender: false }, at - 0.12);
+        tl.fromTo(parts, { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 0.18, stagger: 0.03, ease: EASE.snap(3), immediateRender: false }, at);
       });
       tl.to({}, { duration: 0.6 });
       const D = tl.duration();

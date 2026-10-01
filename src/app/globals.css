@@ -260,9 +260,10 @@ html[data-cursor-instrument="on"] label {
   left: 50%;
   top: var(--pw-top, calc(50% + var(--pw-dy)));
   width: var(--pw-w, min(86cqw, calc((100cqh - var(--pw-reserve, 132px)) * 1.932)));
-  /* centring lives in `translate`, so scenes can move the window with transform (x / y) */
-  translate: -50% -50%;
+  transform: translate(-50%, -50%);
 }
+/* scenes move the window through .pw-move (x / y), never the centred .pw-pos (GSAP owns transform) */
+.pw-move { position: relative; }
 .pw {
   position: relative;
   transform-origin: 50% 50%;

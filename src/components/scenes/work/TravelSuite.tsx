@@ -56,7 +56,7 @@ export function TravelSuite() {
       tl.addLabel("rest0", 0);
       // every value a later tween changes gets an explicit state at 0, so scrubbing back restores it
       tl.set(pw, { "--s": s0, "--rot": 1, "--fill": 1 }, 0);
-      tl.set(q(".pw-pos")[0], { x: 0 }, 0);
+      tl.set(q(".pw-move")[0], { x: 0 }, 0);
       tl.fromTo([strip, ...bar], { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.3, ease: EASE.linear, immediateRender: true }, 0.55);
       tl.fromTo(head, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.35, ease: EASE.linear, immediateRender: true }, 0.1);
       // PRESENT: the slab becomes the window
@@ -81,7 +81,7 @@ export function TravelSuite() {
       tl.fromTo(pw, { "--rot": 1, "--s": 1 }, { "--rot": 0, "--s": 0.42, duration: 0.9, ease: EASE.product, immediateRender: false }, "exit");
       tl.to([strip, ...bar, head], { clipPath: "inset(0 100% 0 0)", duration: 0.25, ease: EASE.linear }, "exit");
       tl.fromTo(pw, { "--fill": 1 }, { "--fill": 0, duration: 0.3, ease: EASE.linear, immediateRender: false }, "exit+=0.7");
-      tl.fromTo(q(".pw-pos")[0], { x: 0 }, { x: () => -window.innerWidth, duration: 0.5, ease: EASE.linear, immediateRender: false }, "exit+=1.0");
+      tl.fromTo(q(".pw-move")[0], { x: 0 }, { x: () => -window.innerWidth, duration: 0.5, ease: EASE.linear, immediateRender: false }, "exit+=1.0");
       tl.addLabel("rest99", tl.duration());
       return tl;
     },

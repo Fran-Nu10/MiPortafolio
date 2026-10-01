@@ -59,14 +59,13 @@ export function Prospector() {
         caps.forEach((c, k) => tl.set(c, { visibility: k === i ? "visible" : "hidden" }, at));
       };
 
-      tl.addLabel("rest0", 0);
       cap(0, 0);
       tl.set(canvas, { "--fx": 0.494 }, 0);
       tl.set(layers, { autoAlpha: 1 }, 0);
       tl.fromTo(head, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.3, ease: EASE.linear, immediateRender: true }, 0);
 
       // ── DRAW: the technical outline, at the real place of each ingredient
-      tl.fromTo(ell, { attr: { "stroke-dashoffset": 1 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.35, stagger: 0.08, ease: EASE.snap(5), immediateRender: true }, 0.1);
+      tl.fromTo(ell, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.35, stagger: 0.08, ease: EASE.snap(5), immediateRender: true }, 0.1);
       tl.fromTo(leaders, { scaleX: 0 }, { scaleX: 1, transformOrigin: "left center", duration: 0.15, stagger: 0.08, ease: EASE.linear, immediateRender: true }, 0.35);
       tl.fromTo(labels, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.15, stagger: 0.08, ease: EASE.snap(3), immediateRender: true }, 0.45);
       tl.addLabel("rest1", 1.05);
@@ -80,7 +79,7 @@ export function Prospector() {
       tl.addLabel("rest2", 2.2);
 
       // ── PRESENT: the cut-outs were the real hero all along — the page opens around them
-      tl.to(ell, { attr: { "stroke-dashoffset": 1 }, duration: 0.2, ease: EASE.linear }, 2.25);
+      tl.to(ell, { clipPath: "inset(0 0 0 100%)", duration: 0.2, ease: EASE.linear }, 2.25);
       tl.to([...leaders, ...labels], { clipPath: "inset(0 100% 0 0)", duration: 0.2, ease: EASE.linear }, 2.25);
       cap(2, 2.4);
       tl.fromTo(heroEl, { clipPath: "inset(0% 50% 0% 50%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.8, ease: EASE.product, immediateRender: true }, 2.4);
@@ -96,7 +95,7 @@ export function Prospector() {
       const snapAt = 4.45;
       tl.set(layers, { autoAlpha: 0 }, snapAt);
       const a = rayoAssembled;
-      tl.fromTo(menuEl, { clipPath: `ellipse(0% 0% at ${a.cx}% ${a.cy}%)` }, { clipPath: `ellipse(${a.w * 0.54}% ${a.h * 0.54}% at ${a.cx}% ${a.cy}%)`, duration: 0.01, immediateRender: true }, snapAt);
+      tl.fromTo(menuEl, { clipPath: `ellipse(0% 0% at ${a.cx}% ${a.cy}%)` }, { clipPath: `ellipse(${a.rx}% ${a.ry}% at ${a.cx}% ${a.cy}%)`, duration: 0.01, immediateRender: true }, snapAt);
       tl.addLabel("rest4", snapAt + 0.15);
 
       // ── the menu opens around the burger: the product is the interface
@@ -144,12 +143,15 @@ export function Prospector() {
                   <Capture capture={hero} sizes={SIZES} position="center center" />
                 </div>
               ))}
-              {/* the technical outline */}
-              <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                {rayoLayers.map((l, i) => (
-                  <ellipse key={l.label} className="rs-ell" cx={l.cx} cy={l.cy} rx={l.rx} ry={l.ry} fill="none" stroke={i % 2 ? "var(--bone-3)" : "var(--bone)"} strokeWidth={1} vectorEffect="non-scaling-stroke" pathLength={1} strokeDasharray={1} strokeDashoffset={1} />
-                ))}
-              </svg>
+              {/* the technical outline: one hairline ellipse per part, at its real place */}
+              {rayoLayers.map((l, i) => (
+                <div
+                  key={l.label}
+                  className="rs-ell pointer-events-none absolute rounded-[50%]"
+                  style={{ left: `${l.cx - l.rx}%`, top: `${l.cy - l.ry}%`, width: `${l.rx * 2}%`, height: `${l.ry * 2}%`, border: `1px solid ${i % 2 ? "var(--bone-3)" : "var(--bone)"}`, clipPath: "inset(0 100% 0 0)" }}
+                  aria-hidden="true"
+                />
+              ))}
               {rayoLayers.map((l) => (
                 <div key={l.label} className="pointer-events-none absolute flex items-center gap-1.5" style={{ left: `${l.cx + l.rx + 0.6}%`, top: `${l.cy}%`, transform: "translateY(-50%)" }} aria-hidden="true">
                   <span className="rs-leader block h-px w-4 bg-orange md:w-8" />

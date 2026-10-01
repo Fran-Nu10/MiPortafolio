@@ -57,7 +57,7 @@ export function ChefArturo() {
       const dark = q(".ca-dark")[0];
       const head = q(".sheet-head")[0];
       const pw = q(".pw")[0];
-      const pos = q(".pw-pos")[0];
+      const pos = q(".pw-move")[0];
       const strip = q(".pw-strip")[0];
       const bar = q(".pw-controls-bar");
       const pageEls = q(".ca-page");
@@ -80,7 +80,7 @@ export function ChefArturo() {
       const ah = ((ARCH.b - ARCH.t) / 100) * (cw / CAPTURE_RATIO);
       const archClip = `inset(${ay}px ${sec.width - ax - aw}px ${sec.height - ay - ah}px ${ax}px round ${aw / 2}px ${aw / 2}px 0px 0px)`;
 
-      tl.addLabel("rest0", 0);
+      // reduced motion: the first resting state is the frontal hero (no half-built sheet)
       canvases.forEach((c, i) => tl.set(c, { "--fx": pages[i].fx }, 0));
       tl.set(pos, { x: 0, y: 0 }, 0);
       tl.set(arch, { visibility: "hidden" }, 0);

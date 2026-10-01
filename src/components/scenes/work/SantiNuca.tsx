@@ -50,11 +50,11 @@ export function SantiNuca() {
       const rule = q(".sn-rule")[0];
       const numeral = q(".sn-numeral")[0];
       const head = q(".sheet-head")[0];
-      const pos = q(".pw-pos")[0];
+      const pos = q(".pw-move")[0];
       const pages = q(".sn-page");
       const canvases = pages.map((p) => p.querySelector<HTMLElement>(".screen-canvas")!);
 
-      tl.addLabel("rest0", 0);
+      // reduced motion: the first resting state is the page already set (no half-wiped paper)
       canvases.forEach((c, i) => tl.set(c, { "--fx": spreads[i].fx }, 0));
       tl.set(pos, { y: () => window.innerHeight * 0.6 }, 0);
       pages.forEach((pg, i) => i && tl.set(pg, { yPercent: 100, visibility: "hidden" }, 0));
@@ -63,7 +63,6 @@ export function SantiNuca() {
       tl.fromTo(rule, { scaleY: 0 }, { scaleY: 1, transformOrigin: "top center", duration: 0.4, ease: EASE.linear, immediateRender: true }, 0.35);
       tl.fromTo(numeral, { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 0.4, ease: EASE.settle, immediateRender: true }, 0.5);
       tl.fromTo(head, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.3, ease: EASE.linear, immediateRender: true }, 0.7);
-      tl.addLabel("rest1", 1.0);
       // the first spread rises as a page; the numeral steps back
       tl.fromTo(pos, { y: () => window.innerHeight * 0.6 }, { y: 0, duration: 0.7, ease: EASE.product, immediateRender: true }, 1.0);
       tl.to([rule, numeral], { clipPath: "inset(0 0 100% 0)", duration: 0.3, ease: EASE.linear }, 1.3);
