@@ -1,41 +1,27 @@
 import type { Project } from "@/data/projects";
 
-const isConfirmed = (v?: string) => !!v && !v.startsWith("[");
-
-/** Left rail of a project sheet: title, category and the documented answers only. */
-export function Rail({ project, paper = false, compact = false }: { project: Project; paper?: boolean; compact?: boolean }) {
-  const ink = paper ? "#3e3e3e" : "var(--bone-2)";
+/**
+ * The head of a project sheet in V2: sheet number, name, category and the structural claim.
+ * Short on purpose — the product underneath takes the frame.
+ */
+export function SheetHead({ project, paper = false, className = "" }: { project: Project; paper?: boolean; className?: string }) {
   const strong = paper ? "#14120f" : "var(--bone)";
-  const rows: Array<[string, string | undefined]> = [
-    ["What", project.what],
-    ["Challenge", project.challenge],
-    ["Made", project.made],
-    ["Role", project.role],
-  ];
+  const dim = paper ? "#6b6a66" : "var(--bone-3)";
   return (
-    <div className="rail flex flex-col gap-3" style={{ color: ink }}>
-      <h2 className="t-display m-0 whitespace-pre-line" style={{ fontSize: compact ? 36 : "clamp(36px, 3.6vw, 56px)", color: strong }}>
-        {project.displayName}
-      </h2>
-      <div className="t-mono" style={{ color: paper ? "#8a8a86" : "var(--bone-3)" }}>{project.category}</div>
-      {rows.filter(([, v]) => isConfirmed(v)).map(([k, v]) => (
-        <div key={k} className={`flex-col gap-1 border-t pt-2 ${compact ? "hidden md:flex" : "hidden md:flex"}`} style={{ borderColor: paper ? "rgba(20,18,15,.25)" : "var(--edge)" }}>
-          <div className="t-dim">{k}</div>
-          <p className="m-0 text-[13px] leading-[1.45]" style={{ textWrap: "pretty" }}>{v}</p>
+    <div className={`sheet-head ${className}`}>
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <div className="t-dim">03.0{project.index} · sheet 0{project.index} / 04</div>
+        <h2 className="sheet-name t-display m-0" style={{ color: strong }}>{project.name}</h2>
+        <div className="t-mono" style={{ color: dim }}>
+          {project.category}
+          {project.stack.length > 0 && <span className="hidden lg:inline"> · {project.stack.join(" · ")}</span>}
         </div>
-      ))}
-    </div>
-  );
-}
-
-/** The title block that signs every sheet: project · sheet number · stack (documented only) · drawn by. */
-export function TitleBlock({ project, type }: { project: Project; type: string }) {
-  return (
-    <div className="title-block t-mono grid grid-cols-2 border border-edge" style={{ width: 340, fontSize: 10 }}>
-      <div className="border-b border-r border-edge px-3 py-2"><span className="text-bone-3">Project</span><br />{project.name}</div>
-      <div className="border-b border-edge px-3 py-2"><span className="text-bone-3">Sheet</span><br />0{project.index} / 04 · {type}</div>
-      <div className="border-r border-edge px-3 py-2"><span className="text-bone-3">Stack</span><br />{project.stack.length ? project.stack.join(" · ") : "—"}</div>
-      <div className="px-3 py-2"><span className="text-bone-3">Drawn by</span><br />F. Núñez</div>
+        {/* the documented description, for readers who don't watch the drawing */}
+        <p className="sr-only">{project.what}</p>
+      </div>
+      <p className="m-0 hidden max-w-[400px] pb-1 text-right text-[14px] leading-[1.45] md:block" style={{ color: paper ? "#3e3e3e" : "var(--bone-2)", textWrap: "pretty" }}>
+        {project.claim}
+      </p>
     </div>
   );
 }
