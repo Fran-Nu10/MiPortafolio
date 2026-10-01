@@ -20,18 +20,8 @@ export interface Tray {
 
 const p = projectById;
 
+/** bins with real captures first; the bin still waiting for captures closes the row */
 export const trays: Tray[] = [
-  {
-    id: "digital-products",
-    title: "Digital products",
-    sub: "SaaS · dashboards · operating systems",
-    parts: [
-      { label: "data table", from: "travelsuite360", capture: null },
-      { label: "inbox thread", from: "travelsuite360", capture: null },
-      { label: "CRM record", from: "travelsuite360", capture: null },
-      { label: "quote · reservation", from: "travelsuite360", capture: null },
-    ],
-  },
   {
     id: "commerce",
     title: "Commerce experiences",
@@ -41,6 +31,17 @@ export const trays: Tray[] = [
       { label: "3 purchase modes", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[5].src, alt: "Fechas que importan", position: "center 45%" } },
       { label: "tracklist menu", from: "prospector", capture: { src: p.prospector.captures[3].src, alt: "RAYO SMASH tracklist menu", position: "center 60%" } },
       { label: "product · add to cart", from: "prospector", capture: { src: p.prospector.captures[4].src, alt: "RAYO SMASH product page", position: "center 30%" } },
+    ],
+  },
+  {
+    id: "interactive-web",
+    title: "Interactive web",
+    sub: "motion · 3D · scroll storytelling",
+    parts: [
+      { label: "layered hero", from: "prospector", capture: { src: p.prospector.captures[0].src, alt: "RAYO SMASH layered hero", position: "center center" } },
+      { label: "image expansion", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[2].src, alt: "Chef Arturo image at full bleed", position: "center 60%" } },
+      { label: "editorial spreads", from: "santi-nuca", capture: { src: p["santi-nuca"].captures[4].src, alt: "Santi Nuca triptych", position: "center 40%" } },
+      { label: "this site · Ensamble", from: "prospector", capture: null },
     ],
   },
   {
@@ -55,14 +56,14 @@ export const trays: Tray[] = [
     ],
   },
   {
-    id: "interactive-web",
-    title: "Interactive web",
-    sub: "motion · 3D · scroll storytelling",
+    id: "digital-products",
+    title: "Digital products",
+    sub: "SaaS · dashboards · operating systems",
     parts: [
-      { label: "layered hero", from: "prospector", capture: { src: p.prospector.captures[0].src, alt: "RAYO SMASH layered hero", position: "center center" } },
-      { label: "image expansion", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[2].src, alt: "Chef Arturo image at full bleed", position: "center 60%" } },
-      { label: "editorial spreads", from: "santi-nuca", capture: { src: p["santi-nuca"].captures[4].src, alt: "Santi Nuca triptych", position: "center 40%" } },
-      { label: "this site · Ensamble", from: "prospector", capture: null },
+      { label: "data table", from: "travelsuite360", capture: null },
+      { label: "inbox thread", from: "travelsuite360", capture: null },
+      { label: "CRM record", from: "travelsuite360", capture: null },
+      { label: "quote · reservation", from: "travelsuite360", capture: null },
     ],
   },
 ];
