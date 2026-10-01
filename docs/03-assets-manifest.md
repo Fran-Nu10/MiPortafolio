@@ -11,18 +11,35 @@ Regla: **ningún asset se inventa**. Si una pantalla no está capturada, se marc
 
 ## 01 · TravelSuite360 — `public/projects/travelsuite360/`
 
-**Estado: PENDIENTE — sin capturas en el repo.**
+Capturas reales entregadas el 01/10/2026 (2000 px de ancho). **Datos personales difuminados antes de
+publicar**: nombres y teléfonos de clientes (CRM), lista de conversaciones, mensajes del cliente, su
+teléfono y nombres del equipo (TravelChat). Métricas e interfaz intactas.
 
-Capturas necesarias (según Content Map V2, en orden de prioridad):
-
-| Archivo esperado | Pantalla | Uso en el diseño |
+| Archivo | Pantalla | Uso en el diseño |
 |---|---|---|
+| `travelsuite360-travelchat.png` | TravelChat · inbox, handover IA → humano, documentación del pasajero | Módulo 01 · cara del hero (part 01) · Capabilities |
+| `travelsuite360-crm.png` | CRM · totales, embudo comercial, distribución, tabla de clientes | Módulo 02 · Capabilities |
+| `travelsuite360-ai-assistant.png` | Asistente IA · crear cotización, borradores, documentos | Módulo 03 · Capabilities |
+| `travelsuite360-reportes-financieros.png` | Reportes financieros · UYU / USD, evolución de ingresos | Módulo 04 · Capabilities |
+
+Pendientes (los módulos siguen dibujados hasta que lleguen): `travelsuite360-viajes-reservas.png`,
+`travelsuite360-automations.png`; opcional `travelsuite360-usuarios-permisos.png`.
+Se conectan en `src/data/projects.ts` → `modules[].capture` (con `fx` / `fy` / `zm` / `pan` para el
+encuadre en teléfonos). También pendiente: stack real, rol exacto, URL pública si corresponde.
+
+---|---|---|
 | `travelsuite360-dashboard.png` | Dashboard | Slab frontal · Elevation (W-T2) · rack · mobile pan window |
 | `travelsuite360-travelchat.png` | TravelChat / inbox | Módulo activo del rack (W-T3) |
 | `travelsuite360-crm.png` | CRM | Rack |
 | `travelsuite360-cotizaciones.png` | Cotizaciones | Rack |
 | `travelsuite360-viajes-reservas.png` | Viajes / reservas | Rack |
+| `travelsuite360-reportes-financieros.png` | Reportes financieros (Master Prompt V2) | Módulo 05 de la ventana |
+| `travelsuite360-automations.png` | Automations | Módulo 06 de la ventana |
 | `travelsuite360-usuarios-permisos.png` | Usuarios · permisos (opcional) | Capa 04 · data |
+
+**V2:** cada captura se conecta en `src/data/projects.ts` → `modules[].capture` (import estático como
+las demás). La ventana de Sheet 01 y la cara del hero la muestran en lugar del dibujo del módulo.
+`travelsuite360-cotizaciones.png` puede ser la vista del AI assistant de cotizaciones.
 
 También pendiente: stack real, rol exacto de Franco, nombre público, URL.
 
@@ -85,7 +102,7 @@ Pendiente: captura del carrito (W-C5 sigue con placeholder), stack real.
 
 ## Pendientes globales
 
-- TravelSuite360: todo.
+- TravelSuite360: viajes · reservas, automations; stack y rol.
 - Carrito de Chef Arturo.
 - Portrait real para About (`public/about/franco-portrait.png`, a definir).
 - Nombres públicos definitivos, descripciones factuales, URLs y rol por proyecto.

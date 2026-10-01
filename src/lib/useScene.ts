@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, type RefObject } from "react";
-import { gsap, ScrollTrigger, registerGsap, prefersReducedMotion } from "./motion";
+import { gsap, ScrollTrigger, registerGsap, prefersReducedMotion, isCompact } from "./motion";
 
 export interface SceneApi {
   /** the pinned root element */
@@ -10,12 +10,17 @@ export interface SceneApi {
   q: (sel: string) => HTMLElement[];
   /** true when the visitor prefers reduced motion — build the same timeline, it will snap between its states */
   rm: boolean;
+  /** below the layout breakpoint (phones, portrait tablets): the scene has its own, shorter composition */
+  compact: boolean;
+  /** the scene runs as normal flow (no pin) on this viewport */
+  flow: boolean;
   gsap: typeof gsap;
 }
 
 interface SceneOptions {
-  /** total scroll distance while pinned, in viewport heights (e.g. 1.5 = 150vh) */
-  pinVh?: number;
+  /** total scroll distance while pinned, in viewport heights (e.g. 1.5 = 150vh).
+   *  Compact viewports never inherit the desktop distance blindly: pass `{ desktop, compact }`. */
+  pinVh?: number | { desktop: number; compact: number };
   /** number of discrete states the timeline snaps to under reduced motion */
   states?: number;
   /** id for ScrollTrigger debugging */
@@ -24,8 +29,10 @@ interface SceneOptions {
   onProgress?: (p: number) => void;
   onEnter?: () => void;
   onEnterBack?: () => void;
-  /** on phones: "flow" = no pin, the timeline scrubs while the section passes (for scenes with inputs) */
+  /** on compact viewports: "flow" = no pin, the timeline scrubs while the section passes */
   mobile?: "pin" | "flow";
+  /** flow range (ScrollTrigger start/end) when the scene flows */
+  flowRange?: [string, string];
   /** return the scrubbed timeline; return null for a scene without pin/scrub */
   build: (api: SceneApi) => gsap.core.Timeline | null;
   deps?: unknown[];
@@ -68,7 +75,10 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
     const setup = () => {
       ctx = gsap.context(() => {
         const q = (sel: string) => Array.from(root.querySelectorAll<HTMLElement>(sel));
-        const tl = o.build({ root, q, rm, gsap });
+        const compact = isCompact();
+        const flow = o.mobile === "flow" && compact;
+        root.dataset.flow = flow ? "1" : "0";
+        const tl = o.build({ root, q, rm, gsap, compact, flow });
         if (!tl) return;
         tl.pause();
         // reduced motion: the timeline is never played between states. A scene can name its
@@ -80,16 +90,18 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
           .sort((a, b) => a - b);
         const stops = rest.length ? rest : Array.from({ length: (o.states ?? 4) + 1 }, (_, i) => i / (o.states ?? 4));
         const snap = (p: number) => stops[Math.min(stops.length - 1, Math.floor(p * stops.length))];
-        const flow = o.mobile === "flow" && window.matchMedia("(max-width: 1023px)").matches;
+        const pinVh = typeof o.pinVh === "object" ? (compact ? o.pinVh.compact : o.pinVh.desktop) : (o.pinVh ?? 1);
+        const [fStart, fEnd] = o.flowRange ?? ["top 80%", "top 20%"];
         ScrollTrigger.create({
           id: o.id,
           trigger: root,
-          start: flow ? "top 70%" : "top top",
-          end: flow ? "top 10%" : `+=${Math.round((o.pinVh ?? 1) * 100)}%`,
+          start: flow ? fStart : "top top",
+          end: flow ? fEnd : `+=${Math.round(pinVh * 100)}%`,
           pin: !flow,
           pinSpacing: true,
           anticipatePin: 1,
-          scrub: rm ? true : 0.6,
+          // touch: less smoothing, so the drawing follows the finger instead of trailing it
+          scrub: rm ? true : compact ? 0.3 : 0.5,
           invalidateOnRefresh: true,
           animation: tl,
           onUpdate: (self) => {

@@ -17,7 +17,9 @@ export function Technology() {
 
   useScene(ref, {
     id: "technology",
-    pinVh: 1.2,
+    pinVh: { desktop: 1, compact: 0 },
+    mobile: "flow",
+    flowRange: ["top 80%", "top 20%"],
     states: 3,
     onProgress: () => setSystem({ step: 5, status: "Engraved", section: "09 — Technology", note: "no logos · no badges · no bars", frame: 1, grid: 0.6, tone: "graphite" }),
     build: ({ q, gsap }) => {
@@ -32,16 +34,17 @@ export function Technology() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Technology" className="vh relative w-full overflow-hidden">
-        <div className="absolute" style={{ inset: "var(--frame-inset)", top: "calc(var(--frame-inset) + 16px)" }}>
-          <div className="absolute left-[2%] top-[4%] flex w-[60%] flex-col gap-3">
+      <section ref={ref} aria-label="Technology" className="relative w-full md:h-[100svh] md:overflow-hidden">
+        <div className="relative px-[var(--frame-inset)] pb-16 pt-[calc(var(--frame-top)+40px)] md:absolute md:inset-[var(--frame-inset)] md:top-[var(--frame-top)] md:p-0">
+          <div className="flex flex-col gap-3 md:absolute md:left-[2%] md:top-[4%] md:w-[60%]">
             <div className="t-dim">09 · Technology</div>
             <h2 className="t-display m-0" style={{ fontSize: "clamp(32px, 4vw, 56px)" }}>Engraved on the plate</h2>
           </div>
 
-          <div className="absolute left-[2%] right-[2%] top-[24%] h-[62%] md:top-[26%]" style={{ perspective: 1600 }}>
-            <div className="plate-top relative h-full w-full border border-edge bg-plate" style={{ transform: "skewX(-8deg)", transformOrigin: "50% 100%" }}>
-              <div className="flex h-full flex-col gap-5 p-6 md:p-10" style={{ transform: "skewX(8deg)" }}>
+          <div className="relative mt-8 md:absolute md:left-[2%] md:right-[2%] md:top-[26%] md:mt-0 md:h-[62%]" style={{ perspective: 1600 }}>
+            {/* the plate is drawn in oblique on wide screens; on phones it stays square to the screen (no overflow) */}
+            <div className="plate-top relative h-full w-full border border-edge bg-plate md:[transform:skewX(-8deg)]" style={{ transformOrigin: "50% 100%" }}>
+              <div className="flex h-full flex-col gap-5 p-5 md:p-10 md:[transform:skewX(8deg)]">
                 <div className="t-mono flex justify-between text-edge"><span>Base plate · every build stood here</span><span className="hidden md:inline">engraved 2024 — 2026</span></div>
                 <ul className="m-0 flex list-none flex-wrap gap-x-8 gap-y-3 p-0">
                   {technologies.map((t) => {
@@ -86,7 +89,7 @@ export function Technology() {
               </div>
             </div>
           </div>
-          <p className="absolute bottom-0 left-[2%] m-0 max-w-[560px] text-[13px] leading-[1.5] text-bone-3">
+          <p className="relative m-0 mt-6 max-w-[560px] text-[13px] leading-[1.5] text-bone-3 md:absolute md:bottom-0 md:left-[2%] md:mt-0">
             Technology supports the work; it does not present it. Only Prospector (Next.js, Tailwind, Framer Motion, Apify) and Chef Arturo (Mercado Pago, WhatsApp) have documented links; the other builds light nothing until confirmed.
           </p>
         </div>

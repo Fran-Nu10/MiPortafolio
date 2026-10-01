@@ -1,5 +1,10 @@
 # 04 · Implementation notes
 
+> **V2 (branch `feat/portfolio-v2`):** Selected Work is now four scenes, scroll budgets are per
+> viewport, Capabilities and the project presentations follow BUILD → PRESENT → INTERACT, and the
+> live builds open inside the site. Audit, decisions, scroll tables and Live Windows:
+> `05-v2-audit-and-decisions.md`. The sections below describe V1 where V2 did not change them.
+
 Production implementation of the ENSAMBLE system. This file records what was built, the
 decisions that deviate from the design handoff and why, how the motion system is wired, and
 what still needs Franco.

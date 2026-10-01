@@ -20,16 +20,17 @@ export interface Tray {
 
 const p = projectById;
 
+/** the four bins; every part is a crop of a real screen or an explicit empty slot */
 export const trays: Tray[] = [
   {
     id: "digital-products",
     title: "Digital products",
     sub: "SaaS · dashboards · operating systems",
     parts: [
-      { label: "data table", from: "travelsuite360", capture: null },
-      { label: "inbox thread", from: "travelsuite360", capture: null },
-      { label: "CRM record", from: "travelsuite360", capture: null },
-      { label: "quote · reservation", from: "travelsuite360", capture: null },
+      { label: "inbox · AI → human handover", from: "travelsuite360", capture: { src: p.travelsuite360.captures[0].src, alt: "TravelSuite360 TravelChat inbox", position: "62% 35%" } },
+      { label: "CRM · commercial funnel", from: "travelsuite360", capture: { src: p.travelsuite360.captures[1].src, alt: "TravelSuite360 CRM funnel", position: "50% 22%" } },
+      { label: "AI quote assistant", from: "travelsuite360", capture: { src: p.travelsuite360.captures[2].src, alt: "TravelSuite360 AI quote assistant", position: "55% 55%" } },
+      { label: "financial reports · UYU / USD", from: "travelsuite360", capture: { src: p.travelsuite360.captures[3].src, alt: "TravelSuite360 financial reports", position: "50% 45%" } },
     ],
   },
   {

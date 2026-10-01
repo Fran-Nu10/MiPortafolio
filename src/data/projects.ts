@@ -1,5 +1,10 @@
 import type { StaticImageData } from "next/image";
 
+// TravelSuite360 · client names, phones and staff names blurred before publishing
+import tsTravelChat from "../../public/projects/travelsuite360/travelsuite360-travelchat.png";
+import tsCrm from "../../public/projects/travelsuite360/travelsuite360-crm.png";
+import tsAiAssistant from "../../public/projects/travelsuite360/travelsuite360-ai-assistant.png";
+import tsReportes from "../../public/projects/travelsuite360/travelsuite360-reportes-financieros.png";
 // Prospector · demo RAYO SMASH
 import prospectorHeroExploded from "../../public/projects/prospector/prospector-hero-exploded.png";
 import prospectorHeroExplodedScroll from "../../public/projects/prospector/prospector-hero-exploded-scroll.png";
@@ -27,6 +32,10 @@ import caOcasion from "../../public/projects/chef-arturo/chef-arturo-elegi-tu-oc
 import caCatalogo from "../../public/projects/chef-arturo/chef-arturo-catalogo-merienda.png";
 import caPdp from "../../public/projects/chef-arturo/chef-arturo-pdp-cookie-levain.png";
 
+import { LIVE, type LiveBuild } from "./live";
+
+export type { LiveBuild };
+
 export type LayerKey = "interface" | "components" | "api" | "data";
 
 export interface Layer {
@@ -41,6 +50,21 @@ export interface Capture {
   alt: string;
   /** Short caption used in the sheet, never a claim. */
   label: string;
+}
+
+/** A module of a product system. capture null = documented but not captured yet. */
+export interface Module {
+  name: string;
+  /** the documented API / data parts it runs through (from the layers) */
+  api: string[];
+  data: string[];
+  capture: Capture | null;
+  /** phones: the region of the capture the portrait window frames (0–1), and an optional pan */
+  fx?: number;
+  fy?: number;
+  /** phones only: zoom into the screen so dense UI stays legible */
+  zm?: number;
+  pan?: [number, number];
 }
 
 export interface Project {
@@ -63,7 +87,19 @@ export interface Project {
   /** Hex colours of the product's own top face, so the plate reads four identities. */
   faceColor: string;
   pending: string[];
+  /** the live build, when one is public and verified */
+  live: LiveBuild | null;
+  /** product systems: the modules the frontal window steps through */
+  modules?: Module[];
 }
+
+/** TravelSuite360 screens (shared by the sheet's captures and its modules) */
+const tsScreens = {
+  chat: { src: tsTravelChat, alt: "TravelSuite360 TravelChat: the agency inbox with open and closed conversations, a chat where the AI hands over to a human agent, passenger documents, commercial state and an AI summary", label: "travelchat · inbox" },
+  crm: { src: tsCrm, alt: "TravelSuite360 CRM: client totals, conversion rates through the commercial funnel, distribution by state and priority, average value per client and the client table", label: "crm" },
+  ai: { src: tsAiAssistant, alt: "TravelSuite360 AI assistant: start a travel quote with AI, continue a draft or open recent documents, with the quote history on the left", label: "asistente ia · cotizaciones" },
+  reports: { src: tsReportes, alt: "TravelSuite360 financial reports: leads, conversion and bookings, monthly income and averages in UYU and USD, and income evolution charts", label: "reportes financieros" },
+} satisfies Record<string, Capture>;
 
 export const projects: Project[] = [
   {
@@ -83,10 +119,21 @@ export const projects: Project[] = [
       { key: "api", label: "03 · api · automation", parts: ["inbox · TravelChat", "quotes", "reservations", "CRM", "automations", "auth · roles"] },
       { key: "data", label: "04 · data", parts: ["agencies", "users · permissions", "trips", "quotes", "reservations", "conversations", "multi-agency"] },
     ],
-    captures: [],
+    captures: [tsScreens.chat, tsScreens.crm, tsScreens.ai, tsScreens.reports],
+    // module list: Content Map V2 + Master Prompt V2. Modules with a capture show the real screen;
+    // the others stay drawn until theirs lands in public/projects/travelsuite360/.
+    modules: [
+      { name: "TravelChat · inbox", api: ["inbox · TravelChat"], data: ["conversations"], capture: tsScreens.chat, fx: 0.5, fy: 0.4, zm: 1.2, pan: [0.5, 0.88] },
+      { name: "CRM", api: ["CRM"], data: ["agencies", "users · permissions"], capture: tsScreens.crm, fx: 0.15, fy: 0.16, zm: 1.2, pan: [0.15, 0.85] },
+      { name: "Cotizaciones · AI assistant", api: ["quotes"], data: ["quotes"], capture: tsScreens.ai, fx: 0.55, fy: 0.52, zm: 1.2 },
+      { name: "Reportes financieros", api: [], data: ["quotes", "reservations"], capture: tsScreens.reports, fx: 0.12, fy: 0.24, zm: 1.2, pan: [0.12, 0.5] },
+      { name: "Viajes · reservas", api: ["reservations"], data: ["trips", "reservations"], capture: null },
+      { name: "Automations", api: ["automations", "auth · roles"], data: ["multi-agency"], capture: null },
+    ],
     world: "product",
     faceColor: "#f6f7f9",
-    pending: ["dashboard", "TravelChat · inbox", "CRM", "cotizaciones", "viajes · reservas"],
+    pending: ["viajes · reservas", "automations", "public demo URL"],
+    live: LIVE.travelsuite360,
   },
   {
     id: "prospector",
@@ -117,6 +164,7 @@ export const projects: Project[] = [
     world: "demo",
     faceColor: "#0b0b0b",
     pending: ["real mobile capture"],
+    live: LIVE.prospector,
   },
   {
     id: "santi-nuca",
@@ -147,6 +195,7 @@ export const projects: Project[] = [
     world: "editorial",
     faceColor: "#f4f3f0",
     pending: ["typeface name"],
+    live: LIVE["santi-nuca"],
   },
   {
     id: "chef-arturo",
@@ -178,7 +227,29 @@ export const projects: Project[] = [
     world: "commerce",
     faceColor: "#f3eee4",
     pending: ["cart capture", "stack"],
+    live: LIVE["chef-arturo"],
   },
 ];
 
 export const projectById = Object.fromEntries(projects.map((p) => [p.id, p])) as Record<Project["id"], Project>;
+
+/**
+ * RAYO SMASH · the six real ingredients as they sit in the exploded hero capture
+ * (prospector-hero-exploded.png), top to bottom. Centre and radii in % of the capture, so the
+ * portfolio can cut each layer out of the real image and move it — the drawing becomes the product.
+ */
+export const rayoLayers = [
+  { label: "01 · pan superior", short: "01 · pan", cx: 49.4, cy: 12.4, rx: 9.2, ry: 7.4 },
+  { label: "02 · bacon", short: "02 · bacon", cx: 49.4, cy: 30.4, rx: 11.6, ry: 6.4 },
+  { label: "03 · medallón + cheddar", short: "03 · medallón", cx: 49.2, cy: 46.9, rx: 9.6, ry: 6.4 },
+  { label: "04 · cebolla", short: "04 · cebolla", cx: 49.4, cy: 63.2, rx: 10.2, ry: 6.0 },
+  { label: "05 · medallón + cheddar", short: "05 · medallón", cx: 49.4, cy: 79.6, rx: 10.2, ry: 6.0 },
+  { label: "06 · pan inferior", short: "06 · pan", cx: 49.4, cy: 96.4, rx: 9.6, ry: 5.2 },
+] as const;
+
+/** the assembled CLÁSICA in the menu capture (prospector-menu-tracklist.png): an ellipse that hugs the
+ *  burger and leaves out the letters of the title behind it, % of the capture */
+export const rayoAssembled = { cx: 49.5, cy: 53.4, rx: 7.4, ry: 12.3 } as const;
+
+/** the captures are all ~2550 × 1320 */
+export const CAPTURE_RATIO = 2550 / 1320;

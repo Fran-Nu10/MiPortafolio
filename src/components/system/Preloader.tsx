@@ -36,7 +36,7 @@ export function Preloader() {
     <div aria-hidden="true" className="fixed inset-0 z-[60] bg-graphite">
       <div className="dot-grid absolute inset-0" />
       {/* the frame */}
-      <div className="absolute" style={{ inset: "var(--frame-inset)", top: "calc(var(--frame-inset) + 16px)", border: "1px solid var(--hairline)" }}>
+      <div className="absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)", border: "1px solid var(--hairline)" }}>
         {/* the first part — same box and centring as the hero bench (Opening.tsx) */}
         <div className="absolute right-[-10%] top-[46%] h-[54%] w-[120%] md:right-[2%] md:top-[4%] md:h-[92%] md:w-[46%]">
           <div className="t-mono absolute left-[12%] top-0 text-bone-3 md:left-0">Part 01 · interface · frontal</div>
@@ -51,7 +51,7 @@ export function Preloader() {
       {/* the header strip, identical to Frame at step 0 */}
       <div
         className="t-mono absolute flex items-center justify-between"
-        style={{ left: "var(--frame-inset)", right: "var(--frame-inset)", top: "calc(var(--frame-inset) - 16px)", color: "var(--bone-3)" }}
+        style={{ left: "var(--frame-inset)", right: "var(--frame-inset)", top: "calc(var(--frame-top) - 32px)", color: "var(--bone-3)" }}
       >
         <div className="flex items-center gap-5">
           <span style={{ color: "var(--bone)", fontWeight: 500 }}>FN</span>
