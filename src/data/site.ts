@@ -7,14 +7,14 @@ export const site = {
   first: "Franco",
   last: "Núñez",
   initials: "FN",
-  positioning: "Digital product designer & developer",
+  positioning: "Diseño y desarrollo de productos digitales",
   tagline:
-    "Builds digital products from brief to production. Strategy, design, engineering and launch — assembled by one person, on purpose.",
-  basedIn: "Montevideo, Uruguay",
-  buildingFor: "anywhere",
-  does: "Designs and builds digital products end to end — strategy, design, engineering, launch.",
+    "Productos digitales, de la idea a producción. Estrategia, diseño, ingeniería y lanzamiento, ensamblados por una sola persona.",
+  basedIn: "Montevideo, Uruguay · UTC−3",
+  buildingFor: "proyectos en cualquier país",
+  does: "Diseña y construye productos digitales de punta a punta: estrategia, diseño, ingeniería y lanzamiento.",
   worksWith:
-    "Founders, studios and businesses that need one person who can take a product from brief to production.",
+    "Fundadores, estudios y empresas que necesitan a una persona capaz de llevar un producto de la idea a producción.",
   timezone: "UTC−3",
   /** Real contact routes. null = not supplied yet → route omitted from the UI. */
   contact: {
@@ -24,11 +24,11 @@ export const site = {
     replyTime: null as string | null,
   },
   workingSince: null as string | null,
-  steps: ["Understand", "Strategize", "Design", "Prototype", "Engineer", "Launch"] as const,
+  steps: ["Entender", "Definir", "Diseñar", "Prototipar", "Construir", "Lanzar"] as const,
   manifesto: [
-    { word: "Design", measures: "01", clause: "Art direction, interface systems, motion. A product nobody can build is a drawing." },
-    { word: "Engineering", measures: "02–04", clause: "Every layer is mine: data, API, components. No handoff gaps." },
-    { word: "Product", measures: "Σ", clause: "Business is the first layer. If it doesn't change a number, it doesn't get built." },
+    { word: "Diseño", measures: "01", clause: "Dirección de arte, interfaz y motion. Si no se puede construir, es solo un dibujo." },
+    { word: "Ingeniería", measures: "02–04", clause: "Datos, API, componentes: cada capa es mía. Nada se pierde entre el diseño y el código." },
+    { word: "Producto", measures: "Σ", clause: "El negocio es la primera capa. Si no mueve un número, no se construye." },
   ],
 };
 
