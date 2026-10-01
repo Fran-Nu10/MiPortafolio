@@ -8,6 +8,8 @@ export function registerGsap() {
   if (registered || typeof window === "undefined") return;
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({ ignoreMobileResize: true });
+  // development only: QA scripts inspect the triggers
+  if (process.env.NODE_ENV !== "production") Object.assign(window, { __ST: ScrollTrigger, __gsap: gsap });
   registered = true;
 }
 

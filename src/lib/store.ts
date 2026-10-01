@@ -25,6 +25,8 @@ export interface SystemState {
   brief: { name: string; what: string; kind: string } | null;
   /** the opening scene is built (fonts + layout measured) — the preloader may leave */
   ready: boolean;
+  /** the Live Project Window: which build is open and the frontal window it grows from */
+  live: { id: string; from: { x: number; y: number; w: number; h: number } | null } | null;
 }
 
 const initial: SystemState = {
@@ -37,6 +39,7 @@ const initial: SystemState = {
   tone: "graphite",
   brief: null,
   ready: false,
+  live: null,
 };
 
 let state: SystemState = initial;

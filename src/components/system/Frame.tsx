@@ -18,12 +18,14 @@ export function Frame() {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-40">
       <div className="frame-grid dot-grid absolute inset-0 transition-opacity duration-500" style={{ opacity: grid }} />
+      {/* the header band: content that flows under the strip never collides with the counter */}
+      <div className="absolute left-0 right-0 top-0 transition-colors duration-300" style={{ height: "calc(var(--frame-top) - 12px)", background: paper ? "#f4f3f0" : "var(--graphite)" }} />
       {/* hairline frame */}
-      <div className="frame-line absolute transition-opacity duration-500" style={{ inset: "var(--frame-inset)", top: "calc(var(--frame-inset) + 16px)", border: `1px solid ${line}`, opacity: frame }} />
+      <div className="frame-line absolute transition-opacity duration-500" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)", border: `1px solid ${line}`, opacity: frame }} />
       {/* header strip */}
       <div
         className="t-mono absolute flex items-center justify-between"
-        style={{ left: "var(--frame-inset)", right: "var(--frame-inset)", top: "calc(var(--frame-inset) - 16px)", color: text }}
+        style={{ left: "var(--frame-inset)", right: "var(--frame-inset)", top: "calc(var(--frame-top) - 32px)", color: text }}
       >
         <div className="flex items-center gap-5">
           <span style={{ color: strong, fontWeight: 500 }}>{site.initials}</span>
