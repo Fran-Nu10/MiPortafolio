@@ -17,7 +17,7 @@ export function Process() {
 
   useScene(ref, {
     id: "process",
-    pinVh: 3,
+    pinVh: { desktop: 2.0, compact: 1.3 },
     states: 6,
     onProgress: (p) => {
       const i = Math.min(5, Math.floor(p * 6));
@@ -66,7 +66,7 @@ export function Process() {
   return (
     <div className="scene-slot">
       <section ref={ref} aria-label="Process" className="vh relative w-full overflow-hidden">
-        <div className="absolute overflow-hidden" style={{ inset: "var(--frame-inset)", top: "calc(var(--frame-inset) + 16px)" }}>
+        <div className="absolute overflow-hidden" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
           <div className="absolute left-[2%] top-[4%] flex w-[60%] flex-col gap-3">
             <div className="t-dim">06 · Process</div>
             <h2 className="t-display m-0" style={{ fontSize: "clamp(36px, 5vw, 72px)" }}>The same object,<br />six stations</h2>

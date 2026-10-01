@@ -43,6 +43,32 @@ export interface Capture {
   label: string;
 }
 
+/**
+ * A live build that can open inside the portfolio (Live Project Window).
+ * Only URLs taken from the project's own repository (GitHub homepage field) and verified to
+ * answer 200 without X-Frame-Options / CSP frame-ancestors. Anything else stays null.
+ */
+export interface LiveBuild {
+  url: string;
+  /** host shown in the window strip */
+  host: string;
+  /** verified embeddable (no X-Frame-Options, no frame-ancestors) — else the window only offers OPEN LIVE */
+  embeddable: boolean;
+  /** the build is responsive: on desktop the window can also show it at phone width */
+  responsive: boolean;
+  /** date the headers were last checked */
+  checked: string;
+}
+
+/** A module of a product system. capture null = documented but not captured yet. */
+export interface Module {
+  name: string;
+  /** the documented API / data parts it runs through (from the layers) */
+  api: string[];
+  data: string[];
+  capture: Capture | null;
+}
+
 export interface Project {
   id: "travelsuite360" | "prospector" | "santi-nuca" | "chef-arturo";
   index: number;
@@ -63,6 +89,10 @@ export interface Project {
   /** Hex colours of the product's own top face, so the plate reads four identities. */
   faceColor: string;
   pending: string[];
+  /** the live build, when one is public and verified */
+  live: LiveBuild | null;
+  /** product systems: the modules the frontal window steps through */
+  modules?: Module[];
 }
 
 export const projects: Project[] = [
@@ -84,9 +114,20 @@ export const projects: Project[] = [
       { key: "data", label: "04 · data", parts: ["agencies", "users · permissions", "trips", "quotes", "reservations", "conversations", "multi-agency"] },
     ],
     captures: [],
+    // module list: Content Map V2 + Master Prompt V2 (TravelChat, CRM, reportes financieros, AI assistant · cotizaciones).
+    // Captures go in public/projects/travelsuite360/ (see docs/03-assets-manifest.md); each one fills its module.
+    modules: [
+      { name: "TravelChat · inbox", api: ["inbox · TravelChat"], data: ["conversations"], capture: null },
+      { name: "CRM", api: ["CRM"], data: ["agencies", "users · permissions"], capture: null },
+      { name: "Cotizaciones · AI assistant", api: ["quotes"], data: ["quotes"], capture: null },
+      { name: "Viajes · reservas", api: ["reservations"], data: ["trips", "reservations"], capture: null },
+      { name: "Reportes financieros", api: [], data: ["quotes", "reservations"], capture: null },
+      { name: "Automations", api: ["automations", "auth · roles"], data: ["multi-agency"], capture: null },
+    ],
     world: "product",
     faceColor: "#f6f7f9",
-    pending: ["dashboard", "TravelChat · inbox", "CRM", "cotizaciones", "viajes · reservas"],
+    pending: ["dashboard", "TravelChat · inbox", "CRM", "cotizaciones · AI assistant", "viajes · reservas", "reportes financieros"],
+    live: null,
   },
   {
     id: "prospector",
@@ -117,6 +158,7 @@ export const projects: Project[] = [
     world: "demo",
     faceColor: "#0b0b0b",
     pending: ["real mobile capture"],
+    live: { url: "https://prospector-phi-virid.vercel.app/rayo-smash", host: "prospector · rayo-smash", embeddable: true, responsive: true, checked: "2026-10-01" },
   },
   {
     id: "santi-nuca",
@@ -147,6 +189,7 @@ export const projects: Project[] = [
     world: "editorial",
     faceColor: "#f4f3f0",
     pending: ["typeface name"],
+    live: { url: "https://hair-portfolio-two.vercel.app", host: "santi nuca · live", embeddable: true, responsive: true, checked: "2026-10-01" },
   },
   {
     id: "chef-arturo",
@@ -178,7 +221,28 @@ export const projects: Project[] = [
     world: "commerce",
     faceColor: "#f3eee4",
     pending: ["cart capture", "stack"],
+    live: { url: "https://chef-arturoprod.vercel.app", host: "chef arturo · live", embeddable: true, responsive: true, checked: "2026-10-01" },
   },
 ];
 
 export const projectById = Object.fromEntries(projects.map((p) => [p.id, p])) as Record<Project["id"], Project>;
+
+/**
+ * RAYO SMASH · the six real ingredients as they sit in the exploded hero capture
+ * (prospector-hero-exploded.png), top to bottom. Centre and radii in % of the capture, so the
+ * portfolio can cut each layer out of the real image and move it — the drawing becomes the product.
+ */
+export const rayoLayers = [
+  { label: "01 · pan superior", short: "01 · pan", cx: 49.4, cy: 12.4, rx: 9.2, ry: 7.4 },
+  { label: "02 · bacon", short: "02 · bacon", cx: 49.4, cy: 30.4, rx: 11.6, ry: 6.4 },
+  { label: "03 · medallón + cheddar", short: "03 · medallón", cx: 49.2, cy: 46.9, rx: 9.6, ry: 6.4 },
+  { label: "04 · cebolla", short: "04 · cebolla", cx: 49.4, cy: 63.2, rx: 10.2, ry: 6.0 },
+  { label: "05 · medallón + cheddar", short: "05 · medallón", cx: 49.4, cy: 79.6, rx: 10.2, ry: 6.0 },
+  { label: "06 · pan inferior", short: "06 · pan", cx: 49.4, cy: 96.4, rx: 9.6, ry: 5.2 },
+] as const;
+
+/** where the assembled CLÁSICA sits in the menu capture (prospector-menu-tracklist.png), % of the capture */
+export const rayoAssembled = { cx: 49.4, cy: 53.2, w: 14.6, h: 24.4 } as const;
+
+/** the captures are all ~2550 × 1320 */
+export const CAPTURE_RATIO = 2550 / 1320;

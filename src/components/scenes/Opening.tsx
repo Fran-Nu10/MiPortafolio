@@ -7,13 +7,14 @@ import { site } from "@/data/site";
 import { projectById } from "@/data/projects";
 import { Stack } from "@/components/system/Stack";
 import { Cota } from "@/components/system/Cota";
-import { ReservedFace } from "@/components/system/ReservedFace";
+import { ModuleFace } from "@/components/system/ModuleFace";
 import { EASE, gsap, isCoarsePointer, prefersReducedMotion } from "@/lib/motion";
 
 /** iso projection constants (orthographic): rotateZ(-45deg) then rotateX(54.7deg) */
 const C45 = Math.SQRT1_2;
 const COS_X = Math.cos((54.7 * Math.PI) / 180);
 const ISO_EXPLODE = 110;
+const ISO_EXPLODE_COMPACT = 64; // phones: the system reads with less depth
 const SEP_RANGE = 50; // the cursor separates the layers within 60–160 px
 
 type Hl = "none" | "design" | "engineering" | "product";
@@ -55,7 +56,8 @@ export function Opening() {
 
   useScene(ref, {
     id: "opening",
-    pinVh: 5.5,
+    // phones: the same drawings in ~half the gesture (5.5 → 3.0 viewport heights)
+    pinVh: { desktop: 4.2, compact: 2.8 },
     states: 12,
     deps: [fontsReady],
     onProgress: (p) => {
@@ -71,7 +73,7 @@ export function Opening() {
       else if (p < m.assembly + 0.04) setSystem({ step: 4, status: "Assembled", section: "02 — Manifesto", note: "three cotas measure one object" });
       else setSystem({ step: 4, status: "Assembled", section: "03 — Selected work · 01 / 04", note: "construction explains · product proves" });
     },
-    build: ({ q, gsap, rm, root }) => {
+    build: ({ q, gsap, rm, root, compact }) => {
       if (!fontsReady) return null;
       const tl = gsap.timeline({ defaults: { ease: "none" } });
       const frame = q(".op-frame")[0];
@@ -93,8 +95,8 @@ export function Opening() {
       const clauses = q(".m-clause");
       const dims = root.querySelector<SVGSVGElement>(".m-dims")!;
       const handoff = q(".handoff")[0];
-      // phones and portrait tablets: the bench sits under the name and never leaves the screen
-      const compact = window.matchMedia("(max-width: 1023px)").matches;
+      const explodeIso = compact ? ISO_EXPLODE_COMPACT : ISO_EXPLODE;
+      q(".explode-val").forEach((n) => (n.textContent = `explode · ${explodeIso}`));
       // the assembled slab hands over at exactly the size Sheet 01 shows it (--bench-scale)
       const inner = q(".bench-inner")[0];
       const innerScale = inner.getBoundingClientRect().width / inner.offsetWidth || 1;
@@ -109,7 +111,7 @@ export function Opening() {
       //    and its system appears as outlines: components · API · data
       tl.addLabel("draw", 0);
       tl.to(guides, { scaleX: 1, duration: 0.6, stagger: 0.1, ease: EASE.linear }, "draw");
-      tl.fromTo(stack, { "--rot": 1, "--explode": "0px" }, { "--rot": 0, "--explode": `${ISO_EXPLODE}px`, duration: 1, ease: EASE.product, immediateRender: true }, "draw+=0.2");
+      tl.fromTo(stack, { "--rot": 1, "--explode": "0px" }, { "--rot": 0, "--explode": `${explodeIso}px`, duration: 1, ease: EASE.product, immediateRender: true }, "draw+=0.2");
       tl.to(partLabel, { opacity: 0, duration: 0.2 }, "draw+=0.2");
       tl.to(explodeCota, { opacity: 1, duration: 0.2 }, "draw+=0.9");
 
@@ -128,7 +130,7 @@ export function Opening() {
       tl.to([tagline, guides, explodeCota, nameCota, nameRule], { opacity: 0, duration: 0.3 }, "plate");
       tl.to(
         bench,
-        compact ? { xPercent: -6, y: 0, scale: 0.9, duration: 1.2, ease: EASE.product } : { xPercent: -78, scale: 0.8, duration: 1.2, ease: EASE.product },
+        compact ? { xPercent: -4, y: -16, scale: 0.8, duration: 1.2, ease: EASE.product } : { xPercent: -78, scale: 0.8, duration: 1.2, ease: EASE.product },
         "plate",
       );
       // lines before surfaces: the plate arrives as an outline (the name can land on it), and its
@@ -142,11 +144,13 @@ export function Opening() {
       tl.addLabel("assembly", `manifesto+=${W * 3 + 0.9}`);
       tl.to(stack, { "--explode": "0px", duration: 0.5, ease: EASE.snap(4) }, "assembly+=0.3");
       tl.to(plate, { opacity: 0, duration: 0.4 }, "assembly+=1.1");
-      tl.to(
-        bench,
-        compact ? { xPercent: -4, scale: endScale, y: -110, duration: 1.1, ease: EASE.product } : { xPercent: -8, scale: endScale, y: -90, duration: 1.1, ease: EASE.product },
-        "assembly+=1.1",
-      );
+      // the slab is handed over at the exact place and size Sheet 01's window starts from:
+      // the centre of the frame, offset by --pw-dy (measured on the untransformed bench)
+      const fb = frame.getBoundingClientRect();
+      const bb = bench.getBoundingClientRect();
+      const pwDy = parseFloat(getComputedStyle(root).getPropertyValue("--pw-dy")) || 44;
+      const hand = { x: fb.left + fb.width / 2 - (bb.left + bb.width / 2), y: fb.top + fb.height / 2 + pwDy - (bb.top + bb.height / 2) };
+      tl.to(bench, { xPercent: 0, x: hand.x, y: hand.y, scale: endScale, duration: 1.1, ease: EASE.product }, "assembly+=1.1");
       tl.to(stack, { "--rot": 1, duration: 1.1, ease: EASE.product }, "assembly+=1.1");
       tl.fromTo(handoff, { opacity: 0 }, { opacity: 1, duration: 0.3, immediateRender: true }, "assembly+=2.1");
       tl.to({}, { duration: 0.4 });
@@ -212,7 +216,10 @@ export function Opening() {
         const label = el("text", { x: x + 5, y: mid, class: `dim-label dim-label-${key}`, transform: `rotate(-90 ${x + 5} ${mid})`, opacity: 0, "text-anchor": "middle", dy: 9 }, code);
         return { path, label };
       };
-      const D = [dim("design", X1, y0, y1, "01 · design"), dim("engineering", X1, y1, y3, "02–04 · engineering"), dim("product", X2, y0, y3, "Σ · product")];
+      // phones: the words column already names them, the cotas carry only their codes
+      const D = compact
+        ? [dim("design", X1, y0, y1, "01"), dim("engineering", X1, y1, y3, "02–04"), dim("product", X2, y0, y3, "Σ")]
+        : [dim("design", X1, y0, y1, "01 · design"), dim("engineering", X1, y1, y3, "02–04 · engineering"), dim("product", X2, y0, y3, "Σ · product")];
       const extsFor: number[][] = [[0, 1], [1, 3], [0, 3]];
 
       // the words column starts right of the cotas on wide screens; on compact layouts it stays on top
@@ -304,7 +311,7 @@ export function Opening() {
   return (
     <div className="scene-slot">
       <section ref={ref} aria-label="Hero and manifesto" className="vh relative w-full overflow-hidden">
-        <div className="op-frame absolute" style={{ inset: "var(--frame-inset)", top: "calc(var(--frame-inset) + 16px)" }}>
+        <div className="op-frame absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
           {/* construction guides */}
           <div className="guide absolute left-0 right-0 origin-left scale-x-0" style={{ top: "12%", height: 1, background: "repeating-linear-gradient(to right,#6a716c 0 4px,transparent 4px 10px)" }} />
           <div className="guide absolute left-0 right-0 origin-left scale-x-0" style={{ top: "54%", height: 1, background: "repeating-linear-gradient(to right,#6a716c 0 4px,transparent 4px 10px)" }} />
@@ -339,7 +346,7 @@ export function Opening() {
           </div>
 
           {/* positioning */}
-          <div className="tagline absolute left-0 top-[34%] flex max-w-[560px] flex-col gap-4 md:top-auto md:bottom-[6%]">
+          <div className="tagline absolute left-0 top-[calc(8%+var(--hero-size)*1.64+58px)] flex max-w-[560px] flex-col gap-4 md:top-auto md:bottom-[6%]">
             <p className="m-0 text-[14px] leading-[1.35] md:text-[clamp(16px,1.5vw,22px)]" style={{ textWrap: "pretty" }}>{site.tagline}</p>
             <div className="t-mono hidden items-center gap-2 text-bone-3 md:flex">
               {site.steps.map((s, i) => (
@@ -362,7 +369,7 @@ export function Opening() {
             <div className="bench-inner absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-[0.62] sm:scale-[0.85] md:scale-100">
               <Stack
                 layers={ts.layers}
-                faces={{ interface: <ReservedFace project={ts} screen="dashboard" /> }}
+                faces={{ interface: <ModuleFace project={ts} active={0} panels={false} /> }}
                 width={420}
                 height={260}
                 rot={1}

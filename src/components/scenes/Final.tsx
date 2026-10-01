@@ -31,7 +31,7 @@ export function Final() {
 
   useScene(ref, {
     id: "final",
-    pinVh: 2.6,
+    pinVh: { desktop: 1.8, compact: 0 },
     states: 5,
     mobile: "flow",
     onProgress: (p) => {
@@ -91,7 +91,7 @@ export function Final() {
     <div className="scene-slot">
       <section ref={ref} aria-label="Build 05 — start the next build" className="relative w-full overflow-hidden md:vh" style={{ minHeight: "100svh" }}>
         {/* phones: the section flows (no pin) and grows with its content; desktop: the frame composition */}
-        <div className="final-inner relative px-[var(--frame-inset)] pb-10 pt-[calc(var(--frame-inset)+16px)] md:absolute md:p-0" style={{ ["--fi" as string]: "var(--frame-inset)" }}>
+        <div className="final-inner relative px-[var(--frame-inset)] pb-10 pt-[var(--frame-top)] md:absolute md:p-0" style={{ ["--fi" as string]: "var(--frame-inset)" }}>
           {/* the headline: I built → we can build */}
           <div className="relative md:absolute md:left-0 md:top-[6%]">
             <h2 className="t-display relative m-0" style={{ fontSize: "clamp(48px, 6.8vw, 124px)", lineHeight: 0.86 }}>

@@ -19,7 +19,10 @@ export function About() {
 
   useScene(ref, {
     id: "about",
-    pinVh: 1.2,
+    // phones: no pin — the plate fills while the section passes
+    pinVh: { desktop: 1, compact: 0 },
+    mobile: "flow",
+    flowRange: ["top 75%", "top 5%"],
     states: 3,
     onProgress: (p) => setSystem({ step: 5, status: "Drawn by", section: "08 — About", note: p < 0.5 ? "the plate fills" : "based in Uruguay · building globally", frame: 1, grid: 0.6, tone: "graphite" }),
     build: ({ q, gsap }) => {
@@ -34,10 +37,10 @@ export function About() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="About" className="vh relative w-full overflow-hidden">
-        <div className="absolute" style={{ inset: "var(--frame-inset)", top: "calc(var(--frame-inset) + 16px)" }}>
+      <section ref={ref} aria-label="About" className="relative w-full md:h-[100svh] md:overflow-hidden">
+        <div className="relative px-[var(--frame-inset)] pb-16 pt-[calc(var(--frame-top)+72px)] md:absolute md:inset-[var(--frame-inset)] md:top-[var(--frame-top)] md:p-0">
           {/* the portrait plate with its four cotas */}
-          <div className="absolute left-[12%] top-[8%] h-[34%] w-[40%] md:left-[8%] md:top-[10%] md:h-[74%] md:w-[26%]">
+          <div className="relative mx-auto h-[300px] w-[56%] max-w-[250px] md:absolute md:left-[8%] md:top-[10%] md:mx-0 md:h-[74%] md:w-[26%] md:max-w-none">
             <div className="relative h-full w-full" style={{ border: "1px solid var(--bone-3)" }}>
               <div className="portrait-fill absolute inset-0" style={{ background: "#3d423f" }} />
               <div className="absolute bottom-0 left-0 h-1 w-full bg-[#141716]" />
@@ -58,7 +61,7 @@ export function About() {
             </div>
           </div>
 
-          <div className="about-block absolute left-0 top-[52%] flex w-full flex-col gap-3 md:left-[48%] md:top-[8%] md:w-[48%] md:gap-5">
+          <div className="about-block relative mt-24 flex w-full flex-col gap-3 md:absolute md:left-[48%] md:top-[8%] md:mt-0 md:w-[48%] md:gap-5">
             <h2 className="t-display m-0" style={{ fontSize: "clamp(40px, 7vw, 120px)" }}>Drawn by<br />{site.name}</h2>
             <dl className="t-mono m-0 grid grid-cols-[110px_1fr] border-t border-edge">
               {[
