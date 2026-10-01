@@ -20,8 +20,19 @@ export interface Tray {
 
 const p = projectById;
 
-/** bins with real captures first; the bin still waiting for captures closes the row */
+/** the four bins; every part is a crop of a real screen or an explicit empty slot */
 export const trays: Tray[] = [
+  {
+    id: "digital-products",
+    title: "Digital products",
+    sub: "SaaS · dashboards · operating systems",
+    parts: [
+      { label: "inbox · AI → human handover", from: "travelsuite360", capture: { src: p.travelsuite360.captures[0].src, alt: "TravelSuite360 TravelChat inbox", position: "62% 35%" } },
+      { label: "CRM · commercial funnel", from: "travelsuite360", capture: { src: p.travelsuite360.captures[1].src, alt: "TravelSuite360 CRM funnel", position: "50% 22%" } },
+      { label: "AI quote assistant", from: "travelsuite360", capture: { src: p.travelsuite360.captures[2].src, alt: "TravelSuite360 AI quote assistant", position: "55% 55%" } },
+      { label: "financial reports · UYU / USD", from: "travelsuite360", capture: { src: p.travelsuite360.captures[3].src, alt: "TravelSuite360 financial reports", position: "50% 45%" } },
+    ],
+  },
   {
     id: "commerce",
     title: "Commerce experiences",
@@ -31,17 +42,6 @@ export const trays: Tray[] = [
       { label: "3 purchase modes", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[5].src, alt: "Fechas que importan", position: "center 45%" } },
       { label: "tracklist menu", from: "prospector", capture: { src: p.prospector.captures[3].src, alt: "RAYO SMASH tracklist menu", position: "center 60%" } },
       { label: "product · add to cart", from: "prospector", capture: { src: p.prospector.captures[4].src, alt: "RAYO SMASH product page", position: "center 30%" } },
-    ],
-  },
-  {
-    id: "interactive-web",
-    title: "Interactive web",
-    sub: "motion · 3D · scroll storytelling",
-    parts: [
-      { label: "layered hero", from: "prospector", capture: { src: p.prospector.captures[0].src, alt: "RAYO SMASH layered hero", position: "center center" } },
-      { label: "image expansion", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[2].src, alt: "Chef Arturo image at full bleed", position: "center 60%" } },
-      { label: "editorial spreads", from: "santi-nuca", capture: { src: p["santi-nuca"].captures[4].src, alt: "Santi Nuca triptych", position: "center 40%" } },
-      { label: "this site · Ensamble", from: "prospector", capture: null },
     ],
   },
   {
@@ -56,14 +56,14 @@ export const trays: Tray[] = [
     ],
   },
   {
-    id: "digital-products",
-    title: "Digital products",
-    sub: "SaaS · dashboards · operating systems",
+    id: "interactive-web",
+    title: "Interactive web",
+    sub: "motion · 3D · scroll storytelling",
     parts: [
-      { label: "data table", from: "travelsuite360", capture: null },
-      { label: "inbox thread", from: "travelsuite360", capture: null },
-      { label: "CRM record", from: "travelsuite360", capture: null },
-      { label: "quote · reservation", from: "travelsuite360", capture: null },
+      { label: "layered hero", from: "prospector", capture: { src: p.prospector.captures[0].src, alt: "RAYO SMASH layered hero", position: "center center" } },
+      { label: "image expansion", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[2].src, alt: "Chef Arturo image at full bleed", position: "center 60%" } },
+      { label: "editorial spreads", from: "santi-nuca", capture: { src: p["santi-nuca"].captures[4].src, alt: "Santi Nuca triptych", position: "center 40%" } },
+      { label: "this site · Ensamble", from: "prospector", capture: null },
     ],
   },
 ];

@@ -32,7 +32,7 @@ src/
   lib/                                  motion · store · useScene
 public/
   projects/
-    travelsuite360/                     (pendiente: sin capturas todavía — ver docs/05)
+    travelsuite360/                     4 capturas · TravelChat, CRM, Asistente IA, Reportes (datos personales difuminados)
     prospector/                         6 capturas · demo RAYO SMASH
     santi-nuca/                         8 capturas · portfolio editorial
     chef-arturo/                        10 capturas · ecommerce editorial

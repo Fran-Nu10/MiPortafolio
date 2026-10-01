@@ -1,5 +1,10 @@
 import type { StaticImageData } from "next/image";
 
+// TravelSuite360 · client names, phones and staff names blurred before publishing
+import tsTravelChat from "../../public/projects/travelsuite360/travelsuite360-travelchat.png";
+import tsCrm from "../../public/projects/travelsuite360/travelsuite360-crm.png";
+import tsAiAssistant from "../../public/projects/travelsuite360/travelsuite360-ai-assistant.png";
+import tsReportes from "../../public/projects/travelsuite360/travelsuite360-reportes-financieros.png";
 // Prospector · demo RAYO SMASH
 import prospectorHeroExploded from "../../public/projects/prospector/prospector-hero-exploded.png";
 import prospectorHeroExplodedScroll from "../../public/projects/prospector/prospector-hero-exploded-scroll.png";
@@ -54,6 +59,12 @@ export interface Module {
   api: string[];
   data: string[];
   capture: Capture | null;
+  /** phones: the region of the capture the portrait window frames (0–1), and an optional pan */
+  fx?: number;
+  fy?: number;
+  /** phones only: zoom into the screen so dense UI stays legible */
+  zm?: number;
+  pan?: [number, number];
 }
 
 export interface Project {
@@ -82,6 +93,14 @@ export interface Project {
   modules?: Module[];
 }
 
+/** TravelSuite360 screens (shared by the sheet's captures and its modules) */
+const tsScreens = {
+  chat: { src: tsTravelChat, alt: "TravelSuite360 TravelChat: the agency inbox with open and closed conversations, a chat where the AI hands over to a human agent, passenger documents, commercial state and an AI summary", label: "travelchat · inbox" },
+  crm: { src: tsCrm, alt: "TravelSuite360 CRM: client totals, conversion rates through the commercial funnel, distribution by state and priority, average value per client and the client table", label: "crm" },
+  ai: { src: tsAiAssistant, alt: "TravelSuite360 AI assistant: start a travel quote with AI, continue a draft or open recent documents, with the quote history on the left", label: "asistente ia · cotizaciones" },
+  reports: { src: tsReportes, alt: "TravelSuite360 financial reports: leads, conversion and bookings, monthly income and averages in UYU and USD, and income evolution charts", label: "reportes financieros" },
+} satisfies Record<string, Capture>;
+
 export const projects: Project[] = [
   {
     id: "travelsuite360",
@@ -100,20 +119,20 @@ export const projects: Project[] = [
       { key: "api", label: "03 · api · automation", parts: ["inbox · TravelChat", "quotes", "reservations", "CRM", "automations", "auth · roles"] },
       { key: "data", label: "04 · data", parts: ["agencies", "users · permissions", "trips", "quotes", "reservations", "conversations", "multi-agency"] },
     ],
-    captures: [],
-    // module list: Content Map V2 + Master Prompt V2 (TravelChat, CRM, reportes financieros, AI assistant · cotizaciones).
-    // Captures go in public/projects/travelsuite360/ (see docs/03-assets-manifest.md); each one fills its module.
+    captures: [tsScreens.chat, tsScreens.crm, tsScreens.ai, tsScreens.reports],
+    // module list: Content Map V2 + Master Prompt V2. Modules with a capture show the real screen;
+    // the others stay drawn until theirs lands in public/projects/travelsuite360/.
     modules: [
-      { name: "TravelChat · inbox", api: ["inbox · TravelChat"], data: ["conversations"], capture: null },
-      { name: "CRM", api: ["CRM"], data: ["agencies", "users · permissions"], capture: null },
-      { name: "Cotizaciones · AI assistant", api: ["quotes"], data: ["quotes"], capture: null },
+      { name: "TravelChat · inbox", api: ["inbox · TravelChat"], data: ["conversations"], capture: tsScreens.chat, fx: 0.5, fy: 0.4, zm: 1.2, pan: [0.5, 0.88] },
+      { name: "CRM", api: ["CRM"], data: ["agencies", "users · permissions"], capture: tsScreens.crm, fx: 0.15, fy: 0.16, zm: 1.2, pan: [0.15, 0.85] },
+      { name: "Cotizaciones · AI assistant", api: ["quotes"], data: ["quotes"], capture: tsScreens.ai, fx: 0.55, fy: 0.52, zm: 1.2 },
+      { name: "Reportes financieros", api: [], data: ["quotes", "reservations"], capture: tsScreens.reports, fx: 0.12, fy: 0.24, zm: 1.2, pan: [0.12, 0.5] },
       { name: "Viajes · reservas", api: ["reservations"], data: ["trips", "reservations"], capture: null },
-      { name: "Reportes financieros", api: [], data: ["quotes", "reservations"], capture: null },
       { name: "Automations", api: ["automations", "auth · roles"], data: ["multi-agency"], capture: null },
     ],
     world: "product",
     faceColor: "#f6f7f9",
-    pending: ["dashboard", "TravelChat · inbox", "CRM", "cotizaciones · AI assistant", "viajes · reservas", "reportes financieros"],
+    pending: ["viajes · reservas", "automations", "public demo URL"],
     live: LIVE.travelsuite360,
   },
   {

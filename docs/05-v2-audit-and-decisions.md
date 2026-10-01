@@ -33,7 +33,7 @@ Findings on `806590c`:
 | --- | --- | --- |
 | 00 Preloader | KEEP | safe-area aware frame |
 | 01–02 Hero + Manifesto | ADAPT | shorter pin, compact layout fixes, real first face (module index), exact hand-off to Sheet 01 |
-| 03.01 TravelSuite360 | REBUILD | slab → full window → module by module (layers per module; capture slots ready) |
+| 03.01 TravelSuite360 | REBUILD | slab → full window → module by module: the real screens (TravelChat, CRM, AI assistant, reports), then the modules still drawn |
 | 03.02 Prospector | REBUILD | outline → real ingredient layers → real hero → assemble/snap → menu → product → INTERACT |
 | 03.03 Santi Nuca | ADAPT | own scene; spreads as large frontal pages; phones frame/pan each spread |
 | 03.04 Chef Arturo | ADAPT | build → rotate → present pattern; arch crosses the frame; PDP at full window; exit as slab 04 |
@@ -48,15 +48,15 @@ Findings on `806590c`:
 
 | Viewport | V1 | V2 |
 | --- | --- | --- |
-| 360×740 | 37.1 | 24.6 |
-| 390×844 | 36.9 | 23.8 |
-| 430×932 | 36.9 | 23.4 |
-| 768×1024 | 36.9 | 23.9 |
-| 1024×768 | 39.6 | 34.6 |
-| 1440×900 | 39.7 | 34.6 |
-| 1920×1080 | 39.6 | 34.5 |
+| 360×740 | 37.1 | 25.3 |
+| 390×844 | 36.9 | 24.5 |
+| 430×932 | 36.9 | 24.1 |
+| 768×1024 | 36.9 | 24.6 |
+| 1024×768 | 39.6 | 35.1 |
+| 1440×900 | 39.7 | 35.2 |
+| 1920×1080 | 39.6 | 35.1 |
 
-Pin per scene, desktop / compact (vh): Hero 4.2 / 2.8 · TravelSuite 2.2 / 1.3 · Prospector
+Pin per scene, desktop / compact (vh): Hero 4.2 / 2.8 · TravelSuite 2.8 / 2.0 · Prospector
 3.0 / 2.2 · Santi Nuca 2.4 / 1.7 · Chef Arturo 3.2 / 2.3 · Capabilities 2.6 / flow · Process
 2.0 / 1.3 · About 1.0 / flow · Technology 1.0 / flow · Final 1.8 / flow.
 
@@ -115,10 +115,10 @@ new tab (popups are allowed to escape the sandbox).
 
 ## 5. Data still needed (nothing was invented)
 
-- **TravelSuite360 captures.** None are in the repository. Drop them in
-  `public/projects/travelsuite360/` and set `capture` on the module in `src/data/projects.ts`
-  (`modules[]`): TravelChat · inbox, CRM, Cotizaciones · AI assistant, Viajes · reservas,
-  Reportes financieros, Automations. Each capture replaces its module's drawing in the window and
-  in the hero's first face; nothing else changes.
+- **TravelSuite360:** four real captures landed (TravelChat, CRM, AI assistant, financial
+  reports — personal data blurred, see `03-assets-manifest.md`). They are the window's first four
+  modules, the hero's first face and the Digital products bin. Still drawn: *Viajes · reservas* and
+  *Automations* — drop their captures in `public/projects/travelsuite360/` and set `capture` on the
+  module in `src/data/projects.ts`.
 - A public / demo URL for TravelSuite360, if one should be usable from the portfolio.
 - Everything already listed in `04-implementation-notes.md` (roles, contact routes, portrait…).
