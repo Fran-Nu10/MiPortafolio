@@ -11,6 +11,7 @@ import { About } from "@/components/scenes/About";
 import { Technology } from "@/components/scenes/Technology";
 import { Final } from "@/components/scenes/Final";
 import { Preloader } from "@/components/system/Preloader";
+import { LiveWindow } from "@/components/system/LiveWindow";
 
 const Cursor = dynamic(() => import("@/components/system/Cursor").then((m) => m.Cursor), { ssr: false });
 
@@ -35,6 +36,7 @@ export function Experience() {
         </div>
       </div>
       <Frame />
+      <LiveWindow />
       <Cursor />
       <Preloader />
     </main>
