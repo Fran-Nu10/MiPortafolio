@@ -13,7 +13,7 @@ const sn = projectById["santi-nuca"];
 
 /** the spreads, in editorial order; on phones each is framed on its subject and may pan */
 const spreads = [
-  { c: sn.captures[0], fx: 0.6, pan: null, label: "opening · SANTI / NUCA" },
+  { c: sn.captures[0], fx: 0.6, pan: null, label: "apertura · SANTI / NUCA" },
   { c: sn.captures[4], fx: 0.22, pan: [0.22, 0.8], label: "forma · línea · textura" },
   { c: sn.captures[2], fx: 0.3, pan: [0.3, 0.72], label: "02 · díptico · editorial" },
   { c: sn.captures[3], fx: 0.6, pan: null, label: "03 · detalle · macro" },
@@ -35,9 +35,9 @@ export function SantiNuca() {
     onProgress: (p) => {
       setSystem({
         step: 4,
-        status: p < 0.1 ? "Sheet 02 → 03" : "Sheet 03 / 04",
-        section: "03 — Selected work · Santi Nuca",
-        note: p < 0.25 ? "the system withdraws" : "no grid · no cotas · the spreads lead",
+        status: p < 0.1 ? "Lámina 02 → 03" : "Lámina 03 / 04",
+        section: "03 — Proyectos · Santi Nuca",
+        note: p < 0.25 ? "el sistema se retira" : "sin grilla · sin cotas · mandan las páginas",
         // the system withdraws once the paper has covered the bench
         frame: p < 0.07 ? 1 : 0,
         grid: p < 0.07 ? 0.4 : 0,
@@ -91,13 +91,13 @@ export function SantiNuca() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Selected work 03 — Santi Nuca" className="vh relative w-full overflow-hidden">
+      <section ref={ref} aria-label="Proyecto 03 — Santi Nuca" className="vh relative w-full overflow-hidden">
         <div className="sn-wipe absolute inset-0 bg-[#f4f3f0]" style={{ transform: "scaleX(0)" }} />
         <div className="area area-cq absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
           <div className="sn-rule absolute left-[40%] top-0 h-full w-px bg-[#14120f]" style={{ transform: "scaleY(0)" }} />
           <div className="sn-numeral absolute bottom-0 left-0" style={{ fontSize: "clamp(120px, 26vw, 380px)", fontWeight: 300, lineHeight: 0.8, letterSpacing: "-0.06em", color: "#14120f", fontFamily: "var(--font-plex-sans)", clipPath: "inset(100% 0 0 0)" }} aria-hidden="true">03</div>
           <SheetHead project={sn} paper />
-          <ProjectWindow project={sn} tone="paper" label="spreads · 1:1">
+          <ProjectWindow project={sn} tone="paper" label="páginas · 1:1">
             {spreads.map((s, i) => (
               <div key={s.label} className="sn-page absolute inset-0 bg-[#f4f3f0]" style={i ? { visibility: "hidden" } : undefined}>
                 <Screen capture={s.c} fx={s.fx} fy={0.5} />

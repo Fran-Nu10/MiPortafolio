@@ -22,9 +22,9 @@ export interface LiveBuild {
 
 export const LIVE: Record<"travelsuite360" | "prospector" | "santi-nuca" | "chef-arturo", LiveBuild | null> = {
   travelsuite360: null,
-  prospector: { url: "https://prospector-phi-virid.vercel.app/rayo-smash", host: "prospector · rayo-smash", embeddable: true, responsive: true, checked: "2026-10-01" },
-  "santi-nuca": { url: "https://hair-portfolio-two.vercel.app", host: "santi nuca · live", embeddable: true, responsive: true, checked: "2026-10-01" },
-  "chef-arturo": { url: "https://chef-arturoprod.vercel.app", host: "chef arturo · live", embeddable: true, responsive: true, checked: "2026-10-01" },
+  prospector: { url: "https://prospector-phi-virid.vercel.app/rayo-smash", host: "rayo smash · en vivo", embeddable: true, responsive: true, checked: "2026-10-01" },
+  "santi-nuca": { url: "https://hair-portfolio-two.vercel.app", host: "santi nuca · en vivo", embeddable: true, responsive: true, checked: "2026-10-01" },
+  "chef-arturo": { url: "https://chef-arturoprod.vercel.app", host: "chef arturo · en vivo", embeddable: true, responsive: true, checked: "2026-10-01" },
 };
 
 /** origins allowed in frame-src */

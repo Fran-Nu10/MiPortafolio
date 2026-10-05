@@ -24,46 +24,46 @@ const p = projectById;
 export const trays: Tray[] = [
   {
     id: "digital-products",
-    title: "Digital products",
-    sub: "SaaS · dashboards · operating systems",
+    title: "Productos digitales",
+    sub: "SaaS · paneles · sistemas de gestión",
     parts: [
-      { label: "inbox · AI → human handover", from: "travelsuite360", capture: { src: p.travelsuite360.captures[0].src, alt: "TravelSuite360 TravelChat inbox", position: "62% 35%" } },
-      { label: "CRM · commercial funnel", from: "travelsuite360", capture: { src: p.travelsuite360.captures[1].src, alt: "TravelSuite360 CRM funnel", position: "50% 22%" } },
-      { label: "AI quote assistant", from: "travelsuite360", capture: { src: p.travelsuite360.captures[2].src, alt: "TravelSuite360 AI quote assistant", position: "55% 55%" } },
-      { label: "financial reports · UYU / USD", from: "travelsuite360", capture: { src: p.travelsuite360.captures[3].src, alt: "TravelSuite360 financial reports", position: "50% 45%" } },
+      { label: "inbox · de la IA a una persona", from: "travelsuite360", capture: { src: p.travelsuite360.captures[0].src, alt: "Inbox de TravelChat en TravelSuite360", position: "62% 35%" } },
+      { label: "CRM · embudo comercial", from: "travelsuite360", capture: { src: p.travelsuite360.captures[1].src, alt: "Embudo comercial del CRM de TravelSuite360", position: "50% 22%" } },
+      { label: "asistente IA de cotizaciones", from: "travelsuite360", capture: { src: p.travelsuite360.captures[2].src, alt: "Asistente IA de cotizaciones de TravelSuite360", position: "55% 55%" } },
+      { label: "reportes financieros · UYU / USD", from: "travelsuite360", capture: { src: p.travelsuite360.captures[3].src, alt: "Reportes financieros de TravelSuite360", position: "50% 45%" } },
     ],
   },
   {
     id: "commerce",
-    title: "Commerce experiences",
-    sub: "ordering · catalogue · checkout",
+    title: "Comercio",
+    sub: "pedidos · catálogo · checkout",
     parts: [
-      { label: "PDP · stock · Mercado Pago", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[8].src, alt: "Chef Arturo product page", position: "center 70%" } },
-      { label: "3 purchase modes", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[5].src, alt: "Fechas que importan", position: "center 45%" } },
-      { label: "tracklist menu", from: "prospector", capture: { src: p.prospector.captures[3].src, alt: "RAYO SMASH tracklist menu", position: "center 60%" } },
-      { label: "product · add to cart", from: "prospector", capture: { src: p.prospector.captures[4].src, alt: "RAYO SMASH product page", position: "center 30%" } },
+      { label: "ficha · stock · Mercado Pago", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[8].src, alt: "Ficha de producto de Chef Arturo", position: "center 70%" } },
+      { label: "3 modos de compra", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[5].src, alt: "Chef Arturo, Fechas que importan", position: "center 45%" } },
+      { label: "menú tracklist", from: "prospector", capture: { src: p.prospector.captures[3].src, alt: "Menú tracklist de RAYO SMASH", position: "center 60%" } },
+      { label: "producto · agregar al carrito", from: "prospector", capture: { src: p.prospector.captures[4].src, alt: "Ficha de producto de RAYO SMASH", position: "center 30%" } },
     ],
   },
   {
     id: "ai-automation",
-    title: "AI & automation",
-    sub: "pipelines · generated demos · automations",
+    title: "IA y automatización",
+    sub: "pipelines · demos generadas · automatizaciones",
     parts: [
-      { label: "lead scraping + scoring · Apify", from: "prospector", capture: null },
-      { label: "one demo per lead", from: "prospector", capture: { src: p.prospector.captures[1].src, alt: "A generated RAYO SMASH demo", position: "center center" } },
-      { label: "automations", from: "travelsuite360", capture: null },
-      { label: "AI tooling in the build process", from: "prospector", capture: null },
+      { label: "scraping y scoring de leads · Apify", from: "prospector", capture: null },
+      { label: "una demo por lead", from: "prospector", capture: { src: p.prospector.captures[1].src, alt: "Una demo generada: RAYO SMASH", position: "center center" } },
+      { label: "automatizaciones", from: "travelsuite360", capture: null },
+      { label: "IA en el proceso de construcción", from: "prospector", capture: null },
     ],
   },
   {
     id: "interactive-web",
-    title: "Interactive web",
-    sub: "motion · 3D · scroll storytelling",
+    title: "Web interactiva",
+    sub: "motion · 3D · relato con scroll",
     parts: [
-      { label: "layered hero", from: "prospector", capture: { src: p.prospector.captures[0].src, alt: "RAYO SMASH layered hero", position: "center center" } },
-      { label: "image expansion", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[2].src, alt: "Chef Arturo image at full bleed", position: "center 60%" } },
-      { label: "editorial spreads", from: "santi-nuca", capture: { src: p["santi-nuca"].captures[4].src, alt: "Santi Nuca triptych", position: "center 40%" } },
-      { label: "this site · Ensamble", from: "prospector", capture: null },
+      { label: "hero por capas", from: "prospector", capture: { src: p.prospector.captures[0].src, alt: "Hero por capas de RAYO SMASH", position: "center center" } },
+      { label: "expansión de imagen", from: "chef-arturo", capture: { src: p["chef-arturo"].captures[2].src, alt: "Chef Arturo, la fotografía a pantalla completa", position: "center 60%" } },
+      { label: "páginas editoriales", from: "santi-nuca", capture: { src: p["santi-nuca"].captures[4].src, alt: "Tríptico editorial de Santi Nuca", position: "center 40%" } },
+      { label: "este sitio · ENSAMBLE", from: "prospector", capture: null },
     ],
   },
 ];
@@ -79,12 +79,12 @@ export interface Station {
 }
 
 export const stations: Station[] = [
-  { key: "understand", label: "Understand", note: "Brief, questions, the number that must move.", state: "dashed" },
-  { key: "strategize", label: "Strategize", note: "Scope, sequence, what ships first.", state: "outline" },
-  { key: "design", label: "Design", note: "Interface, system, motion intent.", state: "face" },
-  { key: "prototype", label: "Prototype", note: "Layers appear, clickable, still outlined.", state: "layers" },
-  { key: "engineer", label: "Engineer", note: "Data, API, components fill in.", state: "filled" },
-  { key: "launch", label: "Launch", note: "Frontal. In production. Watched.", state: "frontal" },
+  { key: "understand", label: "Entender", note: "El brief, las preguntas y el número que tiene que moverse.", state: "dashed" },
+  { key: "strategize", label: "Definir", note: "Alcance, orden y qué sale primero.", state: "outline" },
+  { key: "design", label: "Diseñar", note: "Interfaz, sistema e intención de motion.", state: "face" },
+  { key: "prototype", label: "Prototipar", note: "Aparecen las capas: navegables, todavía en trazo.", state: "layers" },
+  { key: "engineer", label: "Construir", note: "Datos, API y componentes toman cuerpo.", state: "filled" },
+  { key: "launch", label: "Lanzar", note: "Frontal. En producción. Medido.", state: "frontal" },
 ];
 
 /* ---------- Lab · loose parts ---------- */
@@ -104,7 +104,7 @@ export interface Experiment {
 }
 
 export const experiments: Experiment[] = [
-  { id: "this-site", kind: "system", camera: "iso", state: "running", date: "2026", note: "The portfolio's own construction system: stack, cotas, cursor instrument, motion verbs.", slot: { x: 62, y: 58, w: 30, h: 34 } },
+  { id: "this-site", kind: "system", camera: "iso", state: "running", date: "2026", note: "El sistema con el que se construye este portfolio: stack, cotas, cursor-instrumento, verbos de motion.", slot: { x: 62, y: 58, w: 30, h: 34 } },
   { id: "shader-01", kind: "shader", camera: "frontal", state: "reserved", date: null, note: null, slot: { x: 4, y: 6, w: 28, h: 26 } },
   { id: "motion-01", kind: "motion", camera: "frontal", state: "reserved", date: null, note: null, slot: { x: 36, y: 4, w: 30, h: 30 } },
   { id: "object-01", kind: "object", camera: "iso", state: "reserved", date: null, note: null, slot: { x: 72, y: 8, w: 18, h: 26, round: true } },
@@ -114,13 +114,20 @@ export const experiments: Experiment[] = [
   { id: "motion-02", kind: "motion", camera: "frontal", state: "reserved", date: null, note: null, slot: { x: 32, y: 62, w: 26, h: 30 } },
 ];
 
+export const labStateLabel: Record<LabState, string> = {
+  running: "en curso",
+  recorded: "grabado",
+  drawing: "en trazo",
+  reserved: "reservado",
+};
+
 export const labKindLabel: Record<LabKind, string> = {
   shader: "shader · WebGL",
-  motion: "motion study",
-  object: "3D object",
-  interface: "interface concept",
-  ai: "AI experience",
-  system: "technical · system",
+  motion: "estudio de motion",
+  object: "objeto 3D",
+  interface: "concepto de interfaz",
+  ai: "experiencia con IA",
+  system: "técnico · sistema",
 };
 
 /* ---------- Technology · engraved on the plate ---------- */
@@ -148,5 +155,5 @@ export const technologies: Tech[] = [
   { name: "Apify", tier: "base", usedIn: ["prospector"] },
   { name: "Mercado Pago", tier: "base", usedIn: ["chef-arturo"] },
   { name: "WhatsApp", tier: "base", usedIn: ["chef-arturo"] },
-  { name: "AI tooling", tier: "base", usedIn: [] },
+  { name: "Herramientas IA", tier: "base", usedIn: [] },
 ];

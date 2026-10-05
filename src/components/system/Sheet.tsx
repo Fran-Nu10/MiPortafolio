@@ -10,7 +10,7 @@ export function SheetHead({ project, paper = false, className = "" }: { project:
   return (
     <div className={`sheet-head ${className}`}>
       <div className="flex min-w-0 flex-col gap-1.5">
-        <div className="t-dim">03.0{project.index} · sheet 0{project.index} / 04</div>
+        <div className="t-dim">03.0{project.index} · lámina 0{project.index} / 04</div>
         <h2 className="sheet-name t-display m-0" style={{ color: strong }}>{project.name}</h2>
         <div className="t-mono" style={{ color: dim }}>
           {project.category}

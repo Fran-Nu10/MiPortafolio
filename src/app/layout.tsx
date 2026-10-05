@@ -29,14 +29,23 @@ const plexMono = localFont({
   ],
 });
 
+const title = "Franco Núñez — Diseño y desarrollo de productos digitales";
+const description =
+  "Productos digitales, de la idea a producción: estrategia, diseño, ingeniería y lanzamiento. Desde Montevideo, Uruguay, para proyectos en cualquier país.";
+
 export const metadata: Metadata = {
-  title: "Franco Núñez — Digital product designer & developer",
-  description:
-    "Designs and builds digital products end to end: strategy, design, engineering and launch. Based in Montevideo, Uruguay. Building globally.",
+  title,
+  description,
   openGraph: {
-    title: "Franco Núñez — Digital product designer & developer",
-    description: "Designs and builds digital products end to end.",
+    title,
+    description: "Productos digitales, de la idea a producción. Estrategia, diseño, ingeniería y lanzamiento, ensamblados por una sola persona.",
     type: "website",
+    locale: "es_UY",
+  },
+  twitter: {
+    card: "summary",
+    title,
+    description: "Productos digitales, de la idea a producción.",
   },
 };
 
@@ -49,7 +58,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${archivo.variable} ${plexSans.variable} ${plexMono.variable}`}>
+    <html lang="es" className={`${archivo.variable} ${plexSans.variable} ${plexMono.variable}`}>
       <body>{children}</body>
     </html>
   );

@@ -39,7 +39,7 @@ export function Preloader() {
       <div className="absolute" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)", border: "1px solid var(--hairline)" }}>
         {/* the first part — same box and centring as the hero bench (Opening.tsx) */}
         <div className="absolute right-[-10%] top-[46%] h-[54%] w-[120%] md:right-[2%] md:top-[4%] md:h-[92%] md:w-[46%]">
-          <div className="t-mono absolute left-[12%] top-0 text-bone-3 md:left-0">Part 01 · interface · frontal</div>
+          <div className="t-mono absolute left-[12%] top-0 text-bone-3 md:left-0">Pieza 01 · interfaz · frontal</div>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-[0.62] sm:scale-[0.85] md:scale-100">
             <div className="relative" style={{ width: 420, height: 260 }}>
               <div className="pl-outline absolute inset-0 border border-bone" />
@@ -55,14 +55,14 @@ export function Preloader() {
       >
         <div className="flex items-center gap-5">
           <span style={{ color: "var(--bone)", fontWeight: 500 }}>FN</span>
-          <span className="hidden sm:inline">00 — Preloader</span>
+          <span className="hidden sm:inline">00 — Carga</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="inline-block h-2 w-2 bg-orange" />
-          <span style={{ color: "var(--bone)" }}>Assembling</span>
+          <span style={{ color: "var(--bone)" }}>Armando</span>
           <span>00 / 06</span>
         </div>
-        <div className="hidden md:block">part 01 arriving</div>
+        <div className="hidden md:block">llega la pieza 01</div>
       </div>
     </div>
   );

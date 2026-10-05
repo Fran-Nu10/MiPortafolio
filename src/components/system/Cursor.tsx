@@ -48,7 +48,7 @@ export function Cursor() {
         const r = target.getBoundingClientRect();
         readout.textContent = target.dataset.measure ?? `${Math.round(r.width)} × ${Math.round(r.height)}`;
       } else if (m === "separate") {
-        readout.textContent = "separate";
+        readout.textContent = "separar";
       } else if (m !== "inspect") {
         readout.textContent = "";
       }

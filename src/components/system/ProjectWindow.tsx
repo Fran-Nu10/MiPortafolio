@@ -78,12 +78,12 @@ export function LiveControls({ project, tone = "graphite", variant }: { project:
   return (
     <div className={`${cls} items-stretch`}>
       {live.embeddable && (
-        <button type="button" onClick={open} className="pw-btn t-mono" style={{ color: tone === "paper" ? "#f4f3f0" : "var(--graphite)", background: "var(--orange)" }} data-cursor="magnet" aria-label={`Interact with the live ${project.name} build`}>
-          <span aria-hidden="true">▸</span> Interact
+        <button type="button" onClick={open} className="pw-btn t-mono" style={{ color: tone === "paper" ? "#f4f3f0" : "var(--graphite)", background: "var(--orange)" }} data-cursor="magnet" aria-label={`Probar ${project.name} en vivo, dentro del portfolio`}>
+          <span aria-hidden="true">▸</span> Probar
         </button>
       )}
-      <a href={live.url} target="_blank" rel="noopener noreferrer" className="pw-btn t-mono" style={{ color: t.strong, borderColor: t.line }} data-cursor="magnet" aria-label={`Open the live ${project.name} build in a new tab`}>
-        Open live <span aria-hidden="true">↗</span>
+      <a href={live.url} target="_blank" rel="noopener noreferrer" className="pw-btn t-mono" style={{ color: t.strong, borderColor: t.line }} data-cursor="magnet" aria-label={`Abrir ${project.name} en una pestaña nueva`}>
+        Abrir sitio <span aria-hidden="true">↗</span>
       </a>
     </div>
   );

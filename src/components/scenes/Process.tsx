@@ -21,7 +21,7 @@ export function Process() {
     states: 6,
     onProgress: (p) => {
       const i = Math.min(5, Math.floor(p * 6));
-      setSystem({ step: 5, status: `Station 0${i + 1} / 06`, section: "06 — Process", note: stations[i].label.toLowerCase(), frame: 1, grid: 1, tone: "graphite" });
+      setSystem({ step: 5, status: `Estación 0${i + 1} / 06`, section: "06 — Proceso", note: stations[i].label.toLowerCase(), frame: 1, grid: 1, tone: "graphite" });
     },
     build: ({ q, gsap }) => {
       const tl = gsap.timeline({ defaults: { ease: "none" } });
@@ -65,13 +65,13 @@ export function Process() {
 
   return (
     <div className="scene-slot">
-      <section ref={ref} aria-label="Process" className="vh relative w-full overflow-hidden">
+      <section ref={ref} aria-label="Proceso" className="vh relative w-full overflow-hidden">
         <div className="absolute overflow-hidden" style={{ inset: "var(--frame-inset)", top: "var(--frame-top)" }}>
-          <div className="absolute left-[2%] top-[4%] flex w-[60%] flex-col gap-3">
-            <div className="t-dim">06 · Process</div>
-            <h2 className="t-display m-0" style={{ fontSize: "clamp(36px, 5vw, 72px)" }}>The same object,<br />six stations</h2>
+          <div className="absolute left-[2%] top-[4%] flex w-[96%] flex-col gap-3 md:w-[60%]">
+            <div className="t-dim">06 · Proceso</div>
+            <h2 className="t-display m-0" style={{ fontSize: "clamp(36px, 5vw, 72px)" }}>El mismo objeto,<br />seis estaciones</h2>
             <p className="m-0 hidden max-w-[520px] text-[15px] leading-[1.5] text-bone-2 md:block" style={{ textWrap: "pretty" }}>
-              The counter you have watched since 00/06, laid out as a line. A blank part enters on the left and leaves on the right as a product. The object never leaves the frame.
+              El contador que venís viendo desde 00/06, desplegado en una línea. Una pieza en blanco entra por la izquierda y sale por la derecha convertida en producto.
             </p>
           </div>
 
@@ -94,7 +94,7 @@ export function Process() {
               {[2, 1, 0].map((k) => (
                 <div key={k} className="obj-layer absolute inset-0 opacity-0" style={{ transform: isoT, border: "1px solid var(--edge-2)", background: "transparent" }}>
                   <div className="obj-layer-fill absolute inset-0" style={{ background: "linear-gradient(160deg,#2e3330,#202422)" }} />
-                  <div className="t-mono absolute left-2 top-2" style={{ fontSize: 8, color: "var(--bone-3)" }}>{["02 · components", "03 · api", "04 · data"][2 - k]}</div>
+                  <div className="t-mono absolute left-2 top-2" style={{ fontSize: 8, color: "var(--bone-3)" }}>{["02 · componentes", "03 · api", "04 · datos"][2 - k]}</div>
                 </div>
               ))}
               <div
