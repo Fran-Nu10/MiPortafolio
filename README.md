@@ -2,6 +2,8 @@
 
 Portfolio personal. Dirección creativa: **ENSAMBLE** (el sitio se construye delante del visitante).
 
+> **Handoff a Claude Code (REVELADO 2.2).** Empezá por `CLAUDE.md` (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. El código actual es ENSAMBLE (legado) y se reemplaza por fases; auditoría en `docs/06-phase0-audit.md`.
+
 Estado: **implementación de producción** (Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP). El sitio completo vive en `src/`; los documentos de `docs/` siguen siendo la fuente de verdad estratégica y de contenido.
 
 ```
