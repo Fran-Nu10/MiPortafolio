@@ -1,51 +1,47 @@
 # MiPortafolio — Franco Núñez
 
-Portfolio personal. Dirección creativa: **ENSAMBLE** (el sitio se construye delante del visitante).
+Portfolio personal. Dirección creativa: **REVELADO 2.2** (diseño congelado). La implementación avanza por fases; la versión anterior (ENSAMBLE) queda en el historial de git.
 
-> **Handoff a Claude Code (REVELADO 2.2).** Empezá por `CLAUDE.md` (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. El código actual es ENSAMBLE (legado) y se reemplaza por fases; auditoría en `docs/06-phase0-audit.md`.
+> **Para implementar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. Fases hechas: `docs/06-phase0-audit.md` (auditoría) y `docs/07-phase1-foundation.md` (foundation).
 
-Estado: **implementación de producción** (Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP). El sitio completo vive en `src/`; los documentos de `docs/` siguen siendo la fuente de verdad estratégica y de contenido.
+Estado: **Phase 1 · Foundation hecha.** El Journey existe como documento estático y legible (también sin JavaScript) con el copy real y placeholders honestos donde falta material; el motion de cada escena llega desde Phase 2. Stack: Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP 3.15 (+ ScrollTrigger). Sin otras dependencias de runtime.
 
 ```
 npm install
-npm run dev      # http://localhost:3000
-npm run build && npm run start
+npm run dev             # http://localhost:3000
+npm run build           # corre antes check:assets
 npm run lint
+npx tsc --noEmit
+npx vitest run          # tests de contenido y unidades
+npx playwright test     # e2e sobre el build de producción
+npm run check:launch    # falla mientras falten assets que bloquean el lanzamiento
 ```
 
-Entrega del brief (formulario final): copiar `.env.example` a `.env.local` y completar `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM`. Sin esas variables el formulario funciona y avisa honestamente que nada fue enviado.
+Entrega del brief (formulario final): copiar `.env.example` a `.env.local` y completar `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM`. Sin esas variables el formulario muestra un error honesto: "Brief recibido." solo aparece si Resend respondió 2xx.
 
 ## Estructura
 
 ```
 docs/
-  01-documento-maestro-v1.md            Estrategia, principios, arquitectura narrativa
-  02-selected-work-content-map-v2.md    Los 4 Featured Builds y qué demuestra cada uno
-  03-assets-manifest.md                 Qué asset es qué, dónde se usa, qué falta
-  04-implementation-notes.md            Qué se construyó, decisiones, motion, QA, pendientes
-  05-v2-audit-and-decisions.md          V2: auditoría, KEEP/ADAPT/REBUILD, scroll, Live Project Windows
+  05b-content-master.md                 copy, hechos, atribuciones (autoridad 1)
+  05a-revelado-2.2.md                   experiencia y dirección de arte (autoridad 2)
+  05-revelado-implementation-spec.md    arquitectura, fases, QA (autoridad 3)
+  06-phase0-audit.md · 07-phase1-foundation.md
+  01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 src/
-  app/                                  layout, page, globals.css, actions/brief.ts
-  components/scenes/                    00–10: Opening · Work (work/: TravelSuite · Prospector · SantiNuca · ChefArturo)
-                                        · Capabilities · Process · Lab · About · Technology · Final
-  components/system/                    Frame · Cota · Stack · Cursor · Capture · Screen · ProjectWindow · ModuleFace
-                                        · LiveWindow · Sheet · Preloader
-  data/                                 projects · live · site · system (sólo hechos documentados)
-  lib/                                  motion · store · useScene
-public/
-  projects/
-    travelsuite360/                     4 capturas · TravelChat, CRM, Asistente IA, Reportes (datos personales difuminados)
-    prospector/                         6 capturas · demo RAYO SMASH
-    santi-nuca/                         8 capturas · portfolio editorial
-    chef-arturo/                        10 capturas · ecommerce editorial
+  app/                                  layout · page · trabajo/[slug] · not-found · actions/brief · globals.css
+  components/journey/                   Journey (server) · JourneyClient
+  components/{opening,reel,worlds,moments,capabilities,profile,contact,layout}/
+  components/media/                     Still · Cutout · LoopVideo · ProofMedia · Placeholder
+  data/                                 site · projects · capabilities · profile · assets (contratos) · types
+  lib/                                  motion · tiers · useScene · journey-store · geometry · route-sync
+                                        · assets · media · useInView · brief · content
+  fonts/                                Schibsted Grotesk (variable) · IBM Plex Mono 400
+scripts/check-assets.mjs                validación de contratos de assets (prebuild)
+tests/                                  content + foundation (Vitest) · e2e (Playwright)
+public/projects/                        capturas reales (TravelSuite360: no aprobadas para publicar, ver docs/07)
 ```
-
-Convención de assets: `public/projects/<proyecto>/<proyecto>-<pantalla>[-<estado>].png`. Originales PNG sin recomprimir; las versiones optimizadas se generan en build.
-
-## Diseño
-
-El sistema visual y todas las escenas viven en el canvas de Claude Design (páginas 01–04) y están implementadas en `src/`. El objeto 3D es un stack CSS 3D (no WebGL): la cara superior es DOM vivo y las losas planas no necesitan iluminación — ver `docs/04-implementation-notes.md`.
 
 ## Reglas no negociables (resumen)
 
-No inventar métricas, clientes, testimonios, funcionalidades ni pantallas. Sólo se mide lo que Franco construyó. Producto real antes que decoración.
+No inventar métricas, clientes, testimonios, funcionalidades ni pantallas. Lo no confirmado no se publica. Los placeholders nunca se presentan como evidencia. Scroll vertical nativo siempre; la rueda vertical nunca se captura.

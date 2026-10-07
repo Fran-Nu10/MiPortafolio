@@ -13,16 +13,15 @@ Portfolio de **Franco Núñez**. Dirección creativa final: **REVELADO 2.2** (di
 | 3 | **Master Implementation Spec** (rev 37, 29 secciones) | arquitectura, componentes, estado, contratos de assets, fases, QA, aceptación | `docs/05-revelado-implementation-spec.md` |
 | 4 | Código existente (ENSAMBLE, legado) | nada: se reutiliza sólo lo marcado KEEP/EXTEND | `src/**` — ver `docs/06-phase0-audit.md` |
 
-Otros documentos: `docs/06-phase0-audit.md` (Phase 0 hecha: KEEP / EXTEND / REWRITE / RETIRE, assets encontrados y faltantes, riesgos). `docs/01–04` son historia de ENSAMBLE: **no son fuente de verdad** de REVELADO (sólo `03-assets-manifest.md` sirve como inventario de `public/projects/**`).
+Otros documentos: `docs/06-phase0-audit.md` (Phase 0 hecha: KEEP / EXTEND / REWRITE / RETIRE, assets encontrados y faltantes, riesgos) y `docs/07-phase1-foundation.md` (Phase 1 hecha). `docs/01–04`, `docs/05-v2-audit-and-decisions.md` y `docs/06-spanish-copy-system.md` son historia de ENSAMBLE (comparten numeración con los de REVELADO por venir de ramas distintas): **no son fuente de verdad** de REVELADO (sólo `03-assets-manifest.md` sirve como inventario de `public/projects/**`).
 
 Antes de cada fase: releer los capítulos del Spec que ella cita (§26 tiene la tabla fase → capítulos → criterios de aceptación) y las secciones del Content Master que alimentan su copy.
 
 ## 2. Estado actual
 
-- **Phase 0 · Audit: hecha** (`docs/06-phase0-audit.md`).
-- **Phase 1 · Foundation: NO empezada.** El código sigue siendo ENSAMBLE (Next 16.3.7, React 19.2.8, TS 5.9 strict, Tailwind 4, GSAP 3.15). No hay tests ni Playwright instalados todavía.
-- Trabajar **una fase por vez** (Spec §26): no empezar una fase hasta que pasen los criterios de aceptación de la anterior. Al terminar Phase 1: escribir `docs/07-phase1-foundation.md` y detenerse a reportar.
-- Primera tarea pendiente: ejecutar Phase 1 según el brief del propio Spec §26 (tokens, tiers, `globals.css`, `layout.tsx` con Schibsted Grotesk, capa de datos, contratos de assets, componentes de media, `lib/motion`, `useScene`, `journey-store`, geometría, route sync, acción de contacto, skeleton del Journey).
+- **Phase 0 · Audit: hecha** (`docs/06-phase0-audit.md`, hecha sobre `806590c`; `main` ya incluía ENSAMBLE V2 + copy en español — ver `docs/07` §4).
+- **Phase 1 · Foundation: hecha** (`docs/07-phase1-foundation.md`). Esqueleto del Journey estático y legible sin JS, datos tipados, contratos de assets, media, `lib/motion`/`tiers`/`useScene`/`journey-store`/`geometry`/`route-sync`, contacto, `/trabajo/[slug]`. Tests: `npx vitest run` (contenido + unidades) y `npx playwright test` (e2e sobre el build). Stack: Next 16.3.7, React 19.2.8, TS 5.9 strict, Tailwind 4, GSAP 3.15; dev: Vitest 3, Playwright 1.64.
+- **Próxima: Phase 2 · Opening + Hero** (Spec §26). Trabajar **una fase por vez**: no empezar una fase hasta que pasen los criterios de aceptación de la anterior. Al terminar cada fase: escribir `docs/0N-*.md` y detenerse a reportar.
 
 ## 3. No negociables
 
@@ -48,11 +47,11 @@ Antes de cada fase: releer los capítulos del Spec que ella cita (§26 tiene la 
 
 ## 4. Fuentes
 
-Recomendada y decidida: **Schibsted Grotesk** (variable, latin, OFL), auto-hospedada con `next/font/local`. Google Fonts **no es accesible** desde el entorno de sesiones anteriores; la vía usada fue el paquete npm (`@fontsource-variable/schibsted-grotesk`, archivo `files/schibsted-grotesk-latin-wght-normal.woff2` + `LICENSE`) → copiar a `src/fonts/`. Mono: IBM Plex Mono (ya en `src/fonts/`; pregunta abierta no bloqueante, Spec §29). Retirar Archivo Narrow e IBM Plex Sans cuando el reemplazo esté en pie.
+Recomendada y decidida: **Schibsted Grotesk** (variable, latin, OFL), auto-hospedada con `next/font/local`. Google Fonts **no es accesible** desde el entorno de sesiones anteriores; la vía usada fue el paquete npm (`@fontsource-variable/schibsted-grotesk`, archivo `files/schibsted-grotesk-latin-wght-normal.woff2` + `LICENSE`) → copiar a `src/fonts/`. Mono: IBM Plex Mono (ya en `src/fonts/`; pregunta abierta no bloqueante, Spec §29). Archivo Narrow, IBM Plex Sans y Plex Mono 500 ya retirados (Phase 1); en `src/fonts/` quedan `schibsted-grotesk-latin-wght-normal.woff2` (+ licencia) e `ibm-plex-mono-latin-400-normal.woff2`.
 
 ## 5. Assets
 
-- Reales hoy: `public/projects/{prospector,santi-nuca,chef-arturo}/**` (24 PNG ~2550×1325; nunca servir crudos → `Still`/next-image y pipeline `scripts/media.mjs` con `sharp`, que ya está en `node_modules`). **TravelSuite360: ninguno.** **Franco: ni retrato, ni busto, ni video.**
+- Reales hoy: `public/projects/{prospector,santi-nuca,chef-arturo}/**` (24 PNG ~2550×1325; nunca servir crudos → `Still`/next-image y pipeline `scripts/media.mjs` con `sharp`, que ya está en `node_modules`). **TravelSuite360: 4 capturas de ENSAMBLE con datos de producción difuminados — no aprobadas** (Spec §23 exige datos demo + firma de dos personas); registradas como `candidates`, nunca se publican. **Franco: ni retrato, ni busto, ni video.**
 - Contrato único: `data/assets.ts` + `lib/assets.ts` (Spec §22), estados `final | placeholder | derived`. Los componentes de media (`LoopVideo`, `ProofMedia`, `Still`, `Cutout`, `Placeholder`) no conocen paths: piden claves al registro.
 - Faltantes y qué bloquea el lanzamiento: tabla "ASSETS MISSING" en `docs/06-phase0-audit.md`.
 
@@ -64,9 +63,12 @@ npm run dev        # http://localhost:3000
 npm run build
 npm run lint
 npx tsc --noEmit
+npx vitest run          # contenido + unidades (los chequeos de HTML usan el build)
+npx playwright test     # e2e sobre el build de producción (Chromium)
+npm run check:assets    # contratos (corre solo en prebuild); check:launch = modo lanzamiento
 ```
 
-Verificar con `tsc --noEmit`, `eslint` y `next build` antes de cada commit de fase. Node 22.
+Verificar con `tsc --noEmit`, `eslint`, `next build`, `npx vitest run` y `npx playwright test` antes de cada commit de fase. `npm run check:launch` falla a propósito mientras haya slots bloqueantes en placeholder (y también cualquier build con `VERCEL_ENV=production`). Node ≥ 22.18.
 
 ## 7. Git
 
