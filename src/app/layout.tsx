@@ -1,65 +1,72 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { SITE } from "@/data/site";
 import "./globals.css";
 
-const archivo = localFont({
-  variable: "--font-archivo",
+/**
+ * Schibsted Grotesk, one variable file (latin, wght 400–900, OFL): 900 display, 500 editorial,
+ * 400 UI (Revelado 2.2 §3). The metric-adjusted fallback keeps the swap from shifting layout.
+ */
+const schibsted = localFont({
+  variable: "--font-schibsted",
   display: "swap",
-  src: [
-    { path: "../fonts/archivo-narrow-latin-500-normal.woff2", weight: "500", style: "normal" },
-    { path: "../fonts/archivo-narrow-latin-700-normal.woff2", weight: "700", style: "normal" },
-  ],
+  weight: "400 900",
+  adjustFontFallback: "Arial",
+  src: "../fonts/schibsted-grotesk-latin-wght-normal.woff2",
 });
 
-const plexSans = localFont({
-  variable: "--font-plex-sans",
-  display: "swap",
-  src: [
-    { path: "../fonts/ibm-plex-sans-latin-400-normal.woff2", weight: "400", style: "normal" },
-    { path: "../fonts/ibm-plex-sans-latin-500-normal.woff2", weight: "500", style: "normal" },
-  ],
-});
-
+/** IBM Plex Mono 400 for labels and metadata (Spec §29 Q6: kept, non-blocking) */
 const plexMono = localFont({
   variable: "--font-plex-mono",
   display: "swap",
-  src: [
-    { path: "../fonts/ibm-plex-mono-latin-400-normal.woff2", weight: "400", style: "normal" },
-    { path: "../fonts/ibm-plex-mono-latin-500-normal.woff2", weight: "500", style: "normal" },
-  ],
+  adjustFontFallback: false,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
+  src: [{ path: "../fonts/ibm-plex-mono-latin-400-normal.woff2", weight: "400", style: "normal" }],
 });
 
-const title = "Franco Núñez — Diseño y desarrollo de productos digitales";
-const description =
-  "Productos digitales, de la idea a producción: estrategia, diseño, ingeniería y lanzamiento. Desde Montevideo, Uruguay, para proyectos en cualquier país.";
-
 export const metadata: Metadata = {
-  title,
-  description,
+  title: SITE.meta.title,
+  description: SITE.meta.description,
   openGraph: {
-    title,
-    description: "Productos digitales, de la idea a producción. Estrategia, diseño, ingeniería y lanzamiento, ensamblados por una sola persona.",
+    title: SITE.meta.ogTitle,
+    description: SITE.meta.ogDescription,
     type: "website",
-    locale: "es_UY",
+    locale: "es",
   },
   twitter: {
     card: "summary",
-    title,
-    description: "Productos digitales, de la idea a producción.",
+    title: SITE.meta.ogTitle,
+    description: SITE.meta.ogDescription,
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1f2220",
+  themeColor: "#0B0B0C",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
+/**
+ * `.js` on <html> before first paint (Spec §24): CSS switches from the static layout to the
+ * animated initial states only when it is present — without it nothing is ever hidden.
+ * suppressHydrationWarning covers exactly that one attribute on <html>.
+ */
+const JS_GATE = "document.documentElement.classList.add('js')";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${archivo.variable} ${plexSans.variable} ${plexMono.variable}`}>
-      <body>{children}</body>
+    <html lang={SITE.lang} className={`${schibsted.variable} ${plexMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: JS_GATE }} />
+      </head>
+      <body>
+        <a href="#contenido" className="skip-link">
+          {SITE.nav.skip}
+        </a>
+        {children}
+      </body>
     </html>
   );
 }
