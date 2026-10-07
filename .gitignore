@@ -31,3 +31,7 @@ coverage/
 /out/
 *.tsbuildinfo
 next-env.d.ts
+
+# tests
+test-results/
+playwright-report/
