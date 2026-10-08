@@ -33,7 +33,9 @@ test.describe("console, hydration, overflow, layout shift", () => {
       const problems = watchConsole(page);
       await page.goto(route, { waitUntil: "networkidle" });
       await scrollThrough(page, async () => {
-        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        // against the configured viewport: mobile emulation widens innerWidth to fit overflowing content
+        const width = page.viewportSize()!.width;
+        const overflow = await page.evaluate((w) => document.documentElement.scrollWidth - w, width);
         expect(overflow, `horizontal overflow at y=${await page.evaluate(() => window.scrollY)}`).toBeLessThanOrEqual(0);
       });
       expect(problems).toEqual([]);
