@@ -69,10 +69,11 @@ export function labelStops(labels: Record<string, number>, duration: number, pre
 /**
  * Directional label snap: settles on the next `s:` label in the direction of travel
  * (markers `m:` are skipped — the built-in labelsDirectional would stop on every label).
+ * `eps`: how far past a stop still counts as on it (scroll positions are whole pixels, so a
+ * jump to a label can land a fraction of a pixel beyond it).
  */
-export function snapToStop(stops: number[], value: number, direction: number): number {
+export function snapToStop(stops: number[], value: number, direction: number, eps = 1e-4): number {
   if (!stops.length) return value;
-  const eps = 1e-4;
   if (direction >= 0) {
     for (const s of stops) if (s >= value - eps) return s;
     return stops[stops.length - 1];

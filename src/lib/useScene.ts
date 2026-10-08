@@ -44,8 +44,12 @@ export interface SceneOptions {
   id?: string;
   /** pin length in gestures: units × GESTURE_VH[tier] (units × 50vh under reduced motion) */
   units: number | ((tier: Tier, rm: boolean) => number);
-  /** default true. Flow scenes (no pin) scrub while the section passes. */
-  pin?: boolean;
+  /**
+   * default true (a ScrollTrigger pin). "sticky": the root is `position: sticky` inside a parent
+   * that only wraps it (the parent gets the pin length as height). Flow scenes (false) scrub
+   * while the section passes.
+   */
+  pin?: boolean | "sticky";
   /** snap to `s:` labels after scrolling stops (default true; never under reduced motion) */
   snap?: boolean;
   /** default 0.6 (worlds); 0.8 for the rail and Franco at work */
@@ -82,6 +86,25 @@ export function queueRefresh() {
 }
 
 const isDev = process.env.NODE_ENV !== "production";
+
+/**
+ * Built scenes by id: navigation asks where a scene starts or where one of its labels is
+ * ("enter Rayo at s:ISOLATE") without knowing pin lengths. Label positions are 0–1 of the pin.
+ */
+const scenes = new Map<string, { trigger: ScrollTrigger; labels: Record<string, number> }>();
+
+export function getScene(id: string) {
+  return scenes.get(id);
+}
+
+/** document scroll position of a scene's start, or of one of its labels */
+export function sceneScroll(id: string, label?: string): number | null {
+  const sc = scenes.get(id);
+  if (!sc) return null;
+  const { start, end } = sc.trigger;
+  const p = label ? (sc.labels[label] ?? 0) : 0;
+  return start + p * (end - start);
+}
 
 /**
  * One section = one gsap.matchMedia (tiers + reduced motion) → one timeline + at most one
@@ -175,18 +198,35 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         track();
       });
 
+      // 2 px of scroll, in progress: a whole-pixel jump to a label (navigation, a deep link,
+      // Back) is on that label, so a forward snap does not carry it to the next one
+      const pxEps = (st?: ScrollTrigger) => (st && st.end > st.start ? 2 / (st.end - st.start) : 1e-4);
       const units = typeof o.units === "function" ? o.units(tier, rm) : o.units;
       // the end of the pin is a resting place too: past the last state, a stop releases the pin
       const snapStops = stops.length && stops[stops.length - 1] < 1 - 1e-4 ? [...stops, 1] : stops;
       const lengthVh = pinLengthVh(units, tier, rm);
+      // sticky: the root sticks at the top of its parent, which is made as tall as the root plus
+      // the pin length — no fixed positioning, so entering or leaving the pin never shifts layout
+      const holder = pinned && o.pin === "sticky" ? root.parentElement : null;
+      if (holder) {
+        holder.style.height = `${root.offsetHeight + (lengthVh * window.innerHeight) / 100}px`;
+        reverts.push(() => holder.style.removeProperty("height"));
+      }
+      // a snap back to the first state lands on the first whole pixel inside the sticky pin (a
+      // fractional start would round to a scroll position just before the stage sticks)
+      const inside = (stop: number, st?: ScrollTrigger) => {
+        if (stop !== 0 || !holder || !st || st.end <= st.start) return stop;
+        const first = Math.ceil(holder.getBoundingClientRect().top + window.scrollY);
+        return Math.max(0, (first + 0.25 - st.start) / (st.end - st.start));
+      };
       const scrollTrigger = ScrollTrigger.create({
         id: o.id,
-        trigger: root,
+        trigger: holder ?? root,
         start: pinned ? "top top" : "top 80%",
-        end: pinned ? `+=${lengthVh}%` : "bottom 20%",
-        pin: pinned,
+        end: holder ? () => `+=${holder.offsetHeight - root.offsetHeight}` : pinned ? `+=${lengthVh}%` : "bottom 20%",
+        pin: pinned && !holder,
         pinSpacing: true,
-        anticipatePin: pinned ? 1 : 0,
+        anticipatePin: pinned && !holder ? 1 : 0,
         scrub: stepping ? true : (o.scrub ?? 0.6),
         invalidateOnRefresh: true,
         animation: stepping ? undefined : tl,
@@ -194,7 +234,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
           stepping || !(o.snap ?? true) || snapStops.length < 2
             ? undefined
             : {
-                snapTo: (value: number, self?: ScrollTrigger) => snapToStop(snapStops, value, self?.direction ?? 1),
+                snapTo: (value: number, self?: ScrollTrigger) => inside(snapToStop(snapStops, value, self?.direction ?? 1, pxEps(self)), self),
                 duration: { min: 0.25, max: 0.6 },
                 delay: 0.08,
                 ease: "power2.out",
@@ -208,7 +248,13 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         onToggle: (self) => o.onToggle?.(self.isActive),
       });
       track();
+      // a refresh renders the timeline with its events suppressed (a reload restores a scroll
+      // position, nothing scrolls afterwards): mirror the state once the playhead is placed
+      const retrack = () => requestAnimationFrame(track);
+      ScrollTrigger.addEventListener("refresh", retrack);
+      reverts.push(() => ScrollTrigger.removeEventListener("refresh", retrack));
       queueRefresh();
+      if (o.id) scenes.set(o.id, { trigger: scrollTrigger, labels: Object.fromEntries(Object.entries(tl.labels).map(([k, t]) => [k, duration > 0 ? t / duration : 0])) });
 
       // A refresh (coalesced build refresh, fonts, resize) cancels a pending snap. If the visitor
       // has stopped between two states when it lands, finish the directional snap once scrolling
@@ -225,7 +271,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
           if (performance.now() - lastScroll < 200) return settle();
           if (!scrollTrigger.isActive) return;
           const span = scrollTrigger.end - scrollTrigger.start;
-          const target = snapToStop(snapStops, scrollTrigger.progress, scrollTrigger.direction || 1);
+          const target = inside(snapToStop(snapStops, scrollTrigger.progress, scrollTrigger.direction || 1, pxEps(scrollTrigger)), scrollTrigger);
           if (Math.abs(target - scrollTrigger.progress) * span < 2) return;
           window.scrollTo({ top: scrollTrigger.start + target * span, behavior: "smooth" });
         }, 260);
@@ -236,6 +282,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
       }
 
       return () => {
+        if (o.id && scenes.get(o.id)?.trigger === scrollTrigger) scenes.delete(o.id);
         window.clearTimeout(settleTimer);
         if (snaps) {
           window.removeEventListener("scroll", onScroll);

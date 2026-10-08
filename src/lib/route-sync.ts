@@ -9,8 +9,8 @@ import type { SectionId } from "./journey-store";
  * - capacidades / perfil / contacto → `/#{id}`
  * - anything else (opening, reel) → `/`
  *
- * Scrolling only ever calls `history.replaceState` (no history spam). Explicit navigation
- * (reel "Ver caso", overlay, "Siguiente →") pushes history — wired in Phase 4.
+ * Pure mapping, used on the server too. The history side (replaceState while scrolling,
+ * pushState on explicit navigation, popstate) lives in lib/journey-nav.
  */
 
 const PROJECT_SECTIONS: readonly ProjectSlug[] = ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"];
@@ -27,27 +27,18 @@ export function pathForSection(section: SectionId): string {
 }
 
 export function sectionForLocation(pathname: string, hash = ""): SectionId | null {
-  const m = /^\/trabajo\/([^/]+)\/?$/.exec(pathname);
-  if (m) return (PROJECT_SECTIONS as readonly string[]).includes(m[1]) ? (m[1] as ProjectSlug) : null;
+  // an anchor wins over the path: "#perfil" means Perfil on every journey URL
   const h = hash.replace(/^#/, "");
   if ((ANCHOR_SECTIONS as readonly string[]).includes(h)) return h as SectionId;
   if (h === "trabajo") return "trabajo";
+  // any other fragment (the skip link, the no-JS "Ir a …") is the browser's
+  if (h) return null;
+  const m = /^\/trabajo\/([^/]+)\/?$/.exec(pathname);
+  if (m) return (PROJECT_SECTIONS as readonly string[]).includes(m[1]) ? (m[1] as ProjectSlug) : null;
   return pathname === "/" ? "inicio" : null;
 }
 
 /** the URL as the router sees it, for comparison with `pathForSection` */
 export function currentUrl(loc: Pick<Location, "pathname" | "hash">): string {
   return `${loc.pathname}${loc.hash}`;
-}
-
-/**
- * Keep the address bar and the document title in step with the active section
- * (`replaceState` only). `titles` maps each section to its `<title>`.
- */
-export function syncUrl(section: SectionId, titles: Partial<Record<SectionId, string>>, fallbackTitle: string) {
-  if (typeof window === "undefined") return;
-  const next = pathForSection(section);
-  if (currentUrl(window.location) !== next) window.history.replaceState(null, "", next);
-  const title = titles[section] ?? fallbackTitle;
-  if (document.title !== title) document.title = title;
 }

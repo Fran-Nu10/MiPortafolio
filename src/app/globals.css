@@ -652,30 +652,36 @@ html.js main[data-initial]:not([data-started]) .hero-stage {
    measures it: active width W per tier (sm 100vw − 32 · md 84vw · lg 76vw · xl 76vw ≤ 1094),
    capped so the frame is at most 72svh tall (64svh on sm) at its own aspect; gap 8/24/32/32;
    frames centered in the 100svh stage (sm: top at 18svh). The track starts centered on 01. */
-.reel {
+/* the shared reel rectangle (Spec §07): the reel's active frame, every world's SCREEN state
+   and every proof window */
+:root {
   --reel-w: calc(100vw - 32px);
   --reel-cap: 64svh;
   --reel-gap: 8px;
+}
+.reel {
   --r0: var(--r0-m);
   --active-r: var(--active-r-m);
 }
 @media (min-width: 768px) {
-  .reel {
+  :root {
     --reel-w: 84vw;
     --reel-cap: 72svh;
     --reel-gap: 24px;
+  }
+  .reel {
     --r0: var(--r0-d);
     --active-r: var(--active-r-d);
   }
 }
 @media (min-width: 1024px) {
-  .reel {
+  :root {
     --reel-w: 76vw;
     --reel-gap: 32px;
   }
 }
 @media (min-width: 1440px) {
-  .reel {
+  :root {
     --reel-w: min(76vw, 1094px);
   }
 }
@@ -965,7 +971,7 @@ html.js .reel[data-anim] .reel-controls {
   }
 }
 
-/* ── worlds (static SCREEN + copy; Phases 4–8 build the scenes) ─────────── */
+/* ── worlds — without JS: the static SCREEN poster and the world copy, readable ─── */
 .world {
   position: relative;
   padding: 14svh var(--gutter) 8svh;
@@ -1074,6 +1080,280 @@ html.js .reel[data-anim] .reel-controls {
   background: rgb(11 11 12 / 0.6);
   color: var(--color-paper);
   touch-action: manipulation;
+}
+
+/* ── the shared rectangle, as a reusable rule: --w × --h at (--sx, --sy) in a 100svh stage ── */
+.world-stage,
+.proof {
+  --r: var(--r-d);
+  --w: min(var(--reel-w), calc(var(--reel-cap) * var(--r)));
+  --h: calc(var(--w) / var(--r));
+  --sx: calc((100vw - var(--w)) / 2);
+  --sy: calc((100svh - var(--h)) / 2);
+}
+@media (max-width: 767.98px) {
+  .world-stage {
+    --r: var(--r-m);
+    --sy: 18svh;
+  }
+}
+/* proofs: the project's reel rectangle on lg/xl; a 16:9 window on md (84vw) and sm (full width) */
+@media (max-width: 1023.98px) {
+  .proof {
+    --r: 1.7778;
+  }
+}
+
+/* the escaping object exists only for the scene */
+.world-object {
+  display: none;
+}
+
+/* ── worlds with JavaScript (Spec §07 stage) ──────────────────────────────────
+   Descendant selectors on purpose: once pinned, ScrollTrigger wraps the stage in a pin-spacer. */
+html.js .world:has(.world-stage[data-anim]) {
+  padding: 0 0 10svh;
+}
+/* the name is read by assistive tech here; the scenes show it later (TS10 and the others) */
+html.js .world:has(.world-stage[data-anim]) > .world-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: 0;
+}
+html.js .world-stage[data-anim] {
+  --ax: var(--ax-d);
+  --ay: var(--ay-d);
+  --aw: var(--aw-d);
+  --ah: var(--ah-d);
+  /* pinned by sticky inside .world-pin (useScene pin: "sticky") */
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  max-width: none;
+  margin: 0;
+  overflow: clip;
+  background: var(--color-black);
+}
+@media (max-width: 767.98px) {
+  html.js .world-stage[data-anim] {
+    --ax: var(--ax-m);
+    --ay: var(--ay-m);
+    --aw: var(--aw-m);
+    --ah: var(--ah-m);
+  }
+}
+html.js .world-stage[data-anim] .world-env {
+  display: block;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.world[data-env="black"] .world-env {
+  background: var(--color-black);
+}
+.world[data-env="red"] .world-env {
+  background: var(--color-signal);
+}
+.world[data-env="paper"] .world-env {
+  background: var(--color-paper);
+}
+/* Chef: no colour plane — the image itself becomes the environment */
+.world[data-env="image"] .world-env {
+  background: transparent;
+}
+html.js .world-stage[data-anim] .world-screen {
+  position: absolute;
+  left: var(--sx);
+  top: var(--sy);
+  width: var(--w);
+  height: var(--h);
+  aspect-ratio: auto;
+  max-height: none;
+}
+html.js .world-stage[data-anim] .world-screen-dim {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+}
+/* the object over its place in the poster: (sx + ax·w, sy + ay·h), aw·w × ah·h */
+html.js .world-stage[data-anim] .world-object {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: calc(var(--sx) + var(--ax) * var(--w));
+  top: calc(var(--sy) + var(--ay) * var(--h));
+  width: calc(var(--aw) * var(--w));
+  height: calc(var(--ah) * var(--h));
+  opacity: 0;
+  pointer-events: none;
+}
+/* a crop of the poster: the full frame behind a window at the anchor — the same pixels */
+.world-object-crop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.world-object-crop > .still {
+  inset: auto;
+  left: calc(-100% * var(--ax) / var(--aw));
+  top: calc(-100% * var(--ay) / var(--ah));
+  width: calc(100% / var(--aw));
+  height: calc(100% / var(--ah));
+}
+/* TravelSuite360: the message itself, set at its TS01 size (the scene scales it into place) */
+html.js .world-stage[data-anim] .world-object-text {
+  width: max-content;
+  max-width: min(1100px, 76vw);
+  height: auto;
+}
+.world-object-text p,
+p.world-object-text {
+  margin: 0;
+  font-size: var(--type-statement);
+  line-height: 1.1;
+  font-weight: 500;
+  color: var(--color-paper);
+}
+@media (max-width: 767.98px) {
+  html.js .world-stage[data-anim] .world-object-text {
+    max-width: calc(100vw - 48px);
+  }
+}
+html.js .world:has(.world-stage[data-anim]) > .world-credit,
+html.js .world:has(.world-stage[data-anim]) > .world-copy {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+html.js .world:has(.world-stage[data-anim]) > .world-credit {
+  margin-top: 6svh;
+}
+html.js .world:has(.world-stage[data-anim]) > .world-copy {
+  margin-top: 6svh;
+}
+
+/* ── proofs with JavaScript: the window at the shared rectangle, centered in its stage ──── */
+html.js .proof {
+  position: relative;
+  padding: 0 0 14svh;
+}
+html.js .proof .proof-figure {
+  position: relative;
+  height: 100svh;
+  max-width: none;
+  margin: 0;
+}
+html.js .proof .proof-window {
+  position: absolute;
+  left: var(--sx);
+  top: var(--sy);
+  width: var(--w);
+  height: var(--h);
+  aspect-ratio: auto;
+}
+html.js .proof .proof-name {
+  position: absolute;
+  z-index: 1;
+  left: var(--sx);
+  top: calc(var(--sy) - 32px);
+  max-width: none;
+  margin: 0;
+}
+html.js .proof .proof-caption {
+  position: absolute;
+  left: var(--sx);
+  right: var(--sx);
+  top: calc(var(--sy) + var(--h) + 16px);
+  margin: 0;
+}
+html.js .proof .proof-text {
+  max-width: calc(var(--w) + 2 * var(--gutter));
+  padding-inline: var(--gutter);
+  margin-top: 0;
+}
+@media (max-width: 767.98px) {
+  /* phone: the window sits higher, the caption under it, the text follows */
+  html.js .proof {
+    --sy: 18svh;
+  }
+}
+
+/* ── the 01–04 overlay (Spec §19): a native modal dialog ──────────────────── */
+.overlay {
+  width: min(1094px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100svh - 32px);
+  margin: auto;
+  padding: 20px 24px 28px;
+  color: var(--color-paper);
+  background: var(--color-panel);
+  border: 1px solid var(--rule-strong);
+  overscroll-behavior: contain;
+}
+.overlay::backdrop {
+  background: rgb(11 11 12 / 0.82);
+}
+/* the only time the page does not scroll: a modal is open (Spec §05) */
+html:has(dialog.overlay[open]) {
+  overflow: hidden;
+}
+.overlay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.overlay-close {
+  min-height: 44px;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.overlay-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.overlay-item {
+  display: grid;
+  gap: 10px;
+  color: var(--color-muted);
+  text-decoration: none;
+}
+.overlay-item:hover,
+.overlay-item:focus-visible {
+  color: var(--color-paper);
+}
+/* the red only marks what is active (Revelado 2.2 §8) */
+.overlay-item[aria-current] {
+  color: var(--color-signal);
+}
+.overlay-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-black);
+}
+@media (max-width: 767.98px) {
+  .overlay-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+[tabindex="-1"]:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* ── S7 / S14 · moments (flagged off until their media exists) ───────────── */

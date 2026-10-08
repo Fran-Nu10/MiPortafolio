@@ -53,6 +53,9 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
   const worldFor = (p: Project): WorldView => ({
     id: p.id,
     name: p.name,
+    worldType: p.worldType,
+    anchor: anchorOf(p),
+    object: p.worldType === "ts-depth" ? { kind: "text", text: p.worldCopy["TS01.message"] } : { kind: "crop" },
     env: p.theme.env,
     tone: p.theme.tone,
     aspect: p.reel.aspect,
@@ -80,6 +83,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
         ? { href: pathForSection(next.id), label: `${SITE.world.next} ${next.name}` }
         : { href: pathForSection("capacidades"), label: `${SITE.world.next} ${SITE.world.capabilitiesName}` },
       tone: p.theme.tone,
+      aspect: p.reel.aspect,
     };
   };
 
@@ -103,6 +107,11 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
           profile: SITE.nav.profile,
           cta: SITE.nav.cta,
           projects: PROJECTS.map((p) => ({ id: p.id, index: p.index, name: p.name })),
+          overlay: {
+            title: SITE.reel.label,
+            close: SITE.nav.close,
+            items: PROJECTS.map((p) => ({ id: p.id, label: miniLabel(p.index, p.name), href: pathForSection(p.id), poster: resolveAsset(p.reel.poster) })),
+          },
         }}
       />
       <main id="contenido" data-initial={initial ?? undefined}>
@@ -177,6 +186,13 @@ function ProjectWorld({ world, proof, children }: { world: WorldView; proof: Pro
       {children}
     </>
   );
+}
+
+/** where the escaping object sits in the SCREEN poster (its contract), centered if unknown */
+function anchorOf(p: Project): WorldView["anchor"] {
+  const a = resolveAsset(p.screen.poster).meta.anchorRect;
+  const fallback = { x: 0.3, y: 0.3, w: 0.4, h: 0.4 };
+  return { desktop: a?.desktop ?? fallback, mobile: a?.mobile ?? a?.desktop ?? fallback };
 }
 
 /** "Abrir ↗" only when the live URL is confirmed */

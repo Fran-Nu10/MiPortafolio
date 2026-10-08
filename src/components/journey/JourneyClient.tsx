@@ -4,15 +4,16 @@ import { useLayoutEffect } from "react";
 import type { ProjectSlug } from "@/data/types";
 import { registerGsap, ScrollTrigger } from "@/lib/motion";
 import { getJourney, setJourney, subscribeJourney, type SectionId } from "@/lib/journey-store";
-import { syncUrl } from "@/lib/route-sync";
+import { installHistory, navigate, reloadPosition, sectionForHref, sectionScroll, syncUrl, trackScrollPosition } from "@/lib/journey-nav";
 import { queueRefresh } from "@/lib/useScene";
 
 /**
- * Mounts once per journey (Spec §03): section tracking → store, store → URL (replaceState
- * only, Spec §20), and the deep-link start on `/trabajo/{slug}`. Renders nothing.
- *
- * Sections are tracked with one plain ScrollTrigger each (the hero's pinned scene included,
- * through its pin spacer); the opening scene writes `heroRevealed` itself.
+ * Mounts once per journey (Spec §03, §20). Renders nothing.
+ * - section tracking → store; store → URL and title (replaceState only)
+ * - in-journey links (reel "Ver caso", "Siguiente →", header, capabilities) → pushState + jump,
+ *   handled in the bubble phase so the reel (a drag is not a click) and the overlay can veto
+ * - Back / Forward → the remembered position
+ * - start: a deep link lands on its world's SCREEN state; a reload returns where the visitor was
  */
 export function JourneyClient({
   initial,
@@ -25,6 +26,7 @@ export function JourneyClient({
 }) {
   useLayoutEffect(() => {
     registerGsap();
+    const main = document.getElementById("contenido");
 
     const triggers = Array.from(document.querySelectorAll<HTMLElement>("[data-section]")).map((el) =>
       ScrollTrigger.create({
@@ -38,33 +40,53 @@ export function JourneyClient({
     );
     queueRefresh();
 
-    let syncing = !initial;
+    let syncing = false;
     const unsubscribe = subscribeJourney(() => {
       if (syncing) syncUrl(getJourney().section, titles, homeTitle);
     });
+    const offHistory = installHistory();
+    const offScroll = trackScrollPosition();
 
-    // deep link: start at the world, instantly, once layout and fonts are measured
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      const section = sectionForHref(a.getAttribute("href") ?? "");
+      if (!section) return;
+      e.preventDefault();
+      // a keyboard activation (detail 0) moves focus to where the visitor lands
+      navigate(section, { focus: e.detail === 0, from: a });
+    };
+    document.addEventListener("click", onClick);
+
+    // the first position: deep link → the world's SCREEN; reload → the remembered place
     let cancelled = false;
-    if (initial) {
-      const restoration = history.scrollRestoration;
+    const remembered = reloadPosition();
+    const start = () => {
+      if (cancelled) return;
+      ScrollTrigger.refresh();
+      const y = remembered ?? (initial ? sectionScroll(initial) : null);
+      if (y !== null) window.scrollTo({ top: y, behavior: "instant" });
+      history.scrollRestoration = "auto";
+      // the hero was kept out of sight until now (no opening flash on deep links)
+      main?.setAttribute("data-started", "");
+      if (initial && remembered === null) setJourney({ section: initial });
+      syncing = true;
+    };
+    if (initial || remembered !== null) {
       history.scrollRestoration = "manual";
-      const jump = () => {
-        if (cancelled) return;
-        ScrollTrigger.refresh();
-        const target = document.getElementById(initial);
-        if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY, behavior: "instant" });
-        history.scrollRestoration = restoration;
-        // the hero was kept out of sight until now (no opening flash on deep links)
-        document.getElementById("contenido")?.setAttribute("data-started", "");
-        setJourney({ section: initial });
-        syncing = true;
-      };
-      (document.fonts?.ready ?? Promise.resolve()).then(() => requestAnimationFrame(jump));
+      (document.fonts?.ready ?? Promise.resolve()).then(() => requestAnimationFrame(start));
+    } else {
+      main?.setAttribute("data-started", "");
+      syncing = true;
     }
 
     return () => {
       cancelled = true;
       unsubscribe();
+      offHistory();
+      offScroll();
+      document.removeEventListener("click", onClick);
       triggers.forEach((t) => t.kill());
     };
   }, [initial, titles, homeTitle]);

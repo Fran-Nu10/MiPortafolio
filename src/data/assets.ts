@@ -87,6 +87,8 @@ export const ASSETS: AssetContract[] = [
     privacyChecked: false,
     meta: {
       source: "Captura real con datos demo (Spec §23). anchorRect del mensaje: se fija con la captura.",
+      // where the message will sit in the capture: provisional, the placeholder has no message
+      anchorRect: { desktop: { x: 0.08, y: 0.42, w: 0.5, h: 0.12 }, mobile: { x: 0.07, y: 0.4, w: 0.86, h: 0.14 } },
       // ENSAMBLE captures of production data with personal data blurred. Not approved:
       // Spec §23 requires controlled demo data and a two-person sign-off.
       candidates: [
@@ -107,7 +109,11 @@ export const ASSETS: AssetContract[] = [
       mobile: { src: "/projects/prospector/prospector-hero-exploded.png", width: 2543, height: 1321, focus: "50% 50%" },
     },
     alt: "Hamburguesa Clásica, vista por capas",
-    meta: { source: "Captura real del hero de la demo. anchorRect de la burger: Phase 4 (bandas de capas en docs/06)." },
+    meta: {
+      source: "Captura real del hero de la demo.",
+      // the layered burger, normalized to the reel frame (provisional until the cutouts, Phase 6)
+      anchorRect: { desktop: { x: 0.37, y: 0.05, w: 0.25, h: 0.95 }, mobile: { x: 0.26, y: 0.05, w: 0.48, h: 0.95 } },
+    },
   },
   {
     key: "santi.reel.poster",
@@ -119,7 +125,11 @@ export const ASSETS: AssetContract[] = [
       mobile: { src: "/projects/santi-nuca/santi-nuca-opening.png", width: 2547, height: 1324, focus: "50% 50%" },
     },
     alt: "Apertura del portfolio de Santi Nuca — fotografía de Santi Nuca",
-    meta: { source: "Captura real de la apertura del sitio." },
+    meta: {
+      source: "Captura real de la apertura del sitio.",
+      // the opening photograph panel, normalized to the reel frame (provisional, Phase 7)
+      anchorRect: { desktop: { x: 0.29, y: 0.05, w: 0.41, h: 0.95 }, mobile: { x: 0.06, y: 0.02, w: 0.82, h: 0.98 } },
+    },
   },
   {
     key: "chef.reel.poster",
@@ -128,10 +138,15 @@ export const ASSETS: AssetContract[] = [
     aspect: { desktop: [1094, 640], mobile: REEL_MOBILE },
     files: {
       desktop: { src: "/projects/chef-arturo/chef-arturo-hero.png", width: 2553, height: 1324 },
-      mobile: { src: "/projects/chef-arturo/chef-arturo-hero.png", width: 2553, height: 1324, focus: "50% 50%" },
+      // the portrait crop keeps the product (right side of the hero) in frame
+      mobile: { src: "/projects/chef-arturo/chef-arturo-hero.png", width: 2553, height: 1324, focus: "100% 50%" },
     },
     alt: "Portada de la tienda de Chef Arturo",
-    meta: { source: "Captura real del hero de la tienda." },
+    meta: {
+      source: "Captura real del hero de la tienda.",
+      // the product in its arch, normalized to the reel frame (provisional until the original, Phase 8)
+      anchorRect: { desktop: { x: 0.835, y: 0.365, w: 0.153, h: 0.33 }, mobile: { x: 0.53, y: 0.36, w: 0.31, h: 0.33 } },
+    },
   },
 
   // ── reel loops (posters only until they exist — allowed in production) ──────

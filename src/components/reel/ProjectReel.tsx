@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { EASE, gsap, registerGsap, ScrollTrigger, usePrefersReducedMotion } from "@/lib/motion";
+import { navigate, sectionForHref } from "@/lib/journey-nav";
 import { isSaveData } from "@/lib/media";
 import {
   AXIS_LOCK,
@@ -235,9 +236,9 @@ export function ProjectReel({ label, heading, items, copy }: { label: string; he
       }
       if (target.closest("a")) return;
       if (target.closest('[data-part="frame"]')) {
-        // Phase 4 replaces this with the in-journey jump (pushState + SCREEN state)
-        const href = li.querySelector<HTMLAnchorElement>("[data-enter]")?.href;
-        if (href) window.location.assign(href);
+        // the active frame enters its world: pushState + the jump to its SCREEN state
+        const section = sectionForHref(li.querySelector<HTMLAnchorElement>("[data-enter]")?.getAttribute("href") ?? "");
+        if (section) navigate(section, { from: li });
       }
     };
     const onDragStart = (e: DragEvent) => e.preventDefault();
