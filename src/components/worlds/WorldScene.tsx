@@ -14,6 +14,8 @@ export interface WorldView {
   copy: { key: string; text: string }[];
   /** Santi: "Fotografía · Santi Nuca", visible next to the first photograph */
   credit?: string;
+  /** the world a deep link starts at: its poster is the route's largest paint */
+  priority?: boolean;
 }
 
 /**
@@ -49,7 +51,7 @@ export function WorldScene({ world }: { world: WorldView }) {
             } as CSSProperties
           }
         >
-          <Still asset={world.poster} sizes={REEL_SIZES} fill />
+          <Still asset={world.poster} sizes={REEL_SIZES} fill priority={world.priority} />
           <div data-part="screen-dim" className="world-screen-dim" />
         </div>
         {world.credit ? (

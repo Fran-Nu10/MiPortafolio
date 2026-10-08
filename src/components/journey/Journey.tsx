@@ -57,6 +57,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
     poster: resolveAsset(p.screen.poster),
     copy: Object.entries(p.worldCopy).map(([key, text]) => ({ key, text })),
     credit: p.credit ? `${p.credit.label} · ${p.credit.holder}` : undefined,
+    priority: initial === p.id,
   });
 
   const proofFor = (p: Project): ProofView => {
@@ -111,7 +112,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
             </a>
           </p>
         ) : null}
-        <OpeningHero hero={SITE.hero} portrait={resolveAsset("franco.hero")} />
+        <OpeningHero hero={SITE.hero} portrait={resolveAsset("franco.hero")} grain={resolveAsset("site.grain")} skipOpening={initial !== null} />
         <ProjectReel label={SITE.reel.label} heading={SITE.reel.heading} items={reelItems} />
         {PROJECTS.map((p) => (
           <ProjectWorld key={p.id} world={worldFor(p)} proof={proofFor(p)}>

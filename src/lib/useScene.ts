@@ -35,13 +35,15 @@ export interface SceneApi {
    * reset instantly when it crosses backward (`progress(0)`). Under stepping it jumps to its end.
    */
   auto: (label: string, build: () => Segment) => void;
+  /** run `fn` when this build is reverted (tier / reduced-motion flip, resize rebuild, unmount) */
+  onRevert: (fn: () => void) => void;
 }
 
 export interface SceneOptions {
   /** ScrollTrigger id (debugging, QA) */
   id?: string;
   /** pin length in gestures: units × GESTURE_VH[tier] (units × 50vh under reduced motion) */
-  units: number | ((tier: Tier) => number);
+  units: number | ((tier: Tier, rm: boolean) => number);
   /** default true. Flow scenes (no pin) scrub while the section passes. */
   pin?: boolean;
   /** snap to `s:` labels after scrolling stops (default true; never under reduced motion) */
@@ -54,6 +56,8 @@ export interface SceneOptions {
   onState?: (state: string) => void;
   /** the section's trigger became active / inactive */
   onToggle?: (active: boolean) => void;
+  /** scroll progress of the section's trigger (0–1), on every scroll update — not the playhead */
+  onUpdate?: (progress: number) => void;
   deps?: unknown[];
 }
 
@@ -100,6 +104,8 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
       // stepping = states replace each other in place (reduced motion, unpinned tiny viewports)
       const stepping = rm || ((o.pin ?? true) && !pinned);
       const autos: { label: string; seg: Segment }[] = [];
+      const reverts: (() => void)[] = [];
+      const runReverts = () => reverts.splice(0).forEach((fn) => fn());
       const q = (sel: string) => Array.from(root.querySelectorAll<HTMLElement>(sel));
       const api: SceneApi = {
         root,
@@ -114,6 +120,9 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
           seg.pause(0);
           autos.push({ label, seg });
         },
+        onRevert: (fn) => {
+          reverts.push(fn);
+        },
       };
 
       let tl: gsap.core.Timeline | null;
@@ -123,9 +132,9 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         // that section falls back to its static layout; the others are unaffected (Spec §24)
         root.removeAttribute("data-anim");
         if (isDev) console.error(`[useScene:${o.id ?? root.id}] build failed`, err);
-        return;
+        return runReverts;
       }
-      if (!tl) return;
+      if (!tl) return runReverts;
       tl.pause();
 
       const duration = tl.duration();
@@ -134,6 +143,8 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         .filter(([name]) => name.startsWith(SNAP_PREFIX))
         .sort((a, b) => a[1] - b[1]);
 
+      // a snap lands on whole pixels, a hair before its label: ≈ 2 px of scroll in timeline time
+      const labelEps = Math.max(1e-4, duration * 0.002);
       // state mirroring + autos follow the playhead (which lags the scroll while scrubbing)
       let prevTime = 0;
       let state = "";
@@ -151,7 +162,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         }
         prevTime = t;
         let current = stateLabels[0]?.[0] ?? "";
-        for (const [name, at] of stateLabels) if (at <= t + 1e-4) current = name;
+        for (const [name, at] of stateLabels) if (at <= t + labelEps) current = name;
         if (current && current !== state) {
           state = current;
           root.dataset.state = current.slice(SNAP_PREFIX.length);
@@ -164,7 +175,9 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         track();
       });
 
-      const units = typeof o.units === "function" ? o.units(tier) : o.units;
+      const units = typeof o.units === "function" ? o.units(tier, rm) : o.units;
+      // the end of the pin is a resting place too: past the last state, a stop releases the pin
+      const snapStops = stops.length && stops[stops.length - 1] < 1 - 1e-4 ? [...stops, 1] : stops;
       const lengthVh = pinLengthVh(units, tier, rm);
       const scrollTrigger = ScrollTrigger.create({
         id: o.id,
@@ -178,29 +191,59 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         invalidateOnRefresh: true,
         animation: stepping ? undefined : tl,
         snap:
-          stepping || !(o.snap ?? true) || stops.length < 2
+          stepping || !(o.snap ?? true) || snapStops.length < 2
             ? undefined
             : {
-                snapTo: (value: number, self?: ScrollTrigger) => snapToStop(stops, value, self?.direction ?? 1),
+                snapTo: (value: number, self?: ScrollTrigger) => snapToStop(snapStops, value, self?.direction ?? 1),
                 duration: { min: 0.25, max: 0.6 },
                 delay: 0.08,
                 ease: "power2.out",
                 inertia: false,
               },
-        onUpdate: stepping
-          ? (self) => {
-              // the same timeline, shown only at its resting states
-              tl!.progress(stepToStop(stops, self.progress));
-            }
-          : undefined,
+        onUpdate: (self) => {
+          // stepping: the same timeline, shown only at its resting states
+          if (stepping) tl!.progress(stepToStop(stops, self.progress));
+          o.onUpdate?.(self.progress);
+        },
         onToggle: (self) => o.onToggle?.(self.isActive),
       });
       track();
       queueRefresh();
 
+      // A refresh (coalesced build refresh, fonts, resize) cancels a pending snap. If the visitor
+      // has stopped between two states when it lands, finish the directional snap once scrolling
+      // has been idle for a moment — never while a gesture is in progress.
+      const snaps = !stepping && (o.snap ?? true) && snapStops.length >= 2;
+      let settleTimer = 0;
+      let lastScroll = 0;
+      const onScroll = () => {
+        lastScroll = performance.now();
+      };
+      const settle = () => {
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(() => {
+          if (performance.now() - lastScroll < 200) return settle();
+          if (!scrollTrigger.isActive) return;
+          const span = scrollTrigger.end - scrollTrigger.start;
+          const target = snapToStop(snapStops, scrollTrigger.progress, scrollTrigger.direction || 1);
+          if (Math.abs(target - scrollTrigger.progress) * span < 2) return;
+          window.scrollTo({ top: scrollTrigger.start + target * span, behavior: "smooth" });
+        }, 260);
+      };
+      if (snaps) {
+        window.addEventListener("scroll", onScroll, { passive: true });
+        ScrollTrigger.addEventListener("refresh", settle);
+      }
+
       return () => {
+        window.clearTimeout(settleTimer);
+        if (snaps) {
+          window.removeEventListener("scroll", onScroll);
+          ScrollTrigger.removeEventListener("refresh", settle);
+        }
         scrollTrigger.kill();
         for (const a of autos) a.seg.kill();
+        runReverts();
       };
     };
 

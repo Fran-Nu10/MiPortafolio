@@ -34,9 +34,11 @@ export function Still({
     "--focus-m": mobile.focus ?? desktop.focus ?? "50% 50%",
   } as CSSProperties;
 
+  // Next 16: `priority` is deprecated — an above-the-fold LCP image loads eagerly at high priority
+  const eager = priority ? ({ loading: "eager", fetchPriority: "high" } as const) : {};
   let img: ReactNode;
   if (mobile.src !== desktop.src) {
-    const common = { alt: asset.alt, sizes, fill: true, priority } as const;
+    const common = { alt: asset.alt, sizes, fill: true, ...eager } as const;
     const { props: d } = getImageProps({ ...common, src: desktop.src });
     const {
       props: { srcSet: mobileSrcSet, ...m },
@@ -50,7 +52,7 @@ export function Still({
       </picture>
     );
   } else {
-    img = <Image src={desktop.src} alt={asset.alt} fill sizes={sizes} priority={priority} className="media-img" />;
+    img = <Image src={desktop.src} alt={asset.alt} fill sizes={sizes} {...eager} className="media-img" />;
   }
 
   return (

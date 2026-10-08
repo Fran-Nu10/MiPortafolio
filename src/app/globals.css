@@ -266,6 +266,26 @@ html:not(.js) .js-only {
   background: linear-gradient(rgb(11 11 12 / 0.85), rgb(11 11 12 / 0));
   font-size: 14px;
 }
+/* the header fades in after O2 (journey store `heroRevealed`); keyboard focus always shows it */
+.site-header {
+  transition: opacity 600ms var(--ease-settle);
+}
+html.js .site-header[data-revealed="false"]:not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+  animation: header-rescue 0s linear 4s forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition-duration: 200ms;
+  }
+}
+@keyframes header-rescue {
+  to {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
 .site-header-id {
   display: flex;
   align-items: baseline;
@@ -310,14 +330,30 @@ html:not(.js) .js-only {
   }
 }
 
-/* ── S1 · hero (static H2-like composition; Phase 2 animates it) ────────── */
+/* ── S1 · Opening → Hero → Positioning (Spec §02 S1, §03 hero stack, §15) ───
+   The static layout below is the H1 composition: what no-JS visitors, failed builds and
+   tiny viewports see. The scene (OpeningHero) takes over with inline GSAP styles. */
 .hero-stage {
+  /* FRANCO starts low enough to part upward (−6vh at H2) without meeting the header */
+  --first-top: calc(var(--header-h) + 8svh);
   position: relative;
   height: 100svh;
   min-height: 560px;
   overflow: clip;
   isolation: isolate;
   background: var(--color-black);
+}
+/* z1 · grain: one static tiled layer, never animated (no per-frame repaint) */
+.hero-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: var(--grain, none);
+  background-size: 256px 256px;
+  opacity: 0.06;
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 .hero-name {
   position: absolute;
@@ -329,54 +365,197 @@ html:not(.js) .js-only {
   color: var(--color-paper);
   user-select: none;
 }
+.hero-name > span {
+  display: inline;
+}
+/* z2 · FRANCO, behind the body */
 .hero-name-first {
   z-index: 2;
   left: var(--gutter);
-  top: calc(var(--header-h) + 4svh);
+  top: var(--first-top);
+}
+/* z3 · the portrait inside two nested clip windows: the scrolled aperture (O2 → O3) and the
+   time-based band (O0 → O1); what shows is their intersection */
+.hero-aperture {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.hero-band {
+  position: absolute;
+  inset: 0;
 }
 .hero-portrait {
   position: absolute;
-  z-index: 3;
-  right: 10vw;
+  right: 8vw;
   bottom: 0;
-  height: 88svh;
-  aspect-ratio: 3 / 4;
+  height: 92svh;
+  aspect-ratio: var(--ar-d);
 }
+.hero-lqip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px);
+  transform: scale(1.08);
+  opacity: 0;
+}
+/* z4 · NÚÑEZ, in front of the body, cut by the right edge */
 .hero-name-last {
   z-index: 4;
-  /* in front of the body, cut by the right edge */
   left: 38vw;
-  top: calc(var(--header-h) + 4svh + var(--hero-size) * 0.86);
+  top: calc(var(--first-top) + var(--hero-size) * 0.86);
 }
+/* z5 · readable copy */
 .hero-copy {
   position: absolute;
   z-index: 5;
   left: var(--gutter);
   bottom: calc(6svh + env(safe-area-inset-bottom));
-  max-width: min(520px, calc(100vw - 2 * var(--gutter)));
+  max-width: calc(100vw - 2 * var(--gutter));
 }
 .hero-index {
+  display: grid;
+}
+.hero-index > span {
+  grid-area: 1 / 1;
+}
+.hero-index [data-part="index-0"] {
+  color: var(--color-muted);
+  visibility: hidden;
+}
+.hero-index [data-part="index-1"] {
   color: var(--color-signal);
 }
 .hero-support {
   margin-top: 12px;
+  width: fit-content;
+  max-width: min(520px, 100%);
   font-size: var(--type-lead);
   line-height: 1.35;
   font-weight: 500;
 }
-@media (max-width: 767.98px) {
+/* z6 · the red line: one 2px element along the band's lower edge, O3 only */
+.hero-line {
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  top: calc(57% - 1px);
+  height: 2px;
+  background: var(--color-signal);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+/* statement size, measured by the scene for the H2 growth */
+.hero-probe {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-size: var(--type-statement);
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
   .hero-portrait {
-    right: 0;
+    right: 4vw;
+    height: 88svh;
+  }
+}
+/* sm: the vertical crop — FRA / NCO above, NÚ / ÑEZ below (Revelado 2.2 §6) */
+@media (max-width: 767.98px) {
+  .hero-stage {
+    /* FRA / NCO start low enough to part upward (−6vh at H2) without meeting the header */
+    --first-top: calc(var(--header-h) + 6svh);
+    /* the body overlaps the lower half of NCO */
+    --portrait-top: calc(var(--first-top) + var(--hero-size) * 1.25);
+    /* portrait height: the 4:5 crop at 86vw, capped so the copy always fits below */
+    --ph: min(calc(86vw * 1.25), calc(100svh - var(--portrait-top) - 230px));
+  }
+  .hero-name {
+    /* stacked capitals with accents (Ú, Ñ) need room between the two lines */
+    line-height: 0.94;
+  }
+  .hero-name > span {
+    display: block;
+  }
+  .hero-name-first {
+    top: var(--first-top);
+  }
+  .hero-portrait {
     left: 0;
+    right: 0;
+    bottom: auto;
+    top: var(--portrait-top);
+    height: var(--ph);
     margin-inline: auto;
-    width: 78vw;
-    height: auto;
-    aspect-ratio: 4 / 5;
-    bottom: 22svh;
+    aspect-ratio: var(--ar-m);
   }
   .hero-name-last {
     left: auto;
-    right: calc(-0.08 * var(--hero-size));
+    right: calc(var(--hero-size) * -0.06);
+    top: calc(var(--portrait-top) + var(--ph) * 0.4);
+    text-align: right;
+  }
+  .hero-copy {
+    bottom: calc(4svh + env(safe-area-inset-bottom));
+  }
+}
+
+/* ── the opening before the scene is built (html.js, not a deep link) ────────
+   O0 → O1 starts at first paint as a CSS animation on the inner band; the scene continues it
+   from the same value in GSAP (pinning re-parents the section, which would restart a CSS
+   animation). If the scene never builds, everything is shown at 4 s — never a dead black screen. */
+html.js main:not([data-initial]) .hero[data-anim][data-opening]:not([data-built]) .hero-band {
+  clip-path: inset(50% 0% 50% 0%);
+  animation:
+    hero-band 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards,
+    hero-rescue-clip 0s linear 4s forwards;
+}
+html.js main:not([data-initial]) .hero[data-anim]:not([data-built]) :is(.hero-name, .hero-firma, .hero-support, [data-part="index-1"]) {
+  opacity: 0;
+  animation: hero-rescue-show 0s linear 4s forwards;
+}
+html.js main:not([data-initial]) .hero[data-anim]:not([data-built]) .hero-lqip {
+  opacity: 1;
+}
+html.js main:not([data-initial]) .hero[data-anim]:not([data-built]) [data-lqip] .media-img {
+  opacity: 0;
+  animation: hero-rescue-show 0s linear 4s forwards;
+}
+@keyframes hero-band {
+  to {
+    clip-path: inset(43% 0% 43% 0%);
+  }
+}
+@keyframes hero-rescue-clip {
+  to {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+}
+@keyframes hero-rescue-show {
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* reduced motion: no band — the portrait arrives full and sharp */
+  html.js main:not([data-initial]) .hero[data-anim][data-opening]:not([data-built]) .hero-band {
+    clip-path: none;
+    animation: none;
+  }
+}
+/* deep link: the visitor starts at a world — the hero stays out of sight until the jump */
+html.js main[data-initial]:not([data-started]) .hero-stage {
+  visibility: hidden;
+  animation: hero-rescue-visible 0s linear 4s forwards;
+}
+@keyframes hero-rescue-visible {
+  to {
+    visibility: visible;
   }
 }
 
@@ -465,7 +644,8 @@ html:not(.js) .js-only {
 }
 .world-name {
   margin-bottom: 32px;
-  font-size: var(--type-display);
+  /* the longest name (TravelSuite360, 14 characters) must fit at 320px */
+  font-size: min(var(--type-display), calc((100vw - 2 * var(--gutter)) / 8.6));
   line-height: 1;
   font-weight: 900;
   letter-spacing: -0.01em;

@@ -11,8 +11,8 @@ import { queueRefresh } from "@/lib/useScene";
  * Mounts once per journey (Spec §03): section tracking → store, store → URL (replaceState
  * only, Spec §20), and the deep-link start on `/trabajo/{slug}`. Renders nothing.
  *
- * Phase 1 tracks sections with one plain ScrollTrigger each; from Phase 2 on, sections that
- * own a scene report through their own trigger instead.
+ * Sections are tracked with one plain ScrollTrigger each (the hero's pinned scene included,
+ * through its pin spacer); the opening scene writes `heroRevealed` itself.
  */
 export function JourneyClient({
   initial,
@@ -25,8 +25,6 @@ export function JourneyClient({
 }) {
   useLayoutEffect(() => {
     registerGsap();
-    // the opening is static until Phase 2: the header may show at once
-    setJourney({ heroRevealed: true });
 
     const triggers = Array.from(document.querySelectorAll<HTMLElement>("[data-section]")).map((el) =>
       ScrollTrigger.create({
@@ -56,6 +54,8 @@ export function JourneyClient({
         const target = document.getElementById(initial);
         if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY, behavior: "instant" });
         history.scrollRestoration = restoration;
+        // the hero was kept out of sight until now (no opening flash on deep links)
+        document.getElementById("contenido")?.setAttribute("data-started", "");
         setJourney({ section: initial });
         syncing = true;
       };
