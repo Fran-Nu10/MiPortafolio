@@ -39,6 +39,13 @@ export const SITE = {
     restHint: "arrastrá · ← → · 1–4",
     prev: "Proyecto anterior",
     next: "Proyecto siguiente",
+    /** accessible names of the reel's structure (Spec §06 DOM) */
+    a11y: { region: "Trabajo", roleCarousel: "carrusel", roleItem: "proyecto", nav: "Proyectos" },
+    /**
+     * cursor words (Revelado 2.2 §8: DRAG · VER). Content Master 03 allows no English interface
+     * labels, so the drag word is the Content Master's own verb for it ("arrastrá", 05 and 16).
+     */
+    cursor: { drag: "Arrastrá", enter: "Ver" },
   },
 
   world: {

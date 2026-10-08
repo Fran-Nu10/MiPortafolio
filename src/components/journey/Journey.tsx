@@ -5,7 +5,7 @@ import { PROJECTS, getProject } from "@/data/projects";
 import { SITE } from "@/data/site";
 import type { Project, ProjectSlug } from "@/data/types";
 import { resolveAsset } from "@/lib/assets";
-import { confirmed, indexLabel, proofCaption, routeErrorText, stackLine } from "@/lib/content";
+import { confirmed, indexLabel, liveLabel, miniLabel, proofCaption, routeErrorText, stackLine } from "@/lib/content";
 import type { SectionId } from "@/lib/journey-store";
 import { pathForSection } from "@/lib/route-sync";
 import { CapabilitiesRail } from "@/components/capabilities/CapabilitiesRail";
@@ -38,11 +38,13 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
   const reelItems: ReelItemView[] = PROJECTS.map((p) => ({
     id: p.id,
     indexLabel: indexLabel(p.index, total),
+    miniLabel: miniLabel(p.index, p.name),
+    liveLabel: liveLabel(p.index, total, p.name),
     name: p.name,
     reelLine: p.reelLine,
     relationLine: p.relationLine,
     aspect: p.reel.aspect,
-    poster: resolveAsset(p.reel.poster),
+    loop: resolveAsset(p.reel.loop),
     reelLabel: p.a11y.reelLabel,
     enter: { href: pathForSection(p.id), label: SITE.reel.enter },
     open: openLink(p),
@@ -113,7 +115,12 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
           </p>
         ) : null}
         <OpeningHero hero={SITE.hero} portrait={resolveAsset("franco.hero")} grain={resolveAsset("site.grain")} skipOpening={initial !== null} />
-        <ProjectReel label={SITE.reel.label} heading={SITE.reel.heading} items={reelItems} />
+        <ProjectReel
+          label={SITE.reel.label}
+          heading={SITE.reel.heading}
+          items={reelItems}
+          copy={{ hint: SITE.reel.hint, restHint: SITE.reel.restHint, prev: SITE.reel.prev, next: SITE.reel.next, a11y: SITE.reel.a11y, cursor: SITE.reel.cursor }}
+        />
         {PROJECTS.map((p) => (
           <ProjectWorld key={p.id} world={worldFor(p)} proof={proofFor(p)}>
             {p.id === "rayo-smash" && SITE.features.humanMoment ? <HumanMoment media={resolveAsset("moments.human")} /> : null}

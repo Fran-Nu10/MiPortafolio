@@ -27,6 +27,7 @@ function useHydrated() {
 export function LoopVideo({
   asset,
   active,
+  mount = true,
   loop = true,
   preload = "none",
   sizes,
@@ -36,6 +37,8 @@ export function LoopVideo({
 }: {
   asset: ResolvedAsset;
   active: boolean;
+  /** the owner's lifecycle decision: whether the <video> element exists at all (reel, Spec §06) */
+  mount?: boolean;
   /** false = Franco at work: plays once per entry, holds the last frame */
   loop?: boolean;
   preload?: "none" | "metadata" | "auto";
@@ -54,7 +57,7 @@ export function LoopVideo({
   const [shown, setShown] = useState(false);
 
   const real = asset.status !== "placeholder";
-  const canMount = real && hydrated && !rm && !failed && !isSaveData();
+  const canMount = mount && real && hydrated && !rm && !failed && !isSaveData();
   const shouldPlay = canMount && active && inView && visible;
 
   useEffect(() => {

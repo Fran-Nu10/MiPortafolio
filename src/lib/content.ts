@@ -18,6 +18,16 @@ export function indexLabel(index: number, total: number): string {
   return `${pad2(index)} / ${pad2(total)}`;
 }
 
+/** reel neighbour: "02 · Rayo Smash" (Content Master 05) */
+export function miniLabel(index: number, name: string): string {
+  return `${pad2(index)} · ${name}`;
+}
+
+/** reel live region after each settle: "02 de 04 · Rayo Smash" (Spec §06) */
+export function liveLabel(index: number, total: number, name: string): string {
+  return `${pad2(index)} de ${pad2(total)} · ${name}`;
+}
+
 /** Chef's proof line upgrades only when Mercado Pago live is confirmed (Spec §21 rule 4) */
 export const CHEF_PAYMENTS_PROOF = "Tienda real, con pagos en producción.";
 

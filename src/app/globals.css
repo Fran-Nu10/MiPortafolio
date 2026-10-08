@@ -559,7 +559,7 @@ html.js main[data-initial]:not([data-started]) .hero-stage {
   }
 }
 
-/* ── S2 · reel (no-JS list; Phase 3 makes it the horizontal reel) ────────── */
+/* ── S2 · Project Reel (Spec §06). Without JS: the vertical list of four posters ── */
 .reel {
   padding: 18svh var(--gutter) 12svh;
 }
@@ -621,6 +621,348 @@ html.js main[data-initial]:not([data-started]) .hero-stage {
   flex-wrap: wrap;
   gap: 24px;
   margin-top: 8px;
+}
+
+.reel-meta-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.reel-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 24px;
+}
+.reel-meta-row .reel-links {
+  margin-top: 0;
+}
+/* without JavaScript: the list — no neighbour labels, no controls */
+.reel-meta-mini,
+.reel-controls,
+.reel-cursor {
+  display: none;
+}
+.reel-item img {
+  -webkit-user-drag: none;
+}
+
+/* ── the horizontal reel (html.js) ───────────────────────────────────────────
+   Spec §06 geometry in CSS, so the first paint is already the reel and hydration only
+   measures it: active width W per tier (sm 100vw − 32 · md 84vw · lg 76vw · xl 76vw ≤ 1094),
+   capped so the frame is at most 72svh tall (64svh on sm) at its own aspect; gap 8/24/32/32;
+   frames centered in the 100svh stage (sm: top at 18svh). The track starts centered on 01. */
+.reel {
+  --reel-w: calc(100vw - 32px);
+  --reel-cap: 64svh;
+  --reel-gap: 8px;
+  --r0: var(--r0-m);
+  --active-r: var(--active-r-m);
+}
+@media (min-width: 768px) {
+  .reel {
+    --reel-w: 84vw;
+    --reel-cap: 72svh;
+    --reel-gap: 24px;
+    --r0: var(--r0-d);
+    --active-r: var(--active-r-d);
+  }
+}
+@media (min-width: 1024px) {
+  .reel {
+    --reel-w: 76vw;
+    --reel-gap: 32px;
+  }
+}
+@media (min-width: 1440px) {
+  .reel {
+    --reel-w: min(76vw, 1094px);
+  }
+}
+html.js .reel[data-anim] {
+  padding: 18svh 0 0;
+  /* the active frame's box: the 01–04 index aligns to its right edge, under it */
+  --wa: min(var(--reel-w), calc(var(--reel-cap) * var(--active-r)));
+  --ha: calc(var(--wa) / var(--active-r));
+}
+html.js .reel[data-anim] .reel-header {
+  padding-inline: var(--gutter);
+}
+html.js .reel[data-anim] .reel-stage {
+  position: relative;
+  height: 100svh;
+}
+html.js .reel[data-anim] .reel-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  /* the browser keeps vertical panning; horizontal touch belongs to the reel */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+html.js .reel[data-anim] .reel-viewport[data-cursor],
+html.js .reel[data-anim] .reel-viewport[data-cursor] * {
+  cursor: none;
+}
+html.js .reel[data-anim] .reel-track {
+  --w0: min(var(--reel-w), calc(var(--reel-cap) * var(--r0)));
+  display: flex;
+  align-items: center;
+  gap: var(--reel-gap);
+  width: max-content;
+  height: 100%;
+  transform: translateX(calc((100vw - var(--w0)) / 2));
+}
+html.js .reel[data-anim] .reel-item {
+  --r: var(--r-d);
+  position: relative;
+  flex: none;
+  width: min(var(--reel-w), calc(var(--reel-cap) * var(--r)));
+  margin: 0;
+}
+html.js .reel[data-anim] .reel-frame {
+  aspect-ratio: var(--ar-d);
+  max-height: none;
+  cursor: pointer;
+}
+html.js .reel[data-anim] .reel-item:not([data-active]) .reel-frame {
+  opacity: 0.55;
+}
+/* neighbours turn grey once the settle is complete — never interpolated during a drag */
+html.js .reel[data-anim] .reel-item .media-img {
+  transition: filter 200ms linear;
+}
+html.js .reel[data-anim] .reel-item[data-dim] .media-img {
+  filter: grayscale(0.6);
+}
+html.js .reel[data-anim] .reel-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 16px);
+  margin: 0;
+}
+html.js .reel[data-anim] .reel-meta-full {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 240ms var(--ease-settle),
+    transform 240ms var(--ease-settle),
+    visibility 0s linear 240ms;
+}
+html.js .reel[data-anim] .reel-item[data-active] .reel-meta-full {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+html.js .reel[data-anim] .reel-meta-mini {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* fits the neighbour's visible strip: (100vw − W)/2 − gap */
+  max-width: calc((100vw - var(--wa)) / 2 - var(--reel-gap) - 8px);
+  transition: opacity 240ms var(--ease-settle);
+}
+html.js .reel[data-anim] .reel-item[data-side="before"] .reel-meta-mini {
+  text-align: right;
+}
+/* the neighbours' strips are wide enough for their label from lg up (≥ 90px) */
+@media (min-width: 1024px) {
+  html.js .reel[data-anim] .reel-meta-mini {
+    display: block;
+  }
+}
+html.js .reel[data-anim] .reel-item[data-side="before"] .reel-meta-mini {
+  left: auto;
+  right: 0;
+}
+html.js .reel[data-anim] .reel-item[data-active] .reel-meta-mini {
+  opacity: 0;
+}
+html.js .reel[data-anim] .reel-relation {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+/* 01–04: right edge of the active frame, on the row of its name */
+html.js .reel[data-anim] .reel-controls {
+  position: absolute;
+  z-index: 2;
+  right: calc((100vw - var(--wa)) / 2);
+  top: calc(50% + var(--ha) / 2 + 16px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  max-width: 50vw;
+  column-gap: 4px;
+}
+.reel-nav {
+  display: flex;
+  gap: 2px;
+}
+.reel-nav-item,
+.reel-step {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin-top: -14px;
+  padding: 0 6px;
+  font: inherit;
+  color: var(--color-muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.reel-nav-item[aria-current] {
+  color: var(--color-paper);
+}
+.reel-nav-item:hover,
+.reel-step:hover:not(:disabled) {
+  color: var(--color-paper);
+}
+/* the name shows on hover / focus (Content Master 03); it is always part of the button's name */
+.reel-nav-name {
+  position: absolute;
+  bottom: calc(100% - 8px);
+  right: 0;
+  white-space: nowrap;
+  color: var(--color-paper);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms var(--ease-settle);
+}
+.reel-nav-item:hover .reel-nav-name,
+.reel-nav-item:focus-visible .reel-nav-name {
+  opacity: 1;
+}
+/* prev / next: the reduced-motion alternative beside the index (Spec §06) */
+.reel-step {
+  display: none;
+}
+.reel-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.reel-hint {
+  flex-basis: 100%;
+  text-align: right;
+}
+/* the keys hint only where there is room beside the meta, and only for fine pointers */
+@media (hover: none), (pointer: coarse), (max-width: 1023.98px) {
+  .reel-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* phone: the frame stays at 18svh from the stage top (the shared geometry); the meta and the
+     marks follow it in flow, and the stage grows past 100svh on short screens instead of clipping */
+  html.js .reel[data-anim] .reel-stage {
+    height: auto;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+  html.js .reel[data-anim] .reel-viewport {
+    position: relative;
+    inset: auto;
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+  html.js .reel[data-anim] .reel-track {
+    align-items: flex-start;
+    height: auto;
+    padding-top: 18svh;
+  }
+  html.js .reel[data-anim] .reel-meta {
+    position: static;
+    margin-top: 16px;
+  }
+  html.js .reel[data-anim] .reel-item {
+    --r: var(--r-m);
+  }
+  html.js .reel[data-anim] .reel-frame {
+    aspect-ratio: var(--ar-m);
+  }
+  /* four marks under the meta, at the bottom of the stage; labels stay for screen readers */
+  html.js .reel[data-anim] .reel-controls {
+    position: static;
+    margin-top: auto;
+    padding: 16px 0 calc(16px + env(safe-area-inset-bottom));
+    max-width: none;
+    justify-content: center;
+  }
+  .reel-nav-item {
+    margin-top: 0;
+  }
+  /* an 8px strip has no room for a label */
+  html.js .reel[data-anim] .reel-meta-mini {
+    display: none;
+  }
+  .reel-nav-item::before {
+    content: "";
+    width: 18px;
+    height: 2px;
+    background: currentColor;
+  }
+  .reel-nav-num,
+  .reel-nav-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* the reel cursor (fine pointers, motion allowed) */
+.reel-cursor {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms linear;
+}
+.reel-cursor[data-visible] {
+  opacity: 1;
+}
+.reel-cursor-ring {
+  position: absolute;
+  left: -11px;
+  top: -11px;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--color-paper);
+  border-radius: 50%;
+}
+.reel-cursor-word {
+  position: absolute;
+  left: 18px;
+  top: -8px;
+  white-space: nowrap;
+  color: var(--color-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .reel[data-anim] .reel-step {
+    display: inline-flex;
+  }
+  html.js .reel[data-anim] :is(.reel-meta-full, .reel-meta-mini, .media-img, .reel-nav-name) {
+    transition: none;
+  }
 }
 
 /* ── worlds (static SCREEN + copy; Phases 4–8 build the scenes) ─────────── */

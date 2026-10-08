@@ -1,6 +1,6 @@
 import type { ResolvedAsset } from "@/lib/resolved";
 import { ProofMedia } from "@/components/media/ProofMedia";
-import { REEL_SIZES } from "@/components/reel/ProjectReel";
+import { REEL_SIZES } from "@/lib/reel";
 
 export interface ProofView {
   id: string;

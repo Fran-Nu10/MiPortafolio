@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { ResolvedAsset } from "@/lib/resolved";
 import { Still } from "@/components/media/Still";
-import { REEL_SIZES } from "@/components/reel/ProjectReel";
+import { REEL_SIZES } from "@/lib/reel";
 
 export interface WorldView {
   id: string;
