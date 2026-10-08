@@ -2,9 +2,9 @@
 
 Portfolio personal. Dirección creativa: **REVELADO 2.2** (diseño congelado). La implementación avanza por fases; la versión anterior (ENSAMBLE) queda en el historial de git.
 
-> **Para implementar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. Fases hechas: `docs/06-phase0-audit.md` (auditoría) y `docs/07-phase1-foundation.md` (foundation).
+> **Para implementar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. Fases hechas: `docs/06-phase0-audit.md` (auditoría), `docs/07-phase1-foundation.md` (foundation) y `docs/08-phase2-opening-hero.md` (opening + hero).
 
-Estado: **Phase 1 · Foundation hecha.** El Journey existe como documento estático y legible (también sin JavaScript) con el copy real y placeholders honestos donde falta material; el motion de cada escena llega desde Phase 2. Stack: Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP 3.15 (+ ScrollTrigger). Sin otras dependencias de runtime.
+Estado: **Phase 2 · Opening + Hero hecha.** El opening (banda de luz, foco, apertura) y el hero FRANCO / NÚÑEZ funcionan en todos los tiers, con reduced motion y sin JavaScript; el resto del Journey sigue como documento estático legible con el copy real y placeholders honestos, y gana su motion fase por fase. Stack: Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP 3.15 (+ ScrollTrigger). Sin otras dependencias de runtime.
 
 ```
 npm install
@@ -26,7 +26,7 @@ docs/
   05b-content-master.md                 copy, hechos, atribuciones (autoridad 1)
   05a-revelado-2.2.md                   experiencia y dirección de arte (autoridad 2)
   05-revelado-implementation-spec.md    arquitectura, fases, QA (autoridad 3)
-  06-phase0-audit.md · 07-phase1-foundation.md
+  06-phase0-audit.md · 07-phase1-foundation.md · 08-phase2-opening-hero.md
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 src/
   app/                                  layout · page · trabajo/[slug] · not-found · actions/brief · globals.css
@@ -38,6 +38,7 @@ src/
                                         · assets · media · useInView · brief · content
   fonts/                                Schibsted Grotesk (variable) · IBM Plex Mono 400
 scripts/check-assets.mjs                validación de contratos de assets (prebuild)
+scripts/media.mjs                       grano y cutouts AVIF/WebP + LQIP (sharp)
 tests/                                  content + foundation (Vitest) · e2e (Playwright)
 public/projects/                        capturas reales (TravelSuite360: no aprobadas para publicar, ver docs/07)
 ```
