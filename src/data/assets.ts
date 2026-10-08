@@ -69,10 +69,11 @@ export const ASSETS: AssetContract[] = [
   {
     key: "site.grain",
     kind: "still",
-    status: "placeholder",
+    status: "derived",
     aspect: { desktop: [1, 1] },
+    files: { desktop: { src: "/media/site/grain.png", width: 256, height: 256 } },
     alt: "",
-    meta: { source: "Tile de ruido 256×256 generado (Phase 2)." },
+    meta: { source: "Generado: node scripts/media.mjs grain (ruido 1-bit, mulberry32 semilla 360, ≤ 8 KB)." },
   },
 
   // ── reel posters (= SCREEN posters) ─────────────────────────────────────────

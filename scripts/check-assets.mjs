@@ -39,6 +39,8 @@ const BUDGET = {
   og: { desktop: 300 * KB, mobile: 300 * KB },
 };
 const HERO_BUDGET = { desktop: 180 * KB, mobile: 110 * KB };
+/** per-key overrides (Spec §18): the grain tile is part of the ≤ 8 KB eager budget */
+const KEY_BUDGET = { "franco.hero": HERO_BUDGET, "site.grain": { desktop: 8 * KB, mobile: 8 * KB } };
 /** the reel posters are still raw captures until Phase 12 encodes them (served via next/image) */
 const RAW_CAPTURE = /^\/projects\//;
 
@@ -78,7 +80,7 @@ for (const c of ASSETS) {
         continue;
       }
       const size = statSync(abs).size;
-      const budget = (c.key === "franco.hero" ? HERO_BUDGET : BUDGET[c.kind])?.[tier];
+      const budget = (KEY_BUDGET[c.key] ?? BUDGET[c.kind])?.[tier];
       if (!budget || size <= budget) continue;
       const msg = `${c.key} (${tier}): ${p} is ${Math.round(size / KB)} KB, budget ${Math.round(budget / KB)} KB`;
       // raw captures are optimized by next/image at request time; Phase 12 encodes them

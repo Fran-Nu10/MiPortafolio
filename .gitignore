@@ -35,3 +35,9 @@ next-env.d.ts
 # tests
 test-results/
 playwright-report/
+
+# media masters (asset delivery folder)
+media-src/
+
+# local QA captures and recordings
+qa/
