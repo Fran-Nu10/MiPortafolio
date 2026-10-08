@@ -111,8 +111,15 @@ test.describe("routes", () => {
   test("project routes carry their metadata and start at the world", async ({ page }) => {
     await page.goto("/trabajo/rayo-smash");
     await expect(page).toHaveTitle("Rayo Smash — Franco Núñez");
+    // the pinned stage at the top; tiny viewports (static world): its name under the header
     await expect
-      .poll(async () => page.evaluate(() => Math.abs(document.getElementById("rayo-smash")!.getBoundingClientRect().top)))
+      .poll(async () =>
+        page.evaluate(() => {
+          const tiny = innerWidth < 360 || innerHeight < 560;
+          const want = tiny ? parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0 : 0;
+          return Math.abs(document.getElementById("rayo-smash")!.getBoundingClientRect().top - want);
+        }),
+      )
       .toBeLessThan(4);
     await expect(page.getByRole("link", { name: "Ir a Rayo Smash" })).toBeHidden();
   });

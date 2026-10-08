@@ -72,6 +72,11 @@ describe("label snapping", () => {
     expect(snapToStop(stops, 0.6, 1)).toBe(0.6);
     expect(snapToStop(stops, 0.99, 1)).toBe(1);
   });
+  it("a whole-pixel landing just past a stop stays on it (eps in progress)", () => {
+    expect(snapToStop(stops, 0.6005, 1)).toBe(1);
+    expect(snapToStop(stops, 0.6005, 1, 0.001)).toBe(0.6);
+    expect(snapToStop(stops, 0.0006, 1, 0.001)).toBe(0);
+  });
   it("stepping shows the last stop reached", () => {
     expect(stepToStop(stops, 0.59)).toBe(0.2);
     expect(stepToStop(stops, 0.6)).toBe(0.6);
@@ -90,6 +95,13 @@ describe("route sync mapping", () => {
     expect(sectionForLocation("/trabajo/nope")).toBeNull();
     expect(sectionForLocation("/", "#contacto")).toBe("contacto");
     expect(sectionForLocation("/")).toBe("inicio");
+  });
+  it("an anchor wins over the path; any other fragment belongs to the browser", () => {
+    expect(sectionForLocation("/trabajo/rayo-smash", "#perfil")).toBe("perfil");
+    expect(sectionForLocation("/", "#trabajo")).toBe("trabajo");
+    // the skip link (#contenido) and the no-JS "Ir a …" fragments
+    expect(sectionForLocation("/trabajo/rayo-smash", "#contenido")).toBeNull();
+    expect(sectionForLocation("/", "#rayo-smash")).toBeNull();
   });
 });
 
