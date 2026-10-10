@@ -3,6 +3,7 @@ import { CAPABILITIES } from "@/data/capabilities";
 import { PROFILE } from "@/data/profile";
 import { PROJECTS, getProject } from "@/data/projects";
 import { RAYO_LAYERS, RAYO_STACK } from "@/data/rayo-layers";
+import { SANTI_PHOTOS } from "@/data/santi-photos";
 import { SITE } from "@/data/site";
 import type { Project, ProjectSlug } from "@/data/types";
 import { resolveAsset } from "@/lib/assets";
@@ -20,6 +21,7 @@ import { Profile } from "@/components/profile/Profile";
 import { ProjectReel, type ReelItemView } from "@/components/reel/ProjectReel";
 import { ProjectProof, type ProofView } from "@/components/worlds/ProjectProof";
 import { RayoWorld, type RayoView } from "@/components/worlds/RayoWorld";
+import { SantiWorld, type SantiView } from "@/components/worlds/SantiWorld";
 import { TravelSuiteWorld, type TsView } from "@/components/worlds/TravelSuiteWorld";
 import { WorldScene, type WorldView } from "@/components/worlds/WorldScene";
 import { JourneyClient } from "./JourneyClient";
@@ -193,6 +195,8 @@ function ProjectWorld({ project, world, proof, children }: { project: Project; w
         <TravelSuiteWorld world={world} ts={tsView(project)} summary={project.a11y.worldSummary} />
       ) : project.worldType === "rayo-layers" && world.object.kind === "cutout" ? (
         <RayoWorld world={world} rayo={rayoView(project)} />
+      ) : project.worldType === "santi-editorial" && world.object.kind === "cutout" ? (
+        <SantiWorld world={world} santi={santiView(project)} />
       ) : (
         <WorldScene world={world} />
       )}
@@ -254,5 +258,15 @@ function rayoView(p: Project): RayoView {
     layers: RAYO_LAYERS.map((l) => ({ name: l.name, asset: resolveAsset(l.key), offset: l.offset })),
     stack: { aspect: RAYO_STACK.aspect },
     through: resolveAsset("rayo.through"),
+  };
+}
+
+/** Santi Nuca's world: its three words, the page numbers, the credit and the six photographs */
+function santiView(p: Project): SantiView {
+  return {
+    views: p.worldCopy["N04.views"],
+    pages: p.worldCopy["N04.pages"],
+    credit: p.credit ? `${p.credit.label} · ${p.credit.holder}` : "",
+    photos: SANTI_PHOTOS.map((ph) => ({ n: ph.n, asset: resolveAsset(ph.key), aspect: ph.aspect })),
   };
 }

@@ -47,6 +47,8 @@ export interface WorldSceneExtension {
   build: (api: SceneApi, tl: gsap.core.Timeline, ctx: WorldBuildContext) => void;
   /** the world's trigger became active / inactive */
   onToggle?: (active: boolean) => void;
+  /** the ease of the environment's arrival at EXPAND (default `settle`; Santi's rupture: `reveal`) */
+  envEase?: string;
 }
 
 export interface WorldBuildContext {
@@ -241,8 +243,9 @@ function buildWorld(api: SceneApi, world: WorldView, scene?: WorldSceneExtension
   // ESCAPE (1 → 1.45) and EXPAND (1.45 → 2)
   tl.fromTo(object, start, { ...end, duration: 1, immediateRender: false }, 1);
   tl.fromTo(screen, { scale: 1 }, { scale: 0.92, duration: 0.45, immediateRender: false }, 1);
-  tl.fromTo(env, { opacity: 0 }, { opacity: 1, duration: 0.55, immediateRender: false }, 1.45);
-  tl.fromTo(screen, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.55, immediateRender: false }, 1.45);
+  const envEase = scene?.envEase ?? EASE.settle;
+  tl.fromTo(env, { opacity: 0 }, { opacity: 1, duration: 0.55, ease: envEase, immediateRender: false }, 1.45);
+  tl.fromTo(screen, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.55, ease: envEase, immediateRender: false }, 1.45);
   tl.addLabel("s:WORLD", 2);
   if (scene) scene.build(api, tl, { object, worldAt: 2, natural });
   else tl.to({}, { duration: WORLD_UNITS - 2 }, 2);

@@ -1651,6 +1651,80 @@ html.js .world[data-scene]:has(.world-stage[data-anim]) > .world-copy {
   }
 }
 
+/* ── Santi Nuca world (Spec §10): an editorial layout that recomposes itself, 2D only ──── */
+.santi-layer {
+  display: none;
+}
+html.js .world-stage[data-anim] .santi-layer {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+/* the credit lives in the stage while the scene runs (next to the first photograph) */
+html.js .world[data-scene]:has(.world-stage[data-anim]) > .world-credit {
+  display: none;
+}
+.santi-space {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+.santi-figure {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  background: #d6d0c4;
+}
+/* the paper-toned box a failed photograph leaves: the alt text visible, the layout unchanged */
+.santi-figure .media-img {
+  font: 11px var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+.santi-credit,
+.santi-label,
+.santi-index {
+  position: absolute;
+  margin: 0;
+}
+/* the tone switch: paper type while the stage is black, ink once the paper is there */
+.santi-space[data-paper="no"] .santi-credit,
+.santi-space[data-paper="no"] .santi-label,
+.santi-space[data-paper="no"] .santi-index {
+  color: var(--color-paper);
+}
+.santi-space[data-paper="yes"] .santi-credit,
+.santi-space[data-paper="yes"] .santi-index {
+  color: rgb(20 20 20 / 0.7);
+}
+.santi-space[data-paper="yes"] .santi-label {
+  color: var(--color-ink);
+}
+.santi-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.santi-label-view {
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 500;
+}
+.santi-space[data-paper="yes"] .santi-label-page {
+  color: rgb(20 20 20 / 0.7);
+}
+@media (max-width: 767.98px) {
+  .santi-label {
+    align-items: flex-end;
+  }
+  .santi-label-view {
+    font-size: 18px;
+  }
+}
+
 /* ── proofs with JavaScript: the window at the shared rectangle, centered in its stage ──── */
 html.js .proof {
   position: relative;

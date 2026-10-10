@@ -1,5 +1,6 @@
 import type { AssetContract } from "./types";
 import { RAYO_ANCHOR, RAYO_LAYERS, RAYO_STACK } from "./rayo-layers.ts";
+import { SANTI_ANCHOR, SANTI_PHOTOS } from "./santi-photos.ts";
 
 /**
  * Asset contract registry (Spec §22). Components never know a path: they receive a
@@ -128,8 +129,8 @@ export const ASSETS: AssetContract[] = [
     alt: "Apertura del portfolio de Santi Nuca — fotografía de Santi Nuca",
     meta: {
       source: "Captura real de la apertura del sitio.",
-      // the opening photograph panel, normalized to the reel frame (provisional, Phase 7)
-      anchorRect: { desktop: { x: 0.29, y: 0.05, w: 0.41, h: 0.95 }, mobile: { x: 0.06, y: 0.02, w: 0.82, h: 0.98 } },
+      // the opening photograph's panel, measured in the capture (scripts/derive-santi-photos.mjs)
+      anchorRect: SANTI_ANCHOR,
     },
   },
   {
@@ -218,14 +219,17 @@ export const ASSETS: AssetContract[] = [
     optional: true,
     meta: { duration: 3.2, source: "Render de prueba desde los cutouts derivados (sin 9:16: en sm se omite R05). Render final a producir desde los PNG originales." },
   },
-  ...[1, 2, 3, 4, 5, 6].map((n) => ({
-    key: `santi.photo.${n}`,
+  // Santi Nuca's photographs as his site shows them, cut from the real page captures at the
+  // panels' edges (scripts/derive-santi-photos.mjs): provisional until the originals arrive
+  ...SANTI_PHOTOS.map((p) => ({
+    key: p.key,
     kind: "cutout" as const,
-    status: "placeholder" as const,
-    aspect: { desktop: [4, 5] as [number, number] },
-    alt: `Trabajo ${String(n).padStart(2, "0")} — fotografía de Santi Nuca`,
+    status: "derived" as const,
+    aspect: { desktop: p.aspect },
+    files: { desktop: p.files },
+    alt: p.alt,
     surface: "paper" as const,
-    meta: { source: "Originales a pedir a Santi Nuca, con permiso (Spec §29 Q3)." },
+    meta: { source: `Recorte provisional de la captura del sitio (${p.page}). Original a pedir a Santi Nuca, con permiso (Spec §29 Q3).` },
   })),
   {
     key: "chef.product",
