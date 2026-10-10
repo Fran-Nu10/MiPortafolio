@@ -284,12 +284,13 @@ test.describe("the world grammar", () => {
     expect(s0.object).toBe(0);
     expect(s0.env).toBe(0);
 
-    await scrollToFraction(page, "rayo-smash", 0.4);
+    // Rayo's pin is 5.7 units long since Phase 6: ISOLATE at 1, WORLD (R02) at 2
+    await scrollToFraction(page, "rayo-smash", 1 / 5.7);
     await expect.poll(() => state(page, "rayo-smash")).toBe("ISOLATE");
     await expect.poll(async () => (await look()).dim).toBeCloseTo(0.75, 2);
     expect((await look()).object).toBe(1);
 
-    await scrollToFraction(page, "rayo-smash", 0.8);
+    await scrollToFraction(page, "rayo-smash", 2 / 5.7);
     await expect.poll(() => state(page, "rayo-smash")).toBe("WORLD");
     await expect.poll(async () => (await look()).env).toBe(1);
     const w = await look();
