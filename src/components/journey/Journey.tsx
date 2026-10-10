@@ -4,6 +4,7 @@ import { PROFILE } from "@/data/profile";
 import { PROJECTS, getProject } from "@/data/projects";
 import { RAYO_LAYERS, RAYO_STACK } from "@/data/rayo-layers";
 import { SANTI_PHOTOS } from "@/data/santi-photos";
+import { CHEF_PHOTOS } from "@/data/chef-photos";
 import { SITE } from "@/data/site";
 import type { Project, ProjectSlug } from "@/data/types";
 import { resolveAsset } from "@/lib/assets";
@@ -20,6 +21,7 @@ import { OpeningHero } from "@/components/opening/OpeningHero";
 import { Profile } from "@/components/profile/Profile";
 import { ProjectReel, type ReelItemView } from "@/components/reel/ProjectReel";
 import { ProjectProof, type ProofView } from "@/components/worlds/ProjectProof";
+import { ChefWorld, type ChefView } from "@/components/worlds/ChefWorld";
 import { RayoWorld, type RayoView } from "@/components/worlds/RayoWorld";
 import { SantiWorld, type SantiView } from "@/components/worlds/SantiWorld";
 import { TravelSuiteWorld, type TsView } from "@/components/worlds/TravelSuiteWorld";
@@ -197,6 +199,8 @@ function ProjectWorld({ project, world, proof, children }: { project: Project; w
         <RayoWorld world={world} rayo={rayoView(project)} />
       ) : project.worldType === "santi-editorial" && world.object.kind === "cutout" ? (
         <SantiWorld world={world} santi={santiView(project)} />
+      ) : project.worldType === "chef-commerce" && world.object.kind === "cutout" ? (
+        <ChefWorld world={world} chef={chefView(project)} />
       ) : (
         <WorldScene world={world} />
       )}
@@ -268,5 +272,20 @@ function santiView(p: Project): SantiView {
     pages: p.worldCopy["N04.pages"],
     credit: p.credit ? `${p.credit.label} · ${p.credit.holder}` : "",
     photos: SANTI_PHOTOS.map((ph) => ({ n: ph.n, asset: resolveAsset(ph.key), aspect: ph.aspect })),
+  };
+}
+
+/** Chef Arturo's world: its copy (Content Master 09), the product and the catalog siblings */
+function chefView(p: Project): ChefView {
+  const [productPhoto, ...siblings] = CHEF_PHOTOS.map((ph) => ({ asset: resolveAsset(ph.key), aspect: ph.aspect, label: ph.label, price: ph.price }));
+  return {
+    catalogLine: p.worldCopy["C04.catalog"],
+    productLine: p.worldCopy["C05.product"],
+    purchaseLine: p.worldCopy["C06.purchase"],
+    close: p.worldCopy["C07.close"],
+    productPhoto,
+    siblings,
+    macroLoop: resolveAsset("chef.macro.loop"),
+    purchaseAria: "Vista de compra de Chef Arturo: Cookie levain de pistacho y chocolate blanco, $ 120, agregar al carrito, Mercado Pago o WhatsApp",
   };
 }

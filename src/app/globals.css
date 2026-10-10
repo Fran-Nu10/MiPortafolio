@@ -1725,6 +1725,173 @@ html.js .world[data-scene]:has(.world-stage[data-anim]) > .world-credit {
   }
 }
 
+/* ── Chef Arturo world (Spec §11): food first, commerce second; one image element ───────── */
+.chef-layer {
+  display: none;
+}
+html.js .world-stage[data-anim] .chef-layer {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.chef-space {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  --chef-cream: #f7f3ea;
+  --chef-green: #1f4a3c;
+  --chef-ink: #141414;
+  --chef-ink-70: rgb(20 20 20 / 0.7);
+}
+.chef-field {
+  position: absolute;
+  inset: -200px;
+  background: var(--chef-cream);
+}
+.chef-figure {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  background: #e8e1d3;
+}
+.chef-figure .media-img {
+  font: 11px var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--chef-ink);
+}
+.chef-macro {
+  position: absolute;
+  inset: 0;
+}
+.chef-heading,
+.chef-card-chrome,
+.chef-commerce,
+.chef-info,
+.chef-purchase,
+.chef-close {
+  position: absolute;
+  margin: 0;
+  color: var(--chef-ink);
+}
+.chef-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.chef-heading-title {
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 500;
+}
+.chef-heading-line {
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--chef-ink-70);
+}
+.chef-card-chrome {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgb(20 20 20 / 0.2);
+  font-size: 15px;
+  line-height: 1.25;
+}
+.chef-card-price {
+  color: var(--chef-ink-70);
+}
+.chef-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chef-info-name {
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 500;
+}
+.chef-info-price {
+  font-size: 22px;
+  line-height: 1.2;
+}
+.chef-info-tag {
+  color: var(--chef-ink-70);
+}
+.chef-purchase {
+  display: grid;
+  gap: 14px;
+}
+/* the store's controls, as spans (a depiction, Spec §11): the stepper box, the green button,
+   the payment mark, the outlined WhatsApp button */
+.chef-stepper {
+  display: inline-grid;
+  grid-template-columns: 44px 44px 44px;
+  justify-self: start;
+  height: 44px;
+  align-items: center;
+  text-align: center;
+  font-size: 17px;
+  border: 1px solid rgb(20 20 20 / 0.35);
+}
+.chef-btn {
+  display: block;
+  height: 52px;
+  line-height: 52px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 500;
+}
+.chef-btn-primary {
+  background: var(--chef-green);
+  color: var(--color-paper);
+}
+.chef-btn-secondary {
+  border: 1px solid var(--chef-green);
+  color: var(--chef-green);
+}
+.chef-pay {
+  color: var(--chef-ink-70);
+}
+.chef-close {
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 500;
+  text-align: center;
+}
+@media (max-width: 767.98px) {
+  .chef-heading-title {
+    font-size: 28px;
+  }
+  .chef-heading-line {
+    font-size: 15px;
+  }
+  .chef-card-chrome {
+    font-size: 13px;
+    gap: 4px;
+    padding-top: 6px;
+  }
+  .chef-info-name {
+    font-size: 22px;
+  }
+  .chef-info-price {
+    font-size: 18px;
+  }
+  .chef-purchase {
+    gap: 10px;
+  }
+  .chef-btn {
+    height: 44px;
+    line-height: 44px;
+    font-size: 15px;
+  }
+  .chef-close {
+    font-size: 28px;
+  }
+}
+
 /* ── proofs with JavaScript: the window at the shared rectangle, centered in its stage ──── */
 html.js .proof {
   position: relative;

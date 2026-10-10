@@ -1,6 +1,7 @@
 import type { AssetContract } from "./types";
 import { RAYO_ANCHOR, RAYO_LAYERS, RAYO_STACK } from "./rayo-layers.ts";
 import { SANTI_ANCHOR, SANTI_PHOTOS } from "./santi-photos.ts";
+import { CHEF_ANCHOR, CHEF_PHOTOS } from "./chef-photos.ts";
 
 /**
  * Asset contract registry (Spec §22). Components never know a path: they receive a
@@ -138,16 +139,18 @@ export const ASSETS: AssetContract[] = [
     kind: "still",
     status: "derived",
     aspect: { desktop: [1094, 640], mobile: REEL_MOBILE },
+    // the product page of the Cookie levain (Phase 8): the interface the product escapes
+    // from — the Content Master's product data is the cookie's, and the hero's arch shows
+    // another product (docs/14 §7)
     files: {
-      desktop: { src: "/projects/chef-arturo/chef-arturo-hero.png", width: 2553, height: 1324 },
-      // the portrait crop keeps the product (right side of the hero) in frame
-      mobile: { src: "/projects/chef-arturo/chef-arturo-hero.png", width: 2553, height: 1324, focus: "100% 50%" },
+      desktop: { src: "/projects/chef-arturo/chef-arturo-pdp-cookie-levain.png", width: 2548, height: 1325 },
+      mobile: { src: "/projects/chef-arturo/chef-arturo-pdp-cookie-levain.png", width: 2548, height: 1325, focus: "50% 50%" },
     },
-    alt: "Portada de la tienda de Chef Arturo",
+    alt: "Página de producto de la tienda de Chef Arturo: Cookie levain de pistacho y chocolate blanco",
     meta: {
-      source: "Captura real del hero de la tienda.",
-      // the product in its arch, normalized to the reel frame (provisional until the original, Phase 8)
-      anchorRect: { desktop: { x: 0.835, y: 0.365, w: 0.153, h: 0.33 }, mobile: { x: 0.53, y: 0.36, w: 0.31, h: 0.33 } },
+      source: "Captura real de la página de producto de la tienda.",
+      // the product photograph, measured in the capture (scripts/derive-chef-photos.mjs)
+      anchorRect: CHEF_ANCHOR,
     },
   },
 
@@ -231,13 +234,16 @@ export const ASSETS: AssetContract[] = [
     surface: "paper" as const,
     meta: { source: `Recorte provisional de la captura del sitio (${p.page}). Original a pedir a Santi Nuca, con permiso (Spec §29 Q3).` },
   })),
+  // the Cookie levain as its product page shows it, cut from the real capture (provisional
+  // until the product / macro photography is produced, Spec §29 Q4)
   {
     key: "chef.product",
     kind: "cutout",
-    status: "placeholder",
-    aspect: { desktop: [4, 5] },
-    alt: "Cookie levain de pistacho y chocolate blanco",
-    meta: { source: "Fotografía original de producto (Spec §29 Q4). Provisorio: chef-arturo-pdp-cookie-levain.png." },
+    status: "derived",
+    aspect: { desktop: CHEF_PHOTOS[0].aspect },
+    files: { desktop: CHEF_PHOTOS[0].files },
+    alt: CHEF_PHOTOS[0].alt,
+    meta: { source: "Recorte provisional de chef-arturo-pdp-cookie-levain.png. Fotografía original de producto y macro a producir (Spec §29 Q4).", macroFocus: { x: 0.5, y: 0.45, w: 0, h: 0 } },
   },
   {
     key: "chef.macro.loop",
@@ -249,13 +255,16 @@ export const ASSETS: AssetContract[] = [
     optional: true,
     meta: { duration: 5, source: "Loop macro 4–6 s a producir. Sin él: still." },
   },
-  ...[1, 2, 3].map((n) => ({
-    key: `chef.catalog.${n}`,
-    kind: "still" as const,
-    status: "placeholder" as const,
-    aspect: { desktop: [4, 5] as [number, number] },
-    alt: "Producto del catálogo de Chef Arturo",
-    meta: { source: "Derivable de chef-arturo-catalogo-merienda.png; originales preferidos." },
+  // the three siblings of the "Merienda" row, as the catalog shows them (same script)
+  ...CHEF_PHOTOS.slice(1).map((p) => ({
+    key: p.key,
+    kind: "cutout" as const,
+    status: "derived" as const,
+    aspect: { desktop: p.aspect },
+    files: { desktop: p.files },
+    alt: p.alt,
+    surface: "paper" as const,
+    meta: { source: "Recorte provisional de chef-arturo-catalogo-merienda.png; originales preferidos." },
   })),
 
   // ── proof recordings (block launch for that project's proof) ────────────────
