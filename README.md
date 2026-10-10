@@ -2,9 +2,9 @@
 
 Portfolio personal. Dirección creativa: **REVELADO 2.2** (diseño congelado). La implementación avanza por fases; la versión anterior (ENSAMBLE) queda en el historial de git.
 
-> **Para implementar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. Fases hechas: `docs/06-phase0-audit.md` (auditoría), `docs/07-phase1-foundation.md` (foundation), `docs/08-phase2-opening-hero.md` (opening + hero), `docs/09-phase3-project-reel.md` (reel), `docs/10-phase4-world-system.md` (sistema de mundos) y `docs/11-phase5-travelsuite-world.md` (mundo TravelSuite360).
+> **Para implementar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. Fases hechas: `docs/06-phase0-audit.md` (auditoría), `docs/07-phase1-foundation.md` (foundation), `docs/08-phase2-opening-hero.md` (opening + hero), `docs/09-phase3-project-reel.md` (reel), `docs/10-phase4-world-system.md` (sistema de mundos), `docs/11-phase5-travelsuite-world.md` (mundo TravelSuite360) y `docs/12-phase6-rayo-world.md` (mundo Rayo Smash).
 
-Estado: **Phase 5 · TravelSuite360 world hecha.** El opening, el hero FRANCO / NÚÑEZ, el reel de cuatro productos (drag, swipe, trackpad, teclado, una pieza por gesto) y el paso del reel a cada mundo (el mismo rectángulo, SCREEN → ISOLATE → ESCAPE → EXPAND, Atrás vuelve al reel, deep links `/trabajo/{slug}`, overlay 01–04) y el mundo de TravelSuite360 completo (TS00–TS12: de la consulta a la reserva, el gran reveal y la costura roja hacia Rayo) funcionan en todos los tiers, con reduced motion y sin JavaScript; las escenas de los otros tres mundos y el resto del Journey siguen como documento estático legible con el copy real y placeholders honestos, y ganan su motion fase por fase. Stack: Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP 3.15 (+ ScrollTrigger). Sin otras dependencias de runtime.
+Estado: **Phase 6 · Rayo Smash world hecha.** El opening, el hero FRANCO / NÚÑEZ, el reel de cuatro productos (drag, swipe, trackpad, teclado, una pieza por gesto) y el paso del reel a cada mundo (el mismo rectángulo, SCREEN → ISOLATE → ESCAPE → EXPAND, Atrás vuelve al reel, deep links `/trabajo/{slug}`, overlay 01–04) el mundo de TravelSuite360 completo (TS00–TS12: de la consulta a la reserva, el gran reveal y la costura roja hacia Rayo) y el mundo de Rayo Smash (R00–R07: la hamburguesa escapa del hero, capa por capa, la cámara entre las capas, la reconstrucción y la línea del menú) funcionan en todos los tiers, con reduced motion y sin JavaScript; las escenas de los otros dos mundos y el resto del Journey siguen como documento estático legible con el copy real y placeholders honestos, y ganan su motion fase por fase. Stack: Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP 3.15 (+ ScrollTrigger). Sin otras dependencias de runtime.
 
 ```
 npm install
@@ -26,7 +26,7 @@ docs/
   05b-content-master.md                 copy, hechos, atribuciones (autoridad 1)
   05a-revelado-2.2.md                   experiencia y dirección de arte (autoridad 2)
   05-revelado-implementation-spec.md    arquitectura, fases, QA (autoridad 3)
-  06-phase0-audit.md · 07-phase1-foundation.md · 08-phase2-opening-hero.md · 09-phase3-project-reel.md · 10-phase4-world-system.md · 11-phase5-travelsuite-world.md
+  06-phase0-audit.md · 07-phase1-foundation.md · 08-phase2-opening-hero.md · 09-phase3-project-reel.md · 10-phase4-world-system.md · 11-phase5-travelsuite-world.md · 12-phase6-rayo-world.md
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 src/
   app/                                  layout · page · trabajo/[slug] · not-found · actions/brief · globals.css
