@@ -25,10 +25,15 @@ describe("design space", () => {
 });
 
 describe("escapeRect · where the object lands (the world's first state)", () => {
-  it("TravelSuite360: the message at its TS01 place (x 160, centered; sm x 24, y 300), unscaled", () => {
+  it("TravelSuite360: the message at its TS01 place (x 160, centered; sm x 24, y 300), scaled with the space", () => {
     const text = { w: 900, h: 140 };
     expect(escapeRect("ts-depth", "xl", XL, text)).toEqual({ x: 160, y: 380, w: 900, h: 140 });
     expect(escapeRect("ts-depth", "sm", SM, { w: 342, h: 180 })).toEqual({ x: 24, y: 300, w: 342, h: 180 });
+    const lg = escapeRect("ts-depth", "lg", LG, text);
+    const s = 768 / 900;
+    expect(lg.w).toBeCloseTo(900 * s);
+    expect(lg.x).toBeCloseTo((1366 - 1440 * s) / 2 + 160 * s);
+    expect(lg.y + lg.h / 2).toBeCloseTo(384);
   });
   it("Rayo: centered at 62% of the space height (sm: 70% of its width), aspect kept", () => {
     const r = escapeRect("rayo-layers", "xl", XL, { w: 250, h: 600 });

@@ -21,6 +21,11 @@ describe("tiers", () => {
     expect(pinLengthVh(1, "sm", false)).toBe(60);
     expect(pinLengthVh(7.5, "xl", true)).toBe(375);
   });
+  it("tablets cap a pin at 450vh; phones run at 0.75 of desktop", () => {
+    expect(pinLengthVh(7.5, "md", false)).toBe(450);
+    expect(pinLengthVh(7.5, "sm", false)).toBe(450);
+    expect(pinLengthVh(7.5, "xl", false) * 0.75).toBe(pinLengthVh(7.5, "sm", false));
+  });
 });
 
 describe("geometry · reelRect", () => {
@@ -80,6 +85,10 @@ describe("label snapping", () => {
   it("stepping shows the last stop reached", () => {
     expect(stepToStop(stops, 0.59)).toBe(0.2);
     expect(stepToStop(stops, 0.6)).toBe(0.6);
+  });
+  it("stepping counts a whole-pixel landing just short of a stop as on it (eps)", () => {
+    expect(stepToStop(stops, 0.5995)).toBe(0.2);
+    expect(stepToStop(stops, 0.5995, 0.001)).toBe(0.6);
   });
 });
 
