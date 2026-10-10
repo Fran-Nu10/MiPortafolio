@@ -1298,10 +1298,8 @@ html.js .world-stage[data-anim] .ts-layer {
   z-index: 1;
   pointer-events: none;
 }
-/* the scene shows the copy: the text version below the stage steps aside, the summary speaks */
-html.js .world[data-scene]:has(.world-stage[data-anim]) > .world-copy {
-  display: none;
-}
+/* a running scene shows the copy itself: the text version below the stage steps aside (rule
+   above, shared); the summary speaks */
 html.js .world[data-scene]:has(.world-stage[data-anim]) .world-summary {
   display: block;
 }
@@ -1550,6 +1548,106 @@ html.js .world[data-scene]:has(.world-stage[data-anim]) .world-summary {
   .ts-close {
     margin-top: 14px;
     font-size: 18px;
+  }
+}
+
+/* ── Rayo Smash world (Spec §09): the 1440×900 design space, scaled once; six real cutouts ── */
+.rayo-layer {
+  display: none;
+}
+html.js .world-stage[data-anim] .rayo-layer {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+html.js .world[data-scene]:has(.world-stage[data-anim]) > .world-copy {
+  display: none;
+}
+.rayo-space {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+.rayo-persp,
+.rayo-group {
+  position: absolute;
+  inset: 0;
+}
+.rayo-group {
+  transform-style: preserve-3d;
+  visibility: hidden;
+}
+.rayo-piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+/* the clip's frame is 1920×1200 around the 1440×900 space (it covers the stage on lg too) */
+.rayo-through {
+  position: absolute;
+  left: -240px;
+  top: -150px;
+  z-index: 2;
+  width: 1920px;
+  max-width: none;
+  height: 1200px;
+  object-fit: fill;
+  visibility: hidden;
+  opacity: 0;
+}
+/* the title of the moment, in front of the layers (paper on red: display size, ≥ 3:1) */
+.rayo-title {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  font-size: 88px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--color-paper);
+}
+/* the real menu line under the whole burger: name large in paper, detail and price in ink
+   (ink on the red field ≈ 4.7:1 — paper would not pass for small text, Spec §19) */
+.rayo-menu {
+  position: absolute;
+  z-index: 3;
+  width: 900px;
+  text-align: center;
+}
+.rayo-menu p {
+  margin: 0;
+}
+.rayo-menu-name {
+  font-size: 44px;
+  line-height: 1.1;
+  font-weight: 500;
+  color: var(--color-paper);
+}
+.rayo-menu-detail {
+  margin-top: 8px !important;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--color-black);
+}
+.rayo-menu-price {
+  margin-top: 10px !important;
+  color: var(--color-black);
+}
+@media (max-width: 767.98px) {
+  .rayo-title {
+    font-size: 44px;
+  }
+  .rayo-menu {
+    width: 342px;
+  }
+  .rayo-menu-name {
+    font-size: 28px;
+  }
+  .rayo-menu-detail {
+    font-size: 16px;
   }
 }
 

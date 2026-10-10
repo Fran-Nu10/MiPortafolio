@@ -1,4 +1,5 @@
 import type { AssetContract } from "./types";
+import { RAYO_ANCHOR, RAYO_LAYERS, RAYO_STACK } from "./rayo-layers.ts";
 
 /**
  * Asset contract registry (Spec §22). Components never know a path: they receive a
@@ -111,8 +112,8 @@ export const ASSETS: AssetContract[] = [
     alt: "Hamburguesa Clásica, vista por capas",
     meta: {
       source: "Captura real del hero de la demo.",
-      // the layered burger, normalized to the reel frame (provisional until the cutouts, Phase 6)
-      anchorRect: { desktop: { x: 0.37, y: 0.05, w: 0.25, h: 0.95 }, mobile: { x: 0.26, y: 0.05, w: 0.48, h: 0.95 } },
+      // the layered burger (the stack of six cutouts), measured in the capture (scripts/derive-rayo-layers.mjs)
+      anchorRect: RAYO_ANCHOR,
     },
   },
   {
@@ -156,30 +157,66 @@ export const ASSETS: AssetContract[] = [
   { key: "chef.reel.loop", kind: "loop", status: "placeholder", aspect: { desktop: [1094, 640], mobile: REEL_MOBILE }, poster: "chef.reel.poster", alt: "", optional: true, meta: { duration: 4 } },
 
   // ── world objects ───────────────────────────────────────────────────────────
+  // the Clásica as the demo's hero shows it (six layers, a double smash), keyed out of the
+  // real captures by scripts/derive-rayo-layers.mjs; the demo's original PNGs replace them
   {
     key: "rayo.burger",
     kind: "cutout",
-    status: "placeholder",
-    aspect: { desktop: [1600, 831] },
-    alt: "Hamburguesa Clásica",
-    meta: { source: "Cutout a derivar de prospector-hero-exploded.png (Phase 6)." },
+    status: "derived",
+    aspect: { desktop: RAYO_STACK.aspect },
+    files: { desktop: RAYO_STACK.files },
+    alt: "Hamburguesa Clásica, vista por capas",
+    meta: { source: "Derivado de prospector-hero-exploded.png (+ …-scroll.png para el medallón superior). Cutout final desde los PNG originales de la demo." },
   },
-  ...(["topBun", "bacon", "onion", "patty", "bottomBun"] as const).map((layer) => ({
-    key: `rayo.layers.${layer}`,
+  ...RAYO_LAYERS.map((layer) => ({
+    key: layer.key,
     kind: "cutout" as const,
-    status: "placeholder" as const,
-    aspect: { desktop: [1600, 831] as [number, number] },
+    status: "derived" as const,
+    aspect: { desktop: [layer.files.width, layer.files.height] as [number, number] },
+    files: { desktop: layer.files },
     alt: "",
-    meta: { source: "Bandas identificadas en la captura (docs/06). Cutouts a producir (Phase 6)." },
+    meta: {
+      offset: layer.offset,
+      source:
+        layer.name === "bottomBun"
+          ? "Derivado de la captura; el pliegue del hero lo recorta (últimas filas fundidas). Cutout final desde el PNG original."
+          : layer.name === "patty"
+            ? "Derivado de prospector-hero-exploded-scroll.png (en el hero lo cruza el título de la demo). Cutout final desde el PNG original."
+            : "Derivado de prospector-hero-exploded.png. Cutout final desde el PNG original.",
+    },
   })),
+  // R05 · the camera move between the layers: a test render from the derived cutouts at the
+  // exact R04 composition (scripts/gen-rayo-through.mjs). Desktop only: on phones (no 9:16
+  // clip) and tablets (3D off) R05 is skipped. The final render comes from the original PNGs.
+  {
+    key: "rayo.through.poster",
+    kind: "still",
+    status: "derived",
+    aspect: { desktop: [1920, 1200] },
+    files: { desktop: { src: "/media/rayo/through-desktop-poster.webp", width: 1920, height: 1200 } },
+    alt: "",
+    meta: { source: "Primer frame del render de prueba (= composición R04)." },
+  },
   {
     key: "rayo.through",
     kind: "clip",
-    status: "placeholder",
-    aspect: { desktop: [16, 9], mobile: [9, 16] },
+    status: "derived",
+    aspect: { desktop: [1920, 1200], mobile: [9, 16] },
+    files: {
+      desktop: {
+        sources: [
+          { src: "/media/rayo/through-desktop.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/rayo/through-desktop.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 1920,
+        height: 1200,
+        duration: 3.2,
+      },
+    },
+    poster: "rayo.through.poster",
     alt: "",
     optional: true,
-    meta: { duration: 3, source: "Render a producir. Sin él, R05 se omite (R04 → R06)." },
+    meta: { duration: 3.2, source: "Render de prueba desde los cutouts derivados (sin 9:16: en sm se omite R05). Render final a producir desde los PNG originales." },
   },
   ...[1, 2, 3, 4, 5, 6].map((n) => ({
     key: `santi.photo.${n}`,

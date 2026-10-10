@@ -9,6 +9,7 @@ import type { ResolvedAsset } from "@/lib/resolved";
 import { WORLD_UNITS, WORLD_UNITS_RM, escapeRect, flip } from "@/lib/world";
 import type { Tier } from "@/lib/tiers";
 import { useScene, type SceneApi } from "@/lib/useScene";
+import { Cutout } from "@/components/media/Cutout";
 import { Still } from "@/components/media/Still";
 
 export interface WorldView {
@@ -25,7 +26,7 @@ export interface WorldView {
    * the escaping object (Spec §07): TravelSuite360's is live DOM text (the message); the others,
    * until their cutouts exist, are a crop of their own real poster — the same pixels, leaving
    */
-  object: { kind: "text"; text: string } | { kind: "crop" };
+  object: { kind: "text"; text: string } | { kind: "crop" } | { kind: "cutout"; asset: ResolvedAsset };
   /** world copy in order of appearance (Content Master, verbatim) */
   copy: { key: string; text: string }[];
   /** Santi: "Fotografía · Santi Nuca", visible next to the first photograph */
@@ -140,6 +141,9 @@ export function WorldScene({
               <div className="world-object-crop">
                 <Still asset={world.poster} sizes={REEL_SIZES} fill />
               </div>
+            ) : world.object.kind === "cutout" ? (
+              // the real cutout, at its own place in the poster (its anchorRect)
+              <Cutout asset={world.object.asset} fill />
             ) : (
               <p className="world-object-text">{world.object.text}</p>
             )}
@@ -202,7 +206,7 @@ function buildWorld(api: SceneApi, world: WorldView, scene?: WorldSceneExtension
     const box = placeRect(anchor, rel(screen, stage));
     from = { ...box, h: (box.w / natural.w) * natural.h };
   } else {
-    // the crop is laid out in CSS at its anchor; measured here, then moved to the origin
+    // the crop / cutout is laid out in CSS at its anchor; measured here, then moved to the origin
     from = rel(object, stage);
     natural = { w: from.w, h: from.h };
   }

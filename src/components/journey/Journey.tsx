@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { CAPABILITIES } from "@/data/capabilities";
 import { PROFILE } from "@/data/profile";
 import { PROJECTS, getProject } from "@/data/projects";
+import { RAYO_LAYERS, RAYO_STACK } from "@/data/rayo-layers";
 import { SITE } from "@/data/site";
 import type { Project, ProjectSlug } from "@/data/types";
 import { resolveAsset } from "@/lib/assets";
@@ -18,6 +19,7 @@ import { OpeningHero } from "@/components/opening/OpeningHero";
 import { Profile } from "@/components/profile/Profile";
 import { ProjectReel, type ReelItemView } from "@/components/reel/ProjectReel";
 import { ProjectProof, type ProofView } from "@/components/worlds/ProjectProof";
+import { RayoWorld, type RayoView } from "@/components/worlds/RayoWorld";
 import { TravelSuiteWorld, type TsView } from "@/components/worlds/TravelSuiteWorld";
 import { WorldScene, type WorldView } from "@/components/worlds/WorldScene";
 import { JourneyClient } from "./JourneyClient";
@@ -57,7 +59,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
     name: p.name,
     worldType: p.worldType,
     anchor: anchorOf(p),
-    object: p.worldType === "ts-depth" ? { kind: "text", text: p.worldCopy["TS01.message"] } : { kind: "crop" },
+    object: objectFor(p),
     env: p.theme.env,
     tone: p.theme.tone,
     aspect: p.reel.aspect,
@@ -189,6 +191,8 @@ function ProjectWorld({ project, world, proof, children }: { project: Project; w
     <>
       {project.worldType === "ts-depth" ? (
         <TravelSuiteWorld world={world} ts={tsView(project)} summary={project.a11y.worldSummary} />
+      ) : project.worldType === "rayo-layers" && world.object.kind === "cutout" ? (
+        <RayoWorld world={world} rayo={rayoView(project)} />
       ) : (
         <WorldScene world={world} />
       )}
@@ -196,6 +200,13 @@ function ProjectWorld({ project, world, proof, children }: { project: Project; w
       {children}
     </>
   );
+}
+
+/** the escaping object: TS's message, a project's real cutout, or (until it exists) a crop of the poster */
+function objectFor(p: Project): WorldView["object"] {
+  if (p.worldType === "ts-depth") return { kind: "text", text: p.worldCopy["TS01.message"] };
+  const asset = p.screen.object ? resolveAsset(p.screen.object) : null;
+  return asset && asset.status !== "placeholder" && asset.kind === "cutout" ? { kind: "cutout", asset } : { kind: "crop" };
 }
 
 /** where the escaping object sits in the SCREEN poster (its contract), centered if unknown */
@@ -232,5 +243,16 @@ function tsView(p: Project): TsView {
     report: c["TS08.report"],
     name: p.name,
     close: c["TS10.close"],
+  };
+}
+
+/** Rayo Smash's world: its copy (Content Master 07) and the six real layer cutouts (Spec §09) */
+function rayoView(p: Project): RayoView {
+  return {
+    title: p.worldCopy["R03.title"],
+    menuLine: p.worldCopy["R07.menu"],
+    layers: RAYO_LAYERS.map((l) => ({ name: l.name, asset: resolveAsset(l.key), offset: l.offset })),
+    stack: { aspect: RAYO_STACK.aspect },
+    through: resolveAsset("rayo.through"),
   };
 }
