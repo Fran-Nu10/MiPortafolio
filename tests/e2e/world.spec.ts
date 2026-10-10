@@ -195,10 +195,10 @@ test.describe("entering and leaving", () => {
     if (!tiny(page)) {
       // one gesture's smooth scroll to ISOLATE (reduced motion: a cut to WORLD)
       await expect.poll(() => state(page, "santi-nuca")).toBe((await reduced(page)) ? "WORLD" : "ISOLATE");
-      // the second gesture: the world
-      if (isMobile) await scrollToFraction(page, "santi-nuca", 0.8);
+      // the second gesture: into the world (Santi's own states follow s:WORLD since Phase 7)
+      if (isMobile) await scrollToFraction(page, "santi-nuca", 2 / 5.4);
       else for (let n = 0; n < 6; n++) await page.mouse.wheel(0, 120);
-      await expect.poll(() => state(page, "santi-nuca")).toBe("WORLD");
+      await expect.poll(async () => ["SCREEN", "ISOLATE"].includes((await state(page, "santi-nuca")) ?? "")).toBe(false);
     }
 
     await page.goBack();
@@ -363,7 +363,8 @@ test.describe("without JavaScript", () => {
     await page.goto("/trabajo/santi-nuca");
     const world = page.locator("#santi-nuca");
     await expect(world.getByRole("heading", { level: 2, name: "Santi Nuca" })).toBeVisible();
-    await expect(world.getByText("Fotografía · Santi Nuca")).toBeVisible();
+    await expect(world.locator(".world-credit")).toHaveText("Fotografía · Santi Nuca");
+    await expect(world.locator(".world-credit")).toBeVisible();
     await expect(world.locator('[data-part="object"]')).toBeHidden();
     await expect(page.locator("#trabajo .reel-item [data-enter]").first()).toHaveAttribute("href", "/trabajo/travelsuite360");
     await expect(page.getByRole("banner").getByRole("link", { name: "Trabajo" })).toHaveAttribute("href", "#trabajo");
