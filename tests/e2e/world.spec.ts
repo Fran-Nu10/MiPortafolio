@@ -224,7 +224,8 @@ test.describe("entering and leaving", () => {
     await expect.poll(() => page.evaluate(() => Math.abs(document.querySelector('#chef-arturo [data-part="stage"]')!.getBoundingClientRect().top))).toBeLessThan(2);
     expect(await state(page, "chef-arturo")).toBe("SCREEN");
 
-    await scrollToFraction(page, "chef-arturo", 0.8);
+    // Chef's pin is 6.4 units long since Phase 8 (5 under reduced motion): WORLD (C02) at 2 (0.5)
+    await scrollToFraction(page, "chef-arturo", (await reduced(page)) ? 0.5 / 5 : 2 / 6.4);
     await expect.poll(() => state(page, "chef-arturo")).toBe("WORLD");
     const y = await page.evaluate(() => window.scrollY);
     await page.waitForTimeout(400); // the position is remembered once scrolling settles
