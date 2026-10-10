@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useRef, type CSSProperties, type ReactNode } from "react";
 import type { Rect01, WorldType } from "@/data/types";
 import { placeRect, type Rect } from "@/lib/geometry";
 import { EASE } from "@/lib/motion";
 import { REEL_SIZES } from "@/lib/reel";
 import type { ResolvedAsset } from "@/lib/resolved";
 import { WORLD_UNITS, WORLD_UNITS_RM, escapeRect, flip } from "@/lib/world";
+import type { Tier } from "@/lib/tiers";
 import { useScene, type SceneApi } from "@/lib/useScene";
 import { Still } from "@/components/media/Still";
 
@@ -34,6 +35,28 @@ export interface WorldView {
 }
 
 /**
+ * What a world adds after the shared grammar (Spec §07 "everything after s:WORLD"): its own
+ * timeline, appended to the same timeline inside the same build — one pin, one snap, one
+ * ScrollTrigger per world. Navigation, history and the reel jump stay the shell's.
+ */
+export interface WorldSceneExtension {
+  /** the whole world's length in gestures (the shell's own 2.5 / 1 are replaced) */
+  units: (tier: Tier, rm: boolean) => number;
+  /** labels and tweens from `worldAt` (the time of `s:WORLD`) on */
+  build: (api: SceneApi, tl: gsap.core.Timeline, ctx: WorldBuildContext) => void;
+  /** the world's trigger became active / inactive */
+  onToggle?: (active: boolean) => void;
+}
+
+export interface WorldBuildContext {
+  /** the escaping object (aria-hidden), at its world rect from `worldAt` on */
+  object: HTMLElement;
+  worldAt: number;
+  /** the object's box at its natural size, before any transform */
+  natural: { w: number; h: number };
+}
+
+/**
  * Shared world shell (Spec §07). Every world:
  *   SCREEN   its reel poster at the shared reel rectangle, the object aligned over it
  *   ISOLATE  gesture 1 — the rest of the screen darkens to .75; the object keeps its light
@@ -44,15 +67,28 @@ export interface WorldView {
  * copy follows the stage in normal flow, readable. The stage (and SCREEN) is laid out in CSS
  * from first paint, so a jump from the reel or a deep link never moves anything.
  */
-export function WorldScene({ world }: { world: WorldView }) {
+export function WorldScene({
+  world,
+  scene,
+  summary,
+  children,
+}: {
+  world: WorldView;
+  scene?: WorldSceneExtension;
+  /** the visual-only states, once, for assistive tech (Spec §19) — only while the scene runs */
+  summary?: string[];
+  /** the world's own layers, inside the stage above the shared ones */
+  children?: ReactNode;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
 
   useScene(stageRef, {
     id: `world-${world.id}`,
     pin: "sticky",
-    units: (_tier, rm) => (rm ? WORLD_UNITS_RM : WORLD_UNITS),
-    build: (api) => buildWorld(api, world),
+    units: (tier, rm) => (scene ? scene.units(tier, rm) : rm ? WORLD_UNITS_RM : WORLD_UNITS),
+    build: (api) => buildWorld(api, world, scene),
+    onToggle: scene?.onToggle,
     onState: (state) => {
       if (sectionRef.current) sectionRef.current.dataset.state = state;
     },
@@ -83,6 +119,7 @@ export function WorldScene({ world }: { world: WorldView }) {
       data-state="SCREEN"
       data-env={world.env}
       data-tone={world.tone}
+      data-scene={scene ? "" : undefined}
       aria-labelledby={`${world.id}-h`}
       className="world"
       style={vars}
@@ -107,8 +144,16 @@ export function WorldScene({ world }: { world: WorldView }) {
               <p className="world-object-text">{world.object.text}</p>
             )}
           </div>
+          {children}
         </div>
       </div>
+      {summary?.length ? (
+        <ol className="sr-only world-summary">
+          {summary.map((s) => (
+            <li key={s}>{s}</li>
+          ))}
+        </ol>
+      ) : null}
       {world.credit ? (
         <p className="world-credit micro" data-part="credit">
           {world.credit}
@@ -132,7 +177,7 @@ function rel(el: HTMLElement, stage: HTMLElement): Rect {
   return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height };
 }
 
-function buildWorld(api: SceneApi, world: WorldView): gsap.core.Timeline | null {
+function buildWorld(api: SceneApi, world: WorldView, scene?: WorldSceneExtension): gsap.core.Timeline | null {
   const { gsap, root: stage } = api;
   if (!api.pinned) {
     // very small / short viewports: the static layout (Spec §24)
@@ -181,7 +226,8 @@ function buildWorld(api: SceneApi, world: WorldView): gsap.core.Timeline | null 
     tl.set(env, { opacity: 1 }, 0.5);
     tl.set(screen, { autoAlpha: 0 }, 0.5);
     tl.addLabel("s:WORLD", 0.5);
-    tl.to({}, { duration: WORLD_UNITS_RM - 0.5 }, 0.5);
+    if (scene) scene.build(api, tl, { object, worldAt: 0.5, natural });
+    else tl.to({}, { duration: WORLD_UNITS_RM - 0.5 }, 0.5);
     return tl;
   }
   // ISOLATE · the screen darkens around the object (nothing starts at 0)
@@ -194,6 +240,7 @@ function buildWorld(api: SceneApi, world: WorldView): gsap.core.Timeline | null 
   tl.fromTo(env, { opacity: 0 }, { opacity: 1, duration: 0.55, immediateRender: false }, 1.45);
   tl.fromTo(screen, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.55, immediateRender: false }, 1.45);
   tl.addLabel("s:WORLD", 2);
-  tl.to({}, { duration: WORLD_UNITS - 2 }, 2);
+  if (scene) scene.build(api, tl, { object, worldAt: 2, natural });
+  else tl.to({}, { duration: WORLD_UNITS - 2 }, 2);
   return tl;
 }

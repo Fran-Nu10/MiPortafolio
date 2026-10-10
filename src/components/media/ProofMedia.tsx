@@ -23,7 +23,24 @@ function useHydrated() {
  * While the recording does not exist: the real poster capture with no play button, or the
  * neutral placeholder when there is no real poster either (TravelSuite360 today).
  */
-export function ProofMedia({ asset, label, sizes }: { asset: ResolvedAsset; label: string; sizes: string }) {
+export function ProofMedia({
+  asset,
+  label,
+  sizes,
+  preload,
+  onTime,
+  onFail,
+}: {
+  asset: ResolvedAsset;
+  label: string;
+  sizes: string;
+  /** a staged preload from the world (TS: none → metadata → auto, Spec §08); else by view */
+  preload?: "none" | "metadata" | "auto";
+  /** playback position, for chapter labels */
+  onTime?: (t: number) => void;
+  /** the recording could not play: the poster stays, chapter labels hide */
+  onFail?: () => void;
+}) {
   const boxRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hydrated = useHydrated();
@@ -44,9 +61,13 @@ export function ProofMedia({ asset, label, sizes }: { asset: ResolvedAsset; labe
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (autoplay) v.play().catch(() => setFailed(true));
+    if (autoplay)
+      v.play().catch(() => {
+        setFailed(true);
+        onFail?.();
+      });
     else if (!inView || !visible) v.pause();
-  }, [autoplay, inView, visible]);
+  }, [autoplay, inView, visible, onFail]);
 
   const poster = asset.poster;
   const floor = poster ? <Still asset={poster} sizes={sizes} fill /> : <Placeholder asset={asset} fill />;
@@ -82,7 +103,8 @@ export function ProofMedia({ asset, label, sizes }: { asset: ResolvedAsset; labe
             style={{ opacity: shown ? 1 : 0 }}
             muted
             playsInline
-            preload={inView ? "metadata" : "none"}
+            preload={preload === "auto" ? "auto" : inView || preload === "metadata" ? "metadata" : "none"}
+            onTimeUpdate={(e) => onTime?.(e.currentTarget.currentTime)}
             aria-label={label}
             onPlaying={() => {
               setShown(true);
@@ -93,7 +115,10 @@ export function ProofMedia({ asset, label, sizes }: { asset: ResolvedAsset; labe
               setPlaying(false);
               setEnded(true);
             }}
-            onError={() => setFailed(true)}
+            onError={() => {
+              setFailed(true);
+              onFail?.();
+            }}
           >
             {files.sources.map((s) => (
               <source key={s.src} src={s.src} type={s.type} />

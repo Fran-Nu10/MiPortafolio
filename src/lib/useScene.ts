@@ -242,7 +242,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
               },
         onUpdate: (self) => {
           // stepping: the same timeline, shown only at its resting states
-          if (stepping) tl!.progress(stepToStop(stops, self.progress));
+          if (stepping) tl!.progress(stepToStop(stops, self.progress, pxEps(self)));
           o.onUpdate?.(self.progress);
         },
         onToggle: (self) => o.onToggle?.(self.isActive),

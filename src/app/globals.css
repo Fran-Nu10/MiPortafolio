@@ -1206,23 +1206,30 @@ html.js .world-stage[data-anim] .world-object {
   width: calc(100% / var(--aw));
   height: calc(100% / var(--ah));
 }
-/* TravelSuite360: the message itself, set at its TS01 size (the scene scales it into place) */
+/* TravelSuite360: the message itself, at its design-space size (64px, ≤ 1100 wide; sm 34px, ≤ 342)
+   — the scene scales it with the space, so it lands on the sentence's own pixels */
 html.js .world-stage[data-anim] .world-object-text {
   width: max-content;
-  max-width: min(1100px, 76vw);
+  max-width: 1100px;
   height: auto;
 }
 .world-object-text p,
-p.world-object-text {
+p.world-object-text,
+.ts-statement {
   margin: 0;
-  font-size: var(--type-statement);
+  font-size: 64px;
   line-height: 1.1;
   font-weight: 500;
   color: var(--color-paper);
 }
 @media (max-width: 767.98px) {
   html.js .world-stage[data-anim] .world-object-text {
-    max-width: calc(100vw - 48px);
+    max-width: 342px;
+  }
+  .world-object-text p,
+  p.world-object-text,
+  .ts-statement {
+    font-size: 34px;
   }
 }
 html.js .world:has(.world-stage[data-anim]) > .world-credit,
@@ -1236,6 +1243,314 @@ html.js .world:has(.world-stage[data-anim]) > .world-credit {
 }
 html.js .world:has(.world-stage[data-anim]) > .world-copy {
   margin-top: 6svh;
+}
+
+/* ── TravelSuite360 proof (Spec §08 TS11 / TS12) ───────────────────────────────────────── */
+.proof[data-proof="travelsuite360"] .proof-window {
+  border: 1px solid rgb(142 139 132 / 0.4);
+  border-radius: 8px;
+}
+.proof-chapters {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-muted);
+}
+.proof-chapters [aria-current] {
+  color: var(--color-paper);
+}
+html.js .proof .proof-chapters {
+  position: absolute;
+  z-index: 1;
+  right: var(--sx);
+  top: calc(var(--sy) - 32px);
+}
+/* the seam paints inside the proof's own stacking context: the next world rises over it */
+html.js .proof[data-exit="seam"] {
+  z-index: 0;
+}
+.proof-seam {
+  display: none;
+}
+html.js .proof-seam {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  visibility: hidden;
+  pointer-events: none;
+  background: var(--color-signal);
+}
+
+/* ── TravelSuite360 world (Spec §08): a 1440×900 design space (sm 390×844), scaled once ──
+   Positions, depths and opacities are the scene's; this sets type, rules and structure.
+   Never opacity / filter / overflow / clip-path on the space or the camera (they flatten 3D). */
+.ts-layer,
+.world-summary {
+  display: none;
+}
+html.js .world-stage[data-anim] .ts-layer {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+/* the scene shows the copy: the text version below the stage steps aside, the summary speaks */
+html.js .world[data-scene]:has(.world-stage[data-anim]) > .world-copy {
+  display: none;
+}
+html.js .world[data-scene]:has(.world-stage[data-anim]) .world-summary {
+  display: block;
+}
+.ts-persp {
+  position: absolute;
+  inset: 0;
+}
+.ts-space {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+}
+.ts-camera,
+.ts-plane,
+.ts-reveal {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.ts-raw,
+.ts-interp,
+.ts-field,
+.ts-quote,
+.ts-trip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+}
+.ts-msg {
+  position: relative;
+  width: max-content;
+  max-width: 1100px;
+}
+.ts-msg [data-word] {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+.ts-raw-label,
+.ts-field-label,
+.ts-interp {
+  margin: 0;
+  color: var(--color-muted);
+}
+.ts-raw-label {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  padding-bottom: 20px;
+}
+.ts-origin {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: max-content;
+  max-width: 1100px;
+  margin: 0;
+  padding-top: 28px;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+.ts-field {
+  white-space: nowrap;
+}
+.ts-field-label {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  padding-bottom: 10px;
+}
+.ts-field-value {
+  display: inline-block;
+  position: relative;
+}
+.ts-field-to {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ts-quote {
+  width: 520px;
+}
+.ts-q-title {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin: 0 0 12px;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--color-paper);
+}
+/* the red only marks what is active (Revelado 2.2 §8) */
+.ts-tag {
+  color: var(--color-signal);
+}
+.ts-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: baseline;
+  height: 52px;
+  padding-top: 16px;
+  border-bottom: 1px solid rgb(142 139 132 / 0.45);
+  color: var(--color-paper);
+}
+.ts-row .ts-row-label {
+  color: var(--color-muted);
+}
+.ts-row-value {
+  font-size: 22px;
+  line-height: 1.2;
+}
+.ts-trip {
+  width: 600px;
+}
+.ts-trip .ts-row {
+  grid-template-columns: 112px 1fr;
+}
+.ts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+}
+.ts-res {
+  padding-top: 32px;
+}
+.ts-bar {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  background: rgb(142 139 132 / 0.6);
+}
+.ts-signal {
+  position: absolute;
+  left: 0;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  background: var(--color-signal);
+}
+.ts-res-text,
+.ts-report {
+  margin: 14px 0 0;
+  color: var(--color-paper);
+}
+.ts-report {
+  margin-top: 6px;
+  color: var(--color-muted);
+}
+.ts-group,
+.ts-drift {
+  position: absolute;
+  inset: 0;
+}
+/* opacity on the group (its children are flat), never on the camera (Spec §08 depth groups) */
+.ts-group[data-depth="0"] {
+  opacity: 0.55;
+}
+.ts-group[data-depth="1"] {
+  opacity: 0.4;
+}
+.ts-group[data-depth="2"] {
+  opacity: 0.25;
+}
+.ts-group[data-depth="3"] {
+  opacity: 0.1;
+}
+.ts-frag {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--color-paper);
+}
+.ts-frag::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 4px;
+  background: currentColor;
+}
+.ts-name {
+  position: absolute;
+  left: 0;
+  top: 560px;
+  width: 1440px;
+  text-align: center;
+}
+.ts-name-title {
+  margin: 0;
+  font-size: 88px;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--color-paper);
+}
+.ts-close {
+  margin: 20px 0 0;
+  font-size: 24px;
+  line-height: 1.3;
+  color: var(--color-paper);
+}
+.ts-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 42%, rgb(0 0 0 / 0.78) 100%);
+}
+@media (max-width: 767.98px) {
+  .ts-msg,
+  .ts-origin {
+    max-width: 342px;
+  }
+  .ts-origin {
+    width: 342px;
+    font-size: 16px;
+  }
+  .ts-quote,
+  .ts-trip {
+    width: 342px;
+  }
+  .ts-q-title {
+    font-size: 18px;
+  }
+  .ts-row,
+  .ts-trip .ts-row {
+    grid-template-columns: 110px 1fr;
+    height: 48px;
+    padding-top: 14px;
+  }
+  .ts-row-value {
+    font-size: 16px;
+  }
+  .ts-grid {
+    grid-template-columns: 1fr;
+  }
+  .ts-name {
+    top: 600px;
+    width: 390px;
+  }
+  .ts-name-title {
+    font-size: 44px;
+  }
+  .ts-close {
+    margin-top: 14px;
+    font-size: 18px;
+  }
 }
 
 /* ── proofs with JavaScript: the window at the shared rectangle, centered in its stage ──── */

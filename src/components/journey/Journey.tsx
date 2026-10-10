@@ -8,6 +8,7 @@ import { resolveAsset } from "@/lib/assets";
 import { confirmed, indexLabel, liveLabel, miniLabel, proofCaption, routeErrorText, stackLine } from "@/lib/content";
 import type { SectionId } from "@/lib/journey-store";
 import { pathForSection } from "@/lib/route-sync";
+import { TS_KEY_WORDS, splitField, splitList } from "@/lib/ts-world";
 import { CapabilitiesRail } from "@/components/capabilities/CapabilitiesRail";
 import { FinalCta } from "@/components/contact/FinalCta";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -17,6 +18,7 @@ import { OpeningHero } from "@/components/opening/OpeningHero";
 import { Profile } from "@/components/profile/Profile";
 import { ProjectReel, type ReelItemView } from "@/components/reel/ProjectReel";
 import { ProjectProof, type ProofView } from "@/components/worlds/ProjectProof";
+import { TravelSuiteWorld, type TsView } from "@/components/worlds/TravelSuiteWorld";
 import { WorldScene, type WorldView } from "@/components/worlds/WorldScene";
 import { JourneyClient } from "./JourneyClient";
 
@@ -84,6 +86,10 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
         : { href: pathForSection("capacidades"), label: `${SITE.world.next} ${SITE.world.capabilitiesName}` },
       tone: p.theme.tone,
       aspect: p.reel.aspect,
+      chapters: p.proof.chapters,
+      // TravelSuite360: preload staged by its world; TS12 red seam toward Rayo (Spec §07, §08)
+      stagedPreload: p.worldType === "ts-depth",
+      exit: p.worldType === "ts-depth" && p.next === "rayo-smash" ? "seam" : undefined,
     };
   };
 
@@ -131,7 +137,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
           copy={{ hint: SITE.reel.hint, restHint: SITE.reel.restHint, prev: SITE.reel.prev, next: SITE.reel.next, a11y: SITE.reel.a11y, cursor: SITE.reel.cursor }}
         />
         {PROJECTS.map((p) => (
-          <ProjectWorld key={p.id} world={worldFor(p)} proof={proofFor(p)}>
+          <ProjectWorld key={p.id} project={p} world={worldFor(p)} proof={proofFor(p)}>
             {p.id === "rayo-smash" && SITE.features.humanMoment ? <HumanMoment media={resolveAsset("moments.human")} /> : null}
           </ProjectWorld>
         ))}
@@ -178,10 +184,14 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
 }
 
 /** a world, its proof, and whatever breath follows them */
-function ProjectWorld({ world, proof, children }: { world: WorldView; proof: ProofView; children?: ReactNode }) {
+function ProjectWorld({ project, world, proof, children }: { project: Project; world: WorldView; proof: ProofView; children?: ReactNode }) {
   return (
     <>
-      <WorldScene world={world} />
+      {project.worldType === "ts-depth" ? (
+        <TravelSuiteWorld world={world} ts={tsView(project)} summary={project.a11y.worldSummary} />
+      ) : (
+        <WorldScene world={world} />
+      )}
       <ProjectProof proof={proof} />
       {children}
     </>
@@ -199,4 +209,28 @@ function anchorOf(p: Project): WorldView["anchor"] {
 function openLink(p: Project) {
   const href = confirmed(p.liveUrl);
   return href ? { href, label: SITE.reel.open, aria: p.a11y.openLabel } : undefined;
+}
+
+/** TravelSuite360's world copy (Content Master 06), split into what each state shows */
+function tsView(p: Project): TsView {
+  const c = p.worldCopy;
+  const fields = { dest: splitField(c["TS03.dest"]), date: splitField(c["TS03.date"]), pax: splitField(c["TS03.pax"]) };
+  const known = new Map(Object.values(fields).map((f) => [f.label, f.value]));
+  const rows = splitList(c["TS04.fields"]).map((label) => ({ label, value: known.get(label) }));
+  const [tripLabel, tripValue, ...cells] = splitList(c["TS06.trip"]);
+  return {
+    input: c["TS01.label"],
+    message: c["TS01.message"],
+    words: TS_KEY_WORDS,
+    origin: c["TS01.origin"],
+    interpretado: c["TS03.label"],
+    fields,
+    quote: { titles: [c["TS04.q1"], c["TS04.q2"]], rows, tag: c["TS05.tag"] },
+    // fields without a known value (vuelo, hotel, traslados, estado) carry none (Spec §08)
+    trip: { label: tripLabel, value: tripValue, cells: cells.map((label) => ({ label, value: known.get(label) })) },
+    reservation: c["TS07.reservation"],
+    report: c["TS08.report"],
+    name: p.name,
+    close: c["TS10.close"],
+  };
 }

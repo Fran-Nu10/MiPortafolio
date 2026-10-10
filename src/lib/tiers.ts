@@ -50,8 +50,12 @@ export const GESTURE_VH: Record<Tier, number> = { xl: 80, lg: 80, md: 70, sm: 60
 /** under reduced motion pins shorten to units × 50vh (Spec §16) */
 export const RM_GESTURE_VH = 50;
 
+/** tablets: no pin longer than 450vh (Spec §15) */
+export const MD_PIN_CAP_VH = 450;
+
 export function pinLengthVh(units: number, tier: Tier, rm: boolean): number {
-  return Math.round(units * (rm ? RM_GESTURE_VH : GESTURE_VH[tier]));
+  const vh = Math.round(units * (rm ? RM_GESTURE_VH : GESTURE_VH[tier]));
+  return tier === "md" ? Math.min(MD_PIN_CAP_VH, vh) : vh;
 }
 
 /** snap label prefix (resting states) and marker prefix (inside a gesture, never snapped) */
@@ -82,10 +86,10 @@ export function snapToStop(stops: number[], value: number, direction: number, ep
   return stops[0];
 }
 
-/** reduced motion / tiny viewports: the state shown is the last stop reached */
-export function stepToStop(stops: number[], value: number): number {
+/** reduced motion / tiny viewports: the state shown is the last stop reached (within `eps`) */
+export function stepToStop(stops: number[], value: number, eps = 1e-4): number {
   if (!stops.length) return value;
   let current = stops[0];
-  for (const s of stops) if (s <= value + 1e-4) current = s;
+  for (const s of stops) if (s <= value + eps) current = s;
   return current;
 }

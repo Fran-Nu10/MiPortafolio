@@ -1,8 +1,10 @@
 "use client";
 
-import { useLayoutEffect, useRef, type CSSProperties } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useJourney } from "@/lib/journey-store";
 import { EASE, gsap, prefersReducedMotion, registerGsap, ScrollTrigger } from "@/lib/motion";
 import { REEL_SIZES } from "@/lib/reel";
+import { chapterAt } from "@/lib/ts-world";
 import type { ResolvedAsset } from "@/lib/resolved";
 import { ProofMedia } from "@/components/media/ProofMedia";
 
@@ -22,7 +24,23 @@ export interface ProofView {
   tone: "paper-on-black" | "ink-on-paper";
   /** the window keeps the reel geometry of its project */
   aspect: { desktop: [number, number]; mobile: [number, number] };
+  /** chapter labels over the recording ("TravelChat · CRM · IA"), switched by its time */
+  chapters?: { label: string; at: number }[];
+  /** preload staged by the world: none → metadata (world active) → auto (from TS09) */
+  stagedPreload?: boolean;
+  /** TS12: the red field closes in from the viewport edges toward the next world */
+  exit?: "seam";
 }
+
+/** the TS reveal states from which the recording may load in full */
+const DEEP_STATES = new Set(["TS09a", "TS09b"]);
+
+/** the seam's red plane: a full-viewport rect with a hole `inset` % from each edge (evenodd) */
+const seamClip = (inset: number) => {
+  const a = inset;
+  const b = 100 - inset;
+  return `polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, ${a}% ${a}%, ${a}% ${b}%, ${b}% ${b}%, ${b}% ${a}%, ${a}% ${a}%)`;
+};
 
 /**
  * S4/S6/S9/S11 · Proof (Spec §02 proof sheet). Real media of the real product + the micro case +
@@ -33,6 +51,27 @@ export interface ProofView {
 export function ProjectProof({ proof }: { proof: ProofView }) {
   const ref = useRef<HTMLElement>(null);
   const h = `${proof.id}-proof-h`;
+  const section = useJourney((st) => st.section);
+  const [deep, setDeep] = useState(false);
+  const [chapter, setChapter] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const onFail = useCallback(() => setFailed(true), []);
+  const chapters = proof.chapters && proof.media.status !== "placeholder" && !failed ? proof.chapters : null;
+
+  // the world says when the recording may load: its reveal (TS09) → auto (Spec §08 preload)
+  useEffect(() => {
+    if (!proof.stagedPreload) return;
+    const world = document.getElementById(proof.id);
+    if (!world) return;
+    const check = () => {
+      if (DEEP_STATES.has(world.dataset.state ?? "")) setDeep(true);
+    };
+    check();
+    const mo = new MutationObserver(check);
+    mo.observe(world, { attributes: true, attributeFilter: ["data-state"] });
+    return () => mo.disconnect();
+  }, [proof.stagedPreload, proof.id]);
+  const preload = proof.stagedPreload ? (deep ? "auto" : section === proof.id ? "metadata" : "none") : undefined;
 
   useLayoutEffect(() => {
     registerGsap();
@@ -40,11 +79,28 @@ export function ProjectProof({ proof }: { proof: ProofView }) {
     const stage = root?.querySelector<HTMLElement>('[data-part="stage"]');
     const win = root?.querySelector<HTMLElement>('[data-part="window"]');
     if (!root || !stage || !win || prefersReducedMotion()) return;
+    const seam = root.querySelector<HTMLElement>('[data-part="seam"]');
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: EASE.none } });
       tl.fromTo(win, { scale: 0.9 }, { scale: 1, duration: 0.4 }, 0);
       tl.fromTo(win, { opacity: 1 }, { opacity: 0.55, duration: 0.3, immediateRender: false }, 0.7);
       ScrollTrigger.create({ trigger: stage, start: "top bottom", end: "bottom top", scrub: 0.6, animation: tl });
+      if (seam) {
+        // TS12 · over the last 30% of the proof's pass the red field closes in from the edges;
+        // the next world's stage then rises over it (no black flash, no cut)
+        const red = gsap.timeline({ defaults: { ease: EASE.none } });
+        red.fromTo(seam, { clipPath: seamClip(0) }, { clipPath: seamClip(50), duration: 0.3 }, 0.7);
+        const show = (p: number) => gsap.set(seam, { autoAlpha: p > 0.7 && p < 1 ? 1 : 0 });
+        ScrollTrigger.create({
+          trigger: root,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.6,
+          animation: red,
+          onUpdate: (self) => show(self.progress),
+          onRefresh: (self) => show(self.progress),
+        });
+      }
     }, root);
     return () => ctx.revert();
   }, []);
@@ -56,6 +112,7 @@ export function ProjectProof({ proof }: { proof: ProofView }) {
       data-section={proof.id}
       data-proof={proof.id}
       data-tone={proof.tone}
+      data-exit={proof.exit}
       className="proof"
       style={
         {
@@ -70,8 +127,24 @@ export function ProjectProof({ proof }: { proof: ProofView }) {
         {proof.name}
       </h3>
       <figure className="proof-figure" data-part="stage">
+        {chapters ? (
+          <ol className="proof-chapters micro" aria-label={proof.videoLabel}>
+            {chapters.map((c, i) => (
+              <li key={c.label} aria-current={i === chapter ? "true" : undefined}>
+                {c.label}
+              </li>
+            ))}
+          </ol>
+        ) : null}
         <div className="proof-window" data-part="window">
-          <ProofMedia asset={proof.media} label={proof.videoLabel} sizes={REEL_SIZES} />
+          <ProofMedia
+            asset={proof.media}
+            label={proof.videoLabel}
+            sizes={REEL_SIZES}
+            preload={preload}
+            onTime={chapters ? (t) => setChapter(chapterAt(chapters, t)) : undefined}
+            onFail={onFail}
+          />
         </div>
         <figcaption className="proof-caption">{proof.caption}</figcaption>
       </figure>
@@ -92,6 +165,7 @@ export function ProjectProof({ proof }: { proof: ProofView }) {
           </a>
         </p>
       </div>
+      {proof.exit === "seam" ? <div className="proof-seam" data-part="seam" aria-hidden="true" /> : null}
     </section>
   );
 }
