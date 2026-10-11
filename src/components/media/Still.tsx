@@ -1,4 +1,4 @@
-import Image, { getImageProps } from "next/image";
+import { getImageProps } from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import type { ImageFile } from "@/data/types";
 import { aspectVars, type ResolvedAsset } from "@/lib/resolved";
@@ -34,13 +34,17 @@ export function Still({
     "--focus-m": mobile.focus ?? desktop.focus ?? "50% 50%",
   } as CSSProperties;
 
-  // Next 16: `priority` is deprecated — an above-the-fold LCP image loads eagerly. No
-  // fetchPriority: it emits a <link rel=preload> that can go unused at some widths.
-  const eager = priority ? ({ loading: "eager" } as const) : {};
+  // Next 16: `priority` is deprecated. React 19's server renderer preloads any non-lazy <img>
+  // that is not inside a <picture> (a <link rel=preload imagesrcset>), and WebKit at DPR 2 picked a
+  // different candidate for the element than for the preload ("preloaded but not used" on every
+  // project route: a double download). The optimizer's srcset/sizes come from getImageProps and the
+  // element always sits in a <picture>: an above-the-fold poster loads eagerly with
+  // fetchpriority="high" (server HTML, discovered at once), and nothing is preloaded twice.
+  const eager = priority ? ({ loading: "eager", fetchPriority: "high" } as const) : {};
+  const common = { alt: asset.alt, sizes, fill: true } as const;
+  const { props: d } = getImageProps({ ...common, src: desktop.src });
   let img: ReactNode;
   if (mobile.src !== desktop.src) {
-    const common = { alt: asset.alt, sizes, fill: true, ...eager } as const;
-    const { props: d } = getImageProps({ ...common, src: desktop.src });
     const {
       props: { srcSet: mobileSrcSet, ...m },
     } = getImageProps({ ...common, src: mobile.src });
@@ -49,11 +53,16 @@ export function Still({
         <source media="(min-width: 768px)" srcSet={d.srcSet} sizes={sizes} />
         <source media="(max-width: 767.98px)" srcSet={mobileSrcSet} sizes={sizes} />
         {/* eslint-disable-next-line jsx-a11y/alt-text -- alt comes from getImageProps */}
-        <img {...m} className="media-img" />
+        <img {...m} {...eager} className="media-img" />
       </picture>
     );
   } else {
-    img = <Image src={desktop.src} alt={asset.alt} fill sizes={sizes} {...eager} className="media-img" />;
+    img = (
+      <picture>
+        {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element -- alt and the optimizer's srcset come from getImageProps */}
+        <img {...d} {...eager} className="media-img" />
+      </picture>
+    );
   }
 
   return (

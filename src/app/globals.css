@@ -308,7 +308,9 @@ html.js .site-header[data-revealed="false"]:not(:focus-within) {
   gap: 16px;
   white-space: nowrap;
 }
-.site-nav .link {
+.site-nav .link,
+.site-brand {
+  /* every interactive target ≥ 44px tall (Spec §15; WCAG 2.2 target size) */
   min-height: 44px;
   display: inline-flex;
   align-items: center;
@@ -327,6 +329,26 @@ html.js .site-header[data-revealed="false"]:not(:focus-within) {
   }
   .site-nav {
     gap: 24px;
+  }
+}
+
+/* ≤ 359px (the 320×568 minimum of the QA matrix): the brand and the three links must share one
+   row — a smaller size, tighter gaps, and the brand may be cut with an ellipsis before anything overlaps */
+@media (max-width: 359.98px) {
+  .site-header {
+    gap: 12px;
+    font-size: 13px;
+  }
+  .site-header-id {
+    min-width: 0;
+  }
+  .site-brand {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .site-nav {
+    gap: 12px;
   }
 }
 
@@ -2187,6 +2209,13 @@ html.js .at-work-stage[data-anim] {
 }
 .capability-attr {
   justify-self: start;
+}
+a.capability-attr {
+  /* a link is a target: ≥ 44px tall without moving the text (Spec §15) */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-block: -11px;
 }
 
 /* the rail: lg/xl, a pin, motion allowed — laid out from first paint so the build only adds

@@ -387,7 +387,9 @@ function buildTravelSuite(api: SceneApi, tl: gsap.core.Timeline, ctx: WorldBuild
   tl.addLabel("m:TS02", T(TS_T.TS02));
   const lift = T(TS_T.TS02) + 0.02;
   tl.set(Object.values(fields), { opacity: 1 }, lift);
-  tl.set(msg.querySelectorAll("[data-word]"), { color: "transparent", textDecorationColor: "rgba(237, 232, 222, 1)" }, lift);
+  // reduced motion (Spec §16): nothing flies, so the words stay readable in the sentence — underlined,
+  // with the three fields listed beside it; with motion the copies carry the words and the slots are gaps
+  tl.set(msg.querySelectorAll("[data-word]"), rm ? { textDecorationColor: "rgba(237, 232, 222, 1)" } : { color: "transparent", textDecorationColor: "rgba(237, 232, 222, 1)" }, lift);
   for (const k of KEYS) {
     tl.to(fields[k], { ...place({ x: start[k].x, y: start[k].y - 12 }), duration: 0.38, ease: EASE.settle }, lift);
     tl.to(fields[k].querySelector('[data-part="f-value"]'), { scale: 1.06, duration: 0.38, ease: EASE.settle }, lift);

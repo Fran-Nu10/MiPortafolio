@@ -218,7 +218,10 @@ function buildChef(api: SceneApi, tl: gsap.core.Timeline, ctx: WorldBuildContext
   gsap.set(purchase, { left: view.purchase.x, top: view.purchase.y, width: view.purchase.w });
   gsap.set(controls, { clipPath: HIDE_X });
   gsap.set(close, { left: view.close.x, top: view.close.y, width: view.close.w, clipPath: HIDE_Y });
-  api.onRevert(() => gsap.set([space, fieldEl, figure, ...siblings, heading, ...chromes, catalogEl, commerce, info, ...infoParts, purchase, ...controls, close], { clearProps: "all" }));
+  api.onRevert(() => {
+    gsap.set([space, fieldEl, figure, ...siblings, heading, ...chromes, catalogEl, commerce, info, ...infoParts, purchase, ...controls, close], { clearProps: "all" });
+    commerce.removeAttribute("aria-hidden");
+  });
 
   const swapIn = (t: number) => {
     // the escaping object → the world's figure, in the same frame and the same rectangle
@@ -246,7 +249,7 @@ function buildChef(api: SceneApi, tl: gsap.core.Timeline, ctx: WorldBuildContext
     tl.set([...infoParts, ...controls], { clipPath: SHOW }, T(C_T_RM.C06));
     tl.addLabel("s:C06", T(C_T_RM.C06));
     tl.set(close, { clipPath: SHOW, visibility: "visible" }, T(C_T_RM.C07));
-    tl.set(commerce, { opacity: C07_DIM }, T(C_T_RM.C07));
+    tl.set(commerce, { opacity: C07_DIM, attr: { "aria-hidden": "true" } }, T(C_T_RM.C07));
     tl.addLabel("s:C07", T(C_T_RM.C07));
     tl.to({}, { duration: C_T_RM.END - C_T_RM.C07 }, T(C_T_RM.C07));
     return;
@@ -294,6 +297,9 @@ function buildChef(api: SceneApi, tl: gsap.core.Timeline, ctx: WorldBuildContext
   tl.set(close, { visibility: "visible" }, T(C_T.C06));
   tl.to(close, { clipPath: SHOW, duration: d7 * 0.7, ease: EASE.reveal }, T(C_T.C06) + 0.05);
   tl.to(commerce, { opacity: C07_DIM, duration: d7 * 0.6 }, T(C_T.C06) + 0.1);
+  // dimmed under the closing line, the depiction leaves the accessibility tree (its text no longer
+  // meets AA at .4; the closing line is the state's content; the sr-only summary keeps the purchase)
+  tl.set(commerce, { attr: { "aria-hidden": "true" } }, T(C_T.C07) - 0.02);
   tl.addLabel("s:C07", T(C_T.C07));
   tl.to({}, { duration: C_T.END - C_T.C07 }, T(C_T.C07));
   void f;

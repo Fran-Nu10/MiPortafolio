@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { EvidenceSlotVariant } from "@/data/types";
-import { EASE, prefersReducedMotion, usePrefersReducedMotion } from "@/lib/motion";
+import { EASE, gsap, prefersReducedMotion, usePrefersReducedMotion } from "@/lib/motion";
 import type { ResolvedAsset } from "@/lib/resolved";
 import { getScene, useScene } from "@/lib/useScene";
 import { RAIL_ENTER_AT, SEAM_IN, cardScroll, railUnits, separationWindow } from "@/lib/capabilities-rail";
@@ -123,10 +123,13 @@ export function CapabilitiesRail({ view }: { view: CapabilitiesView }) {
     return () => io.disconnect();
   }, []);
 
-  // keyboard: focus inside an off-screen card scrolls the rail so the card is centered
+  // keyboard: focus inside an off-screen card scrolls the rail so the card is centered. The scroll is
+  // driven frame by frame (settle, 0.5 s) rather than by a native smooth scrollTo: WebKit dropped the
+  // native one when it followed a programmatic jump within ~1 s. Instant under reduced motion.
   useEffect(() => {
     const rail = sectionRef.current?.querySelector<HTMLElement>('[data-part="rail"]');
     if (!rail) return;
+    let tween: gsap.core.Tween | null = null;
     const onFocus = (e: FocusEvent) => {
       const card = (e.target as Element).closest<HTMLElement>("[data-capability]");
       const scene = getScene(ID);
@@ -134,10 +137,19 @@ export function CapabilitiesRail({ view }: { view: CapabilitiesView }) {
       const r = card.getBoundingClientRect();
       if (r.left >= 0 && r.right <= window.innerWidth) return;
       const top = cardScroll(scene.trigger.start, window.innerWidth, measured.current.vh, measured.current.overflow, card.offsetLeft, card.offsetWidth);
-      window.scrollTo({ top, behavior: prefersReducedMotion() ? "instant" : "smooth" });
+      tween?.kill();
+      if (prefersReducedMotion()) {
+        window.scrollTo(0, top);
+        return;
+      }
+      const pos = { y: window.scrollY };
+      tween = gsap.to(pos, { y: top, duration: 0.5, ease: EASE.settle, onUpdate: () => window.scrollTo(0, pos.y) });
     };
     rail.addEventListener("focusin", onFocus);
-    return () => rail.removeEventListener("focusin", onFocus);
+    return () => {
+      tween?.kill();
+      rail.removeEventListener("focusin", onFocus);
+    };
   }, []);
 
   const core = view.items.filter((c) => c.group === "core");

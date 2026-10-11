@@ -75,7 +75,13 @@ export function OpeningHero({
       if (stage && (played.current || state !== "O2")) stage.dataset.phase = state;
     },
     onUpdate: (progress) => {
-      if (progress > 0.001) finishOpening.current?.();
+      if (progress > 0.001) {
+        finishOpening.current?.();
+        if (indexFade.current) {
+          indexFade.current.progress(1).kill();
+          indexFade.current = null;
+        }
+      }
     },
   });
 
@@ -135,6 +141,14 @@ export function OpeningHero({
 
 /** finishes the time-based opening at once (set while it runs) */
 const finishOpening: { current: (() => void) | null } = { current: null };
+/**
+ * The index "00" fading in at O2 (a 400 ms tween of its own). If the scroll timeline starts
+ * before it ends, both would drive the same property and the later one would win per tick —
+ * under load the fade-in could outlive the timeline's 00 → 01 step and leave "00" showing
+ * beside "01". The scroll timeline owns the index from its first pixel: the fade is finished
+ * at once and dropped.
+ */
+const indexFade: { current: gsap.core.Tween | null } = { current: null };
 
 function parts(api: SceneApi) {
   const one = (p: string) => api.q(`[data-part="${p}"]`)[0];
@@ -292,7 +306,7 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
     root.removeAttribute("data-opening");
     p.stage.dataset.phase = "O2";
     if (isSharp) crossfade(OPENING.focus);
-    gsap.to(p.idx0, { autoAlpha: 1, duration: 0.4, ease: EASE.settle });
+    indexFade.current = gsap.to(p.idx0, { autoAlpha: 1, duration: 0.4, ease: EASE.settle, onComplete: () => (indexFade.current = null) });
     reveal();
   };
   const sharpLate = () => crossfade(OPENING.focus);
@@ -316,6 +330,8 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
   api.onRevert(() => {
     cancelRace?.();
     finishOpening.current = null;
+    indexFade.current?.kill();
+    indexFade.current = null;
   });
   return tl;
 }
