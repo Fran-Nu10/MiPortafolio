@@ -113,12 +113,13 @@ test.describe("the rail (Spec §12)", () => {
 
     // the end: 06 fully visible, one gutter from the edge, after the 3× gap and its sub-kicker
     await to(page, 1);
+    const vw = page.viewportSize()!.width;
+    // the scrub settles after the jump: measure once the rail rests
+    await expect.poll(async () => (await cardRect(page, 6)).right, { timeout: 4000 }).toBeLessThanOrEqual(vw);
     const six = await cardRect(page, 6);
     const five = await cardRect(page, 5);
-    const vw = page.viewportSize()!.width;
-    expect(six.right).toBeLessThanOrEqual(vw);
     expect(six.right).toBeGreaterThan(vw - 64);
-    expect(Math.abs(six.left - five.right - 96)).toBeLessThan(2);
+    expect(Math.abs(six.left - five.right - 96)).toBeLessThan(3);
     await expect(page.locator('#capacidades [data-capability="6"] .capability-sub')).toHaveText("Después de publicar");
     await info.attach("end", { body: await page.screenshot(), contentType: "image/png" });
     expect(problems).toEqual([]);

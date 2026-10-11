@@ -86,14 +86,15 @@ test.describe("without JavaScript", () => {
     }
   });
 
-  test("the form posts and fails honestly when delivery is not configured", async ({ page }) => {
+  test("the form posts and fails honestly when delivery fails", async ({ page }) => {
     await page.goto("/#contacto");
     await page.getByRole("button", { name: "Enviar" }).click();
     await expect(page.getByText("Falta esto.").first()).toBeVisible();
 
     await page.getByLabel("Nombre").fill("Ana");
     await page.getByLabel("Email").fill("ana@example.com");
-    await page.getByLabel("¿Qué estamos construyendo?").fill("Una tienda para mi pastelería.");
+    // "[fail]": the mocked Resend answers 500 (tests/e2e/mock-resend.mjs)
+    await page.getByLabel("¿Qué estamos construyendo?").fill("Una tienda para mi pastelería. [fail]");
     await page.getByRole("button", { name: "Enviar" }).click();
     await expect(page.locator(".brief-route-error")).toHaveText("No se envió. Probá de nuevo.");
     await expect(page.getByText("Brief recibido.")).toHaveCount(0);
@@ -164,7 +165,7 @@ test.describe("with JavaScript", () => {
 
     await page.getByLabel("Nombre").fill("Ana");
     await page.getByLabel("Email").fill("ana@");
-    await page.getByLabel("¿Qué estamos construyendo?").fill("Una tienda para mi pastelería.");
+    await page.getByLabel("¿Qué estamos construyendo?").fill("Una tienda para mi pastelería. [fail]");
     await page.getByRole("button", { name: "Enviar" }).click();
     await expect(page.getByText("Revisá el email.")).toBeVisible();
 
