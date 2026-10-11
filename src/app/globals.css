@@ -2010,15 +2010,104 @@ html:has(dialog.overlay[open]) {
   outline: none;
 }
 
-/* ── S7 / S14 · moments (flagged off until their media exists) ───────────── */
-.moment,
-.at-work {
-  padding: 8svh var(--gutter);
+/* ── S7 · human moment · S14 · Franco at work (flagged off until their media exists) ── */
+.moment {
+  /* 120svh of flow with a sticky 100svh frame: the aperture scrubs while the section passes */
+  position: relative;
+  height: 120svh;
+  background: var(--color-black);
 }
-.moment-frame,
+.moment-frame {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: clip;
+  background: var(--color-black);
+}
+.moment-window {
+  position: absolute;
+  inset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .moment {
+    height: 100svh;
+  }
+}
+
+.at-work {
+  background: var(--color-black);
+}
+.at-work-stage {
+  position: relative;
+  height: 100svh;
+  overflow: clip;
+  background: var(--color-black);
+}
+html.js .at-work-stage[data-anim] {
+  /* pinned by sticky inside .at-work-pin (useScene pin: "sticky"); without JS: one viewport in flow */
+  position: sticky;
+  top: 0;
+}
 .at-work-frame {
-  max-width: 1094px;
-  margin-inline: auto;
+  /* laid out at the end size (≈ 95%); the start is a uniform scale + clip inset (Spec §13) */
+  --fw: 95vw;
+  --fh: 95svh;
+  position: absolute;
+  left: calc((100vw - var(--fw)) / 2);
+  top: calc((100svh - var(--fh)) / 2);
+  width: var(--fw);
+  height: var(--fh);
+  margin: 0;
+  overflow: clip;
+  transform-origin: 50% 50%;
+  background: var(--color-field);
+  will-change: transform, clip-path;
+}
+@media (max-width: 767.98px) {
+  .at-work-frame {
+    --fh: 92svh;
+  }
+}
+.at-work-frame .media-img,
+.at-work-frame .media-video {
+  object-fit: cover;
+}
+/* the placeholder: a flat field with the 1px inner rule (Placeholder) and a lighter block where the monitor will be */
+.at-work-ph {
+  position: absolute;
+  inset: 0;
+}
+.at-work-ph .placeholder {
+  aspect-ratio: auto;
+}
+.at-work-ph-monitor {
+  position: absolute;
+  left: calc(var(--mx) * 100%);
+  top: calc(var(--my) * 100%);
+  width: calc(var(--mw) * 100%);
+  height: calc(var(--mh) * 100%);
+  background: #1a1a1b;
+}
+@media (max-width: 767.98px) {
+  .at-work-ph-monitor {
+    left: calc(var(--mx-m) * 100%);
+    top: calc(var(--my-m) * 100%);
+    width: calc(var(--mw-m) * 100%);
+    height: calc(var(--mh-m) * 100%);
+  }
+}
+/* the transition boundary: black with an even-odd hole; hidden until the close starts */
+.at-work-monitor {
+  position: absolute;
+  inset: 0;
+  background: var(--color-black);
+  visibility: hidden;
+  pointer-events: none;
+}
+/* reduced motion / no pin: the frame at 95% as a still; a play button when the video exists */
+.at-work-frame .proof-media {
+  position: absolute;
+  inset: 0;
 }
 
 /* ── S12 · capabilities: the stacked list (no JS, md/sm, reduced motion); the pinned
@@ -2500,15 +2589,29 @@ html:has(dialog.overlay[open]) {
   text-align: center;
   background: var(--color-black);
 }
+.end-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-paper);
+}
 .end-status:focus {
   outline: none;
+}
+/* the red signal that dims after "Brief recibido." (Spec §02 S16) */
+.end-signal {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-signal);
 }
 .end-name {
   font-weight: 900;
   font-size: var(--type-display);
   line-height: 1;
 }
-
 /* ── no-JS deep link, 404 ─────────────────────────────────────────────────── */
 .deep-link {
   position: absolute;

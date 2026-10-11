@@ -106,7 +106,11 @@ export interface BriefEnv {
   RESEND_API_KEY?: string;
   CONTACT_TO?: string;
   CONTACT_FROM?: string;
+  /** Resend's endpoint; only the e2e suite overrides it with a local stand-in */
+  RESEND_API_URL?: string;
 }
+
+export const RESEND_URL = "https://api.resend.com/emails";
 
 export interface BriefDeps {
   env: BriefEnv;
@@ -138,7 +142,7 @@ export async function processBrief(fd: FormData, deps: BriefDeps): Promise<Brief
 
   // (5) plain text only; reply goes to the visitor
   try {
-    const res = await deps.fetch("https://api.resend.com/emails", {
+    const res = await deps.fetch(deps.env.RESEND_API_URL || RESEND_URL, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -18,6 +18,8 @@ export async function submitBrief(_prev: BriefState, formData: FormData): Promis
       RESEND_API_KEY: process.env.RESEND_API_KEY,
       CONTACT_TO: process.env.CONTACT_TO,
       CONTACT_FROM: process.env.CONTACT_FROM,
+      // tests only: the e2e suite points this at a local stand-in (tests/e2e/mock-resend.mjs)
+      RESEND_API_URL: process.env.RESEND_API_URL,
     },
     ip,
     now: Date.now(),

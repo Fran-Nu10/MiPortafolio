@@ -39,6 +39,13 @@ export function BriefForm({ copy, renderedAt }: { copy: BriefFormCopy; renderedA
     if (tRef.current) tRef.current.value = String(Date.now());
   }, []);
 
+  // a server answer with field errors: focus moves to the first invalid field (Spec §14)
+  const serverId = state.status === "error" ? state.id : null;
+  const serverFirst = state.status === "error" && state.fields ? ORDER.find((f) => state.fields?.[f]) : undefined;
+  useEffect(() => {
+    if (serverId && serverFirst) formRef.current?.querySelector<HTMLElement>(`[name="${serverFirst}"]`)?.focus();
+  }, [serverId, serverFirst]);
+
   if (state.status === "success") return <EndSequence success={copy.success} name={copy.end} />;
 
   const serverFields = state.status === "error" ? state.fields : undefined;
@@ -104,7 +111,15 @@ export function BriefForm({ copy, renderedAt }: { copy: BriefFormCopy; renderedA
   });
 
   return (
-    <form ref={formRef} action={formAction} onSubmit={onSubmit} noValidate className="brief-form" aria-busy={pending || undefined}>
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      noValidate
+      className="brief-form"
+      aria-busy={pending || undefined}
+      data-state={pending ? "submitting" : routeError ? "error-route" : clientErrors || serverFields ? "error-fields" : typing ? "typing" : "idle"}
+    >
       {field(
         "name",
         copy.fields.name,

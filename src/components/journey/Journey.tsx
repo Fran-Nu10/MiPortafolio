@@ -38,6 +38,17 @@ import { JourneyClient } from "./JourneyClient";
 const RENDERED_AT = Date.now();
 
 /**
+ * The optional sections (Spec §13): off until their media is approved. A preview build may show
+ * their placeholders (`PREVIEW_MOMENTS=1` at build time, never on Vercel production) — the
+ * sections carry no copy and no evidence claim, so a placeholder there is honest.
+ */
+const PREVIEW_MOMENTS = process.env.PREVIEW_MOMENTS === "1" && process.env.VERCEL_ENV !== "production";
+const FEATURES = {
+  humanMoment: SITE.features.humanMoment || PREVIEW_MOMENTS,
+  francoAtWork: SITE.features.francoAtWork || PREVIEW_MOMENTS,
+};
+
+/**
  * The journey (Spec §01–§03): one server-rendered document, identical on `/` and on every
  * `/trabajo/{slug}`. Every word of copy is in the initial HTML; motion is layered on top by
  * each section's own client code. Copy flows server → client as props; client components
@@ -147,7 +158,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
         />
         {PROJECTS.map((p) => (
           <ProjectWorld key={p.id} project={p} world={worldFor(p)} proof={proofFor(p)}>
-            {p.id === "rayo-smash" && SITE.features.humanMoment ? <HumanMoment media={resolveAsset("moments.human")} /> : null}
+            {p.id === "rayo-smash" && FEATURES.humanMoment ? <HumanMoment media={resolveAsset("moments.human")} /> : null}
           </ProjectWorld>
         ))}
         <CapabilitiesRail
@@ -169,7 +180,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
             contacts,
           }}
         />
-        {SITE.features.francoAtWork ? <FrancoAtWork media={resolveAsset("franco.atWork")} /> : null}
+        {FEATURES.francoAtWork ? <FrancoAtWork media={resolveAsset("franco.atWork")} /> : null}
         <FinalCta
           renderedAt={RENDERED_AT}
           view={{
