@@ -1,3 +1,5 @@
+import { ProfileReveal } from "./ProfileReveal";
+
 export interface ProfileView {
   label: string;
   core: string;
@@ -10,7 +12,8 @@ export interface ProfileView {
 
 /**
  * S13 · Perfil (Spec §12, Content Master 13). The only first-person text on the site; no
- * photo, no title beyond the small nav label. Phase 9 adds the one reveal on entry.
+ * photo, no title beyond the small nav label. One reveal on entry (ProfileReveal); the text is
+ * server HTML, readable without JavaScript.
  */
 export function Profile({ view }: { view: ProfileView }) {
   return (
@@ -35,6 +38,7 @@ export function Profile({ view }: { view: ProfileView }) {
           </p>
         ) : null}
       </div>
+      <ProfileReveal />
     </section>
   );
 }

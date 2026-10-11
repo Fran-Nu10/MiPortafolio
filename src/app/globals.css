@@ -2021,7 +2021,8 @@ html:has(dialog.overlay[open]) {
   margin-inline: auto;
 }
 
-/* ── S12 · capabilities (static list; Phase 9 pins the rail on lg/xl) ────── */
+/* ── S12 · capabilities: the stacked list (no JS, md/sm, reduced motion); the pinned
+   rail on lg/xl with motion (Spec §12) ──────────────────────────────────────── */
 .capabilities {
   padding: 14svh var(--gutter);
 }
@@ -2036,6 +2037,9 @@ html:has(dialog.overlay[open]) {
   gap: 16px;
   align-items: end;
   grid-template-columns: minmax(120px, 240px) 1fr;
+}
+.seam-line {
+  max-width: 32ch;
 }
 .capabilities-kicker {
   margin-top: 64px;
@@ -2052,12 +2056,8 @@ html:has(dialog.overlay[open]) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (min-width: 1024px) {
-  .capabilities-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 .capability {
+  position: relative;
   display: grid;
   gap: 8px;
   align-content: start;
@@ -2066,20 +2066,287 @@ html:has(dialog.overlay[open]) {
 }
 .capability article {
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 .capability[data-group="extended"] {
   /* set apart by space and the sub-kicker only — same type, size and colour */
   margin-top: 64px;
+}
+@media (min-width: 768px) {
+  .capability[data-group="extended"] {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 16px);
+  }
+}
+.capability-sub {
+  margin-bottom: 8px;
 }
 .capability-name {
   font-size: 22px;
   font-weight: 500;
   line-height: 1.2;
 }
+.capability-statement {
+  max-width: 34ch;
+}
 .capability[data-evidence="typographic"] .capability-statement {
   font-size: var(--type-lead);
   line-height: 1.35;
+}
+.capability-evidence:empty {
+  display: none;
+}
+.capability-attr {
+  justify-self: start;
+}
+
+/* the rail: lg/xl, a pin, motion allowed — laid out from first paint so the build only adds
+   transforms; a failed build drops data-anim and the list stacks again */
+@media (min-width: 1024px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+  html.js .capabilities:has(.capabilities-stage[data-anim]) {
+    padding: 0;
+  }
+  html.js .capabilities-stage[data-anim] {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    background: var(--color-black);
+  }
+  html.js .capabilities-stage[data-anim] .seam {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 10svh;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr;
+    width: min(360px, 26vw);
+    margin: 0;
+    max-width: none;
+  }
+  html.js .capabilities-stage[data-anim] .capabilities-kicker {
+    position: absolute;
+    top: calc(var(--header-h) + 24px);
+    left: var(--gutter);
+    margin: 0;
+    max-width: 64ch;
+  }
+  html.js .capabilities-stage[data-anim] .capabilities-list {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    width: max-content;
+    max-width: none;
+    margin: 0;
+    padding: 0 0 0 var(--gutter);
+    will-change: transform;
+  }
+  html.js .capabilities-stage[data-anim] .capability {
+    flex: 0 0 min(420px, 30vw);
+    width: min(420px, 30vw);
+    margin: 0;
+    max-width: none;
+  }
+  html.js .capabilities-stage[data-anim] .capability[data-group="extended"] {
+    margin-left: 64px;
+  }
+  html.js .capabilities-stage[data-anim] .capability-sub {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin: 0 0 12px;
+  }
+}
+
+/* ── evidence elements (live, aria-hidden; a loop runs only while its card is in view) ── */
+.ev {
+  position: relative;
+  height: 180px;
+  overflow: clip;
+}
+.ev [data-ev-step] {
+  transition: opacity 200ms var(--ease-settle);
+}
+/* cross-fading states: only the current step is shown */
+.ev-ts-flow [data-ev-step] {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+}
+.ev-ts-flow[data-step="0"] [data-ev-step="0"],
+.ev-ts-flow[data-step="1"] [data-ev-step="1"],
+.ev-ts-flow[data-step="2"] [data-ev-step="2"] {
+  opacity: 1;
+}
+.ev-ts-msg {
+  font-size: var(--type-lead);
+  line-height: 1.3;
+  max-width: 22ch;
+}
+.ev-ts-fields {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.ev-ts-fields div {
+  display: grid;
+  gap: 2px;
+}
+.ev-ts-fields dd {
+  margin: 0;
+  font-size: 17px;
+}
+.ev-ts-res {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-paper);
+}
+.ev-ts-res::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-signal);
+}
+
+/* three real posters, stacked; the front one cycles (opacity only) */
+.ev-posters {
+  --n: 3;
+}
+.ev-poster {
+  position: absolute;
+  left: calc(var(--i, 0) * 10px);
+  top: calc(var(--i, 0) * 10px);
+  width: calc(100% - (var(--n) - 1) * 10px);
+  height: calc(100% - (var(--n) - 1) * 10px);
+  opacity: 0.35;
+  outline: 1px solid var(--rule);
+}
+.ev-poster[data-ev-step="1"] {
+  --i: 1;
+}
+.ev-poster[data-ev-step="2"] {
+  --i: 2;
+}
+.ev-posters[data-step="0"] [data-ev-step="0"],
+.ev-posters[data-step="1"] [data-ev-step="1"],
+.ev-posters[data-step="2"] [data-ev-step="2"] {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* the store's purchase strip (from the Chef world): the current control is lit */
+.ev-chef {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+}
+/* idle controls are muted and outlined (AA on black); the lit one is paper — no translucency,
+   so the text always keeps its contrast */
+.ev-chef [data-ev-step] {
+  color: var(--color-muted);
+  transition:
+    color 200ms var(--ease-settle),
+    background-color 200ms var(--ease-settle),
+    border-color 200ms var(--ease-settle);
+}
+.ev-chef-stepper {
+  display: inline-grid;
+  grid-template-columns: 40px 40px 40px;
+  justify-self: start;
+  height: 40px;
+  align-items: center;
+  text-align: center;
+  font-size: 17px;
+  border: 1px solid var(--rule-strong);
+}
+.ev-chef-btn {
+  display: block;
+  height: 44px;
+  line-height: 44px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  border: 1px solid var(--rule-strong);
+}
+.ev-chef[data-step="0"] [data-ev-step="0"],
+.ev-chef[data-step="2"] [data-ev-step="2"] {
+  color: var(--color-paper);
+  border-color: var(--color-paper);
+}
+.ev-chef[data-step="1"] [data-ev-step="1"] {
+  color: var(--color-black);
+  background: var(--color-paper);
+  border-color: var(--color-paper);
+}
+
+/* the sentence: the key words underline in turn, then resolve to their field labels */
+.ev-extract {
+  display: grid;
+  align-content: center;
+}
+.ev-extract-msg {
+  font-size: var(--type-lead);
+  line-height: 1.6;
+  max-width: 24ch;
+}
+.ev-word {
+  position: relative;
+  display: inline-block;
+}
+.ev-word-text {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 200ms var(--ease-settle);
+}
+.ev-word-label {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: -4px;
+  color: var(--color-muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-settle);
+}
+.ev-extract[data-step="0"] [data-ev-word="0"] .ev-word-text,
+.ev-extract[data-step="1"] [data-ev-word="1"] .ev-word-text,
+.ev-extract[data-step="2"] [data-ev-word="2"] .ev-word-text,
+.ev-extract[data-step="3"] .ev-word-text {
+  text-decoration-color: var(--color-signal);
+}
+.ev-extract[data-step="3"] .ev-word-label {
+  opacity: 1;
+}
+
+/* the Rayo layers at small size; `--sep` 0 (assembled) → 1 (separated): on the rail it is
+   scrubbed by the scroll, elsewhere it toggles on a time loop */
+.ev-rayo {
+  --sep: 0;
+  display: grid;
+  place-items: center;
+}
+.ev-rayo[data-step="1"]:not([data-scrub]) {
+  --sep: 1;
+}
+.ev-rayo-stack {
+  position: relative;
+  height: 100%;
+  aspect-ratio: var(--ar);
+}
+.ev-rayo-layer {
+  position: absolute;
+  transform: translateY(calc(var(--dy) * var(--sep)));
+  transition: transform 600ms var(--ease-settle);
+}
+.ev-rayo[data-scrub] .ev-rayo-layer {
+  transition: none;
 }
 
 /* ── S13 · profile ────────────────────────────────────────────────────────── */

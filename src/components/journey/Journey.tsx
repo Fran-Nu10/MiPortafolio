@@ -12,7 +12,10 @@ import { confirmed, indexLabel, liveLabel, miniLabel, proofCaption, routeErrorTe
 import type { SectionId } from "@/lib/journey-store";
 import { pathForSection } from "@/lib/route-sync";
 import { TS_KEY_WORDS, splitField, splitList } from "@/lib/ts-world";
-import { CapabilitiesRail } from "@/components/capabilities/CapabilitiesRail";
+import { splitPurchaseLine } from "@/lib/chef-world";
+import { resolveEvidence } from "@/lib/capabilities-rail";
+import { CapabilitiesRail, type CapabilityCardView } from "@/components/capabilities/CapabilitiesRail";
+import type { EvidenceData } from "@/components/capabilities/EvidenceElement";
 import { FinalCta } from "@/components/contact/FinalCta";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { FrancoAtWork } from "@/components/moments/FrancoAtWork";
@@ -154,7 +157,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
             kicker: SITE.capabilities.kicker,
             subKicker: SITE.capabilities.subKicker,
             bust: resolveAsset("franco.bust"),
-            items: CAPABILITIES,
+            items: CAPABILITIES.map(capabilityCard),
           }}
         />
         <Profile
@@ -228,6 +231,54 @@ function anchorOf(p: Project): WorldView["anchor"] {
 function openLink(p: Project) {
   const href = confirmed(p.liveUrl);
   return href ? { href, label: SITE.reel.open, aria: p.a11y.openLabel } : undefined;
+}
+
+/**
+ * A capability card: its copy and its evidence (Spec §12). Live elements reuse the worlds' own
+ * copy and material; material variants are resolved here (never a placeholder, metrics only
+ * when authorized), so the client gets only what may be shown.
+ */
+function capabilityCard(c: (typeof CAPABILITIES)[number]): CapabilityCardView {
+  const base = { index: c.index, name: c.name, statement: c.statement, group: c.group, attribution: c.attribution };
+  if (c.evidence.variant === "element") return { ...base, evidence: { kind: "element", data: evidenceData(c.evidence.element) } };
+  const media = "media" in c.evidence ? c.evidence.media.map((k) => resolveAsset(k)) : [];
+  const variant = resolveEvidence(c.evidence, media.every((m) => m.status !== "placeholder"), process.env.NODE_ENV === "production");
+  return { ...base, evidence: { kind: "slot", variant, media: variant.variant === "typographic" ? [] : media } };
+}
+
+/** the live elements' data, straight from the worlds (Content Master 06/07/09 copy, real layers and posters) */
+function evidenceData(id: EvidenceData["id"]): EvidenceData {
+  const ts = getProject("travelsuite360")!;
+  const chef = getProject("chef-arturo")!;
+  const fields = (["TS03.dest", "TS03.date", "TS03.pax"] as const).map((k) => splitField(ts.worldCopy[k]));
+  switch (id) {
+    case "ts-flow":
+      return { id, message: ts.worldCopy["TS01.message"], fields, reservation: ts.worldCopy["TS07.reservation"] };
+    case "posters":
+      return {
+        id,
+        posters: (["santi-nuca", "rayo-smash", "chef-arturo"] as const).map((slug) => {
+          const p = getProject(slug)!;
+          return { name: p.name, asset: resolveAsset(p.reel.poster) };
+        }),
+      };
+    case "chef-commerce": {
+      const { stepper, add, pay } = splitPurchaseLine(chef.worldCopy["C06.purchase"]);
+      return { id, stepper, add, pay };
+    }
+    case "ts-extraction":
+      return {
+        id,
+        message: ts.worldCopy["TS01.message"],
+        words: [
+          { word: TS_KEY_WORDS.dest, label: fields[0].label },
+          { word: TS_KEY_WORDS.date, label: fields[1].label },
+          { word: TS_KEY_WORDS.pax, label: fields[2].label },
+        ],
+      };
+    case "rayo-layers":
+      return { id, layers: RAYO_LAYERS.map((l) => ({ name: l.name, asset: resolveAsset(l.key), offset: l.offset })), aspect: RAYO_STACK.aspect };
+  }
 }
 
 /** TravelSuite360's world copy (Content Master 06), split into what each state shows */
