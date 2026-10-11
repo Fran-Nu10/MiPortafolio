@@ -37,5 +37,13 @@ export default defineConfig({
     { name: "sm-390", use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } },
     { name: "sm-320", use: { ...devices["Desktop Chrome"], viewport: { width: 320, height: 568 }, hasTouch: true, isMobile: true } },
     { name: "rm-1440", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" } },
+    // Spec §27 automation: WebKit and Firefox (Phase 11). Opt in with CROSS_BROWSER=1 — the default run stays Chromium.
+    ...(process.env.CROSS_BROWSER === "1"
+      ? [
+          { name: "webkit-1440", use: { ...devices["Desktop Safari"], viewport: { width: 1440, height: 900 } } },
+          { name: "webkit-390", use: { ...devices["Desktop Safari"], viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } },
+          { name: "firefox-1440", use: { ...devices["Desktop Firefox"], viewport: { width: 1440, height: 900 } } },
+        ]
+      : []),
   ],
 });

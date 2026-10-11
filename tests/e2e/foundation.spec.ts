@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { watchConsole } from "./console";
 
 /**
  * Phase 1 acceptance (Spec §26): no-JS page readable end to end · 0 console errors ·
@@ -7,14 +8,6 @@ import { expect, test, type Page } from "@playwright/test";
 
 const ROUTES = ["/", "/trabajo/travelsuite360", "/trabajo/rayo-smash", "/trabajo/santi-nuca", "/trabajo/chef-arturo"];
 
-function watchConsole(page: Page) {
-  const problems: string[] = [];
-  page.on("console", (m) => {
-    if (m.type() === "error" || m.type() === "warning") problems.push(`${m.type()}: ${m.text()}`);
-  });
-  page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
-  return problems;
-}
 
 /** walk the whole document like a visitor would, sampling at each step */
 async function scrollThrough(page: Page, each?: () => Promise<void>) {
@@ -38,6 +31,8 @@ test.describe("console, hydration, overflow, layout shift", () => {
         const overflow = await page.evaluate((w) => document.documentElement.scrollWidth - w, width);
         expect(overflow, `horizontal overflow at y=${await page.evaluate(() => window.scrollY)}`).toBeLessThanOrEqual(0);
       });
+      // posters never add an image preload (the hero's AVIF preloads are typed); Phase 11, WebKit "preloaded but not used"
+      expect(await page.locator('link[rel="preload"][as="image"]:not([type="image/avif"])').count()).toBe(0);
       expect(problems).toEqual([]);
     });
   }

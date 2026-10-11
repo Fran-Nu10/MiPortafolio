@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { watchConsole } from "./console";
+import { jump } from "./scroll";
 
 /**
  * Phase 8 acceptance (Spec §26): C00–C07 + reduced motion · the image element is the same DOM
@@ -17,14 +19,6 @@ const tiny = (page: Page) => {
 const state = (page: Page) => page.locator("#chef-arturo").getAttribute("data-state");
 const SHOWN = /inset\(0(px|%)?\)|inset\(0% 0% 0% 0%\)/;
 
-function watchConsole(page: Page) {
-  const problems: string[] = [];
-  page.on("console", (m) => {
-    if (m.type() === "error" || m.type() === "warning") problems.push(m.text());
-  });
-  page.on("pageerror", (e) => problems.push(e.message));
-  return problems;
-}
 
 async function open(page: Page) {
   await page.goto("/trabajo/chef-arturo", { waitUntil: "networkidle" });
@@ -41,7 +35,7 @@ async function to(page: Page, t: number, units = U) {
     },
     [t, units] as const,
   );
-  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
+  await jump(page, y);
 }
 
 const part = (page: Page, name: string, nth = 0) =>

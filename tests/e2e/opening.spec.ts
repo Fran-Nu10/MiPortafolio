@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { watchConsole } from "./console";
+import { jump } from "./scroll";
 
 /**
  * Phase 2 acceptance (Spec §26): first paint < 1 s · scroll during O0–O2 jumps to O3 ·
@@ -20,15 +22,9 @@ const headerOpacity = (page: Page) => page.evaluate(() => Number(getComputedStyl
 async function scrollToLabel(page: Page, at: number, units = 3.25, rm = false) {
   const { w, h } = await page.evaluate(() => ({ w: innerWidth, h: innerHeight }));
   const pin = ((units * (rm ? 50 : GESTURE(w))) / 100) * h;
-  await page.evaluate((y) => window.scrollTo(0, y), Math.round((at / units) * pin));
+  await jump(page, Math.round((at / units) * pin));
 }
 
-function watchConsole(page: Page) {
-  const problems: string[] = [];
-  page.on("console", (m) => (m.type() === "error" || m.type() === "warning") && problems.push(m.text()));
-  page.on("pageerror", (e) => problems.push(e.message));
-  return problems;
-}
 
 test.describe("opening", () => {
   test.use({ viewport: { width: 1440, height: 900 } });

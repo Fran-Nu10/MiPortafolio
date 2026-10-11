@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { watchConsole } from "./console";
+import { settled } from "./scroll";
 
 /**
  * Phase 9 acceptance (Spec §26): the rail pinned on lg/xl and stacked on md/sm · focus on an
@@ -17,14 +19,6 @@ const railTier = (page: Page) => {
 };
 const reduced = (page: Page) => page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-function watchConsole(page: Page) {
-  const problems: string[] = [];
-  page.on("console", (m) => {
-    if (m.type() === "error" || m.type() === "warning") problems.push(m.text());
-  });
-  page.on("pageerror", (e) => problems.push(e.message));
-  return problems;
-}
 
 async function open(page: Page) {
   await page.goto("/", { waitUntil: "networkidle" });
@@ -290,8 +284,14 @@ test.describe("accessibility", () => {
 
   test("an attribution link enters its world in place (pushState, no reload)", async ({ page }) => {
     await open(page);
-    await page.locator('#capacidades [data-capability="3"] a').scrollIntoViewIfNeeded();
-    await page.locator('#capacidades [data-capability="3"] a').click();
+    // on the rail the card travels with the scroll: bring it in through the rail's own focus rule
+    // (it centers the card), let the document rest, then click — a click while the rail still
+    // moves (scrub 0.8 s) can miss under load
+    const link = page.locator('#capacidades [data-capability="3"] a');
+    await link.scrollIntoViewIfNeeded();
+    await link.focus();
+    await settled(page);
+    await link.click();
     await expect.poll(() => page.evaluate(() => location.pathname)).toBe("/trabajo/chef-arturo");
     await expect(page.locator("main")).toHaveAttribute("data-started", "");
     const v = page.viewportSize()!;

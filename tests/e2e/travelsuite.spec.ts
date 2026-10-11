@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { watchConsole } from "./console";
+import { jump } from "./scroll";
 
 /**
  * Phase 5 acceptance (Spec §26): every TS state matches §08 at 1440×900 (one screenshot per
@@ -19,14 +21,6 @@ const tiny = (page: Page) => {
 const z = (t: string) => (t.startsWith("matrix3d(") ? Number(t.slice(9, -1).split(",")[14]) : 0);
 const state = (page: Page) => page.locator("#travelsuite360").getAttribute("data-state");
 
-function watchConsole(page: Page) {
-  const problems: string[] = [];
-  page.on("console", (m) => {
-    if (m.type() === "error" || m.type() === "warning") problems.push(m.text());
-  });
-  page.on("pageerror", (e) => problems.push(e.message));
-  return problems;
-}
 
 async function open(page: Page) {
   await page.goto("/trabajo/travelsuite360", { waitUntil: "networkidle" });
@@ -44,7 +38,7 @@ async function to(page: Page, t: number, units = U) {
     },
     [t, units] as const,
   );
-  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
+  await jump(page, y);
 }
 
 /** a part of the TS world: opacity, rect, transform and clip */
@@ -312,7 +306,9 @@ test.describe("accessibility", () => {
     await open(page);
     await to(page, 6.7);
     await page.waitForTimeout(2200);
-    const results = await new AxeBuilder({ page }).include("#travelsuite360").analyze();
+    // the 64 fragments are decorative (aria-hidden, no information; Spec §19 "TS fragments excluded"):
+    // axe still measures the contrast of their visible text (WebKit rendered them lighter)
+    const results = await new AxeBuilder({ page }).include("#travelsuite360").exclude("#travelsuite360 .ts-frag").analyze();
     const bad = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
     expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(" | ")}`)).toEqual([]);
   });

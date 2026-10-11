@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { watchConsole } from "./console";
+import { jump } from "./scroll";
 import sharp from "sharp";
 
 /**
@@ -34,14 +36,6 @@ const atWorld = (page: Page, slug: Slug) =>
     )
     .toBe(true);
 
-function watchConsole(page: Page) {
-  const problems: string[] = [];
-  page.on("console", (m) => {
-    if (m.type() === "error" || m.type() === "warning") problems.push(m.text());
-  });
-  page.on("pageerror", (e) => problems.push(e.message));
-  return problems;
-}
 
 /**
  * The reel stage at the top of the viewport (to the nearest pixel): the frame at the shared
@@ -84,7 +78,7 @@ const worldY = (page: Page, slug: Slug, f: number) =>
 
 async function scrollToFraction(page: Page, slug: Slug, f: number) {
   const y = await worldY(page, slug, f);
-  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
+  await jump(page, y);
 }
 
 /** every image inside `selector` decoded */
