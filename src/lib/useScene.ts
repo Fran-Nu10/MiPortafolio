@@ -75,6 +75,7 @@ export function queueRefresh() {
   if (typeof window === "undefined" || refreshQueued) return;
   refreshQueued = window.requestAnimationFrame(() => {
     refreshQueued = 0;
+    // pin spacing changes in a refresh: keep the held view (see holdView)
     ScrollTrigger.sort((a: ScrollTrigger, b: ScrollTrigger) => {
       const ta = a.trigger as Element | undefined;
       const tb = b.trigger as Element | undefined;
@@ -82,6 +83,8 @@ export function queueRefresh() {
       return ta.compareDocumentPosition(tb) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
     });
     ScrollTrigger.refresh();
+    restoreView();
+    if (!pending.length && !draining) reading = null;
   });
 }
 
@@ -142,6 +145,41 @@ export function scenesReady(): Promise<void> {
   });
 }
 const DEFER_BELOW_VIEWPORTS = 1.5;
+
+/**
+ * Scenes may build while the visitor is already down the page (a late hydration on a slow device,
+ * a deferred build after a quick scroll). Their pins grow above what the visitor is reading, and
+ * the refresh that follows adds pin spacing. The section at the viewport's center when that starts
+ * is held in place across every build and refresh until the queue has drained, or until the
+ * visitor scrolls on their own (Phase 13: WebKit under load landed in another world — the
+ * engines' own scroll anchoring picked anchors inside pinned stages, and the refreshes moved
+ * everything unanchored).
+ */
+let reading: { el: HTMLElement; top: number } | null = null;
+let readingListeners = false;
+function holdView() {
+  if (reading || window.scrollY <= 0) return;
+  const el = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)?.closest<HTMLElement>("[data-section]");
+  if (!el) return;
+  reading = { el, top: el.getBoundingClientRect().top };
+  if (!readingListeners) {
+    readingListeners = true;
+    const release = () => (reading = null);
+    for (const type of ["wheel", "touchstart", "keydown", "pointerdown"]) window.addEventListener(type, release, { passive: true });
+  }
+}
+function restoreView() {
+  if (!reading) return;
+  const delta = reading.el.getBoundingClientRect().top - reading.top;
+  if (Math.abs(delta) >= 1) window.scrollBy({ top: delta, behavior: "instant" });
+}
+function anchored(root: HTMLElement, fn: () => void) {
+  // a scene below the viewport's center grows below the visitor: nothing to hold
+  if (root.getBoundingClientRect().top > window.innerHeight / 2) return fn();
+  holdView();
+  fn();
+  restoreView();
+}
 
 /**
  * Built scenes by id: navigation asks where a scene starts or where one of its labels is
@@ -359,9 +397,9 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
     if (root.getBoundingClientRect().top > window.innerHeight * (1 + DEFER_BELOW_VIEWPORTS)) {
       cancelDeferred = enqueueBuild(root, () => {
         cancelDeferred = null;
-        setup();
+        anchored(root, setup);
       });
-    } else setup();
+    } else anchored(root, setup);
     // web fonts change measured geometry: refresh once they are in
     document.fonts?.ready.then(queueRefresh).catch(() => {});
 

@@ -59,7 +59,7 @@ export function Still({
   } else {
     img = (
       <picture>
-        {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element -- alt and the optimizer's srcset come from getImageProps */}
+        {/* eslint-disable-next-line jsx-a11y/alt-text -- alt and the optimizer's srcset come from getImageProps */}
         <img {...d} {...eager} className="media-img" />
       </picture>
     );

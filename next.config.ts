@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // no framework banner in the response headers (Phase 13 hardening)
+  poweredByHeader: false,
   images: {
     // Stills (posters, captures): AVIF first, WebP fallback (Spec §17)
     formats: ["image/avif", "image/webp"],

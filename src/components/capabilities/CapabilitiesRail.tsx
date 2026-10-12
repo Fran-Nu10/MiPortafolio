@@ -143,7 +143,18 @@ export function CapabilitiesRail({ view }: { view: CapabilitiesView }) {
         return;
       }
       const pos = { y: window.scrollY };
-      tween = gsap.to(pos, { y: top, duration: 0.5, ease: EASE.settle, onUpdate: () => window.scrollTo(0, pos.y) });
+      let written = pos.y;
+      tween = gsap.to(pos, {
+        y: top,
+        duration: 0.5,
+        ease: EASE.settle,
+        onUpdate: () => {
+          // anything else moved the page (a click into a world, the visitor's own scroll): yield to it
+          if (Math.abs(window.scrollY - written) > 2) return tween?.kill();
+          written = Math.round(pos.y);
+          window.scrollTo(0, pos.y);
+        },
+      });
     };
     rail.addEventListener("focusin", onFocus);
     return () => {
@@ -163,7 +174,7 @@ export function CapabilitiesRail({ view }: { view: CapabilitiesView }) {
       </h2>
       {/* the stage's pin on lg/xl: as tall as the stage plus the rail's length (set by the scene) */}
       <div data-part="pin" className="capabilities-pin">
-        <div ref={stageRef} data-part="stage" data-anim="" className="capabilities-stage">
+        <div ref={stageRef} data-part="stage" data-anim="" data-scene-root="" className="capabilities-stage">
           <figure className="seam" data-part="seam">
             <div className="seam-bust">
               <Cutout asset={view.bust} />

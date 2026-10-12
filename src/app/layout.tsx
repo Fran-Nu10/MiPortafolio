@@ -52,8 +52,13 @@ export const viewport: Viewport = {
  * `.js` on <html> before first paint (Spec §24): CSS switches from the static layout to the
  * animated initial states only when it is present — without it nothing is ever hidden.
  * suppressHydrationWarning covers exactly that one attribute on <html>.
+ *
+ * If one of the app's own scripts fails to load (a blocked or broken chunk — "block GSAP chunk
+ * only", Spec §27), nothing would ever build the scenes: the class is removed again and the page
+ * falls back to the static, readable document instead of stacked animation layers (Phase 13).
  */
-const JS_GATE = "document.documentElement.classList.add('js')";
+const JS_GATE =
+  "(function(){var d=document.documentElement;d.classList.add('js');addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='SCRIPT'&&(t.src||'').indexOf('/_next/static/')>-1){d.classList.remove('js');d.setAttribute('data-js-failed','')}},true)})()";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -118,8 +118,33 @@ export function sectionForHref(href: string): SectionId | null {
 export function syncUrl(section: SectionId, titles: Partial<Record<SectionId, string>>, fallbackTitle: string) {
   const next = pathForSection(section);
   if (`${location.pathname}${location.hash}` !== next) replaceOwnState({ section }, next);
-  const title = titles[section] ?? fallbackTitle;
+  keepTitle(titles[section] ?? fallbackTitle);
+}
+
+/**
+ * The title follows the section — and stays. Next.js syncs its router with our `replaceState`
+ * (history entries without its internal keys) and the resulting React commit rewrites the <title>
+ * text node with the route's own metadata title. In WebKit under load that commit landed after our
+ * write and reverted it (Phase 13: 7 of 8 parallel pages, traced to the react-dom text update). A
+ * small guard re-applies the section's title whenever something else changes it.
+ */
+let desiredTitle: string | null = null;
+let titleGuard: MutationObserver | null = null;
+function keepTitle(title: string) {
+  desiredTitle = title;
   if (document.title !== title) document.title = title;
+  if (titleGuard || typeof MutationObserver === "undefined") return;
+  titleGuard = new MutationObserver(() => {
+    if (desiredTitle !== null && document.title !== desiredTitle) document.title = desiredTitle;
+  });
+  titleGuard.observe(document.head, { subtree: true, childList: true, characterData: true });
+}
+
+/** stop guarding the title (the journey unmounts) */
+export function releaseTitle() {
+  titleGuard?.disconnect();
+  titleGuard = null;
+  desiredTitle = null;
 }
 
 /** remember the scroll position in the current entry once scrolling settles (reload keeps place) */

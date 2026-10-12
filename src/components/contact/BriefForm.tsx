@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { submitBrief } from "@/app/actions/brief";
-import { BRIEF_INITIAL, LIMITS, briefCompletion, validateBrief, type BriefFieldErrors, type BriefValues } from "@/lib/brief";
+import { BRIEF_INITIAL, LIMITS, briefCompletion, readValues, validateBrief, type BriefFieldErrors, type BriefState, type BriefValues } from "@/lib/brief";
 import { EndSequence } from "./EndSequence";
 
 export interface BriefFormCopy {
@@ -23,9 +23,18 @@ const ORDER: Field[] = ["name", "email", "brief"];
  * POST, the server re-renders with the result) and, with it, validates on submit, then live
  * per field once that field has shown an error. Success only after the server got a 2xx from
  * Resend; then the form is replaced by the End block.
+ *
+ * With JavaScript the action is called directly, inside a transition, so a request that never
+ * reaches the server (offline, a crashed function, a 5xx) becomes the honest route error with the
+ * values kept — it used to throw into Next's error screen (Phase 13, Spec §24). Without JavaScript
+ * the same server action handles the plain POST through `formAction`.
  */
 export function BriefForm({ copy, renderedAt }: { copy: BriefFormCopy; renderedAt: number }) {
-  const [state, formAction, pending] = useActionState(submitBrief, BRIEF_INITIAL);
+  const [actionState, formAction, actionPending] = useActionState(submitBrief, BRIEF_INITIAL);
+  const [clientState, setClientState] = useState<BriefState | null>(null);
+  const [sending, startSending] = useTransition();
+  const state = clientState ?? actionState;
+  const pending = actionPending || sending;
   const serverValues = state.status === "error" ? state.values : undefined;
   const [values, setValues] = useState<BriefValues>(() => serverValues ?? { name: "", email: "", brief: "" });
   const [clientErrors, setClientErrors] = useState<BriefFieldErrors | null>(null);
@@ -75,11 +84,22 @@ export function BriefForm({ copy, renderedAt }: { copy: BriefFormCopy; renderedA
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     const errors = validateBrief(values);
+    e.preventDefault();
     if (!errors) {
       setClientErrors(null);
-      return; // the action runs
+      const fd = new FormData(e.currentTarget);
+      startSending(async () => {
+        let next: BriefState;
+        try {
+          next = await submitBrief(state, fd);
+        } catch {
+          // the request never got an answer: never a success, the values stay
+          next = { status: "error", id: `client-${Date.now()}`, route: true, values: readValues(fd), t: Number(fd.get("t")) || renderedAt };
+        }
+        startSending(() => setClientState(next));
+      });
+      return;
     }
-    e.preventDefault();
     setClientErrors(errors);
     const first = ORDER.find((f) => errors[f]);
     if (first) formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();

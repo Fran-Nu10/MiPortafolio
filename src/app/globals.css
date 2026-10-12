@@ -81,6 +81,10 @@ html {
   /* native scroll only: no smooth-scroll override, no overflow lock (Spec §05) */
   scroll-padding-top: var(--header-h);
   -webkit-text-size-adjust: 100%;
+  /* the journey anchors the view itself when a scene's pin grows above the visitor (useScene
+     `anchored`, JourneyClient): the engines' own scroll anchoring chose different anchors inside
+     pinned stages (WebKit landed in another world, Phase 13) and would add to ours */
+  overflow-anchor: none;
 }
 body {
   min-height: 100svh;
@@ -1164,6 +1168,11 @@ html.js .world:has(.world-stage[data-anim]) > .world-name {
   clip-path: inset(50%);
   white-space: nowrap;
   margin: 0;
+}
+/* JS delayed (Spec §24): until a world's scene has built, only its SCREEN shows — the world's own
+   layers would otherwise stack every state at once (seen in Phase 13 with a slow or failed bundle) */
+html.js .world-stage[data-anim]:not([data-scene-built]) > :not([data-part="env"]):not([data-part="screen"]):not([data-part="object"]) {
+  visibility: hidden;
 }
 html.js .world-stage[data-anim] {
   --ax: var(--ax-d);

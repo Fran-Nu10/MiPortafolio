@@ -4,7 +4,7 @@ import { useLayoutEffect } from "react";
 import type { ProjectSlug } from "@/data/types";
 import { registerGsap, ScrollTrigger } from "@/lib/motion";
 import { getJourney, setJourney, subscribeJourney, type SectionId } from "@/lib/journey-store";
-import { installHistory, navigate, reloadPosition, sectionForHref, sectionScroll, syncUrl, trackScrollPosition } from "@/lib/journey-nav";
+import { installHistory, navigate, releaseTitle, reloadPosition, sectionForHref, sectionScroll, syncUrl, trackScrollPosition } from "@/lib/journey-nav";
 import { queueRefresh, scenesReady } from "@/lib/useScene";
 
 /**
@@ -79,6 +79,7 @@ export function JourneyClient({
       main?.setAttribute("data-started", "");
       if (initial && remembered === null) setJourney({ section: initial });
       syncing = true;
+      syncUrl(getJourney().section, titles, homeTitle);
     };
     if (initial || remembered !== null) {
       history.scrollRestoration = "manual";
@@ -87,6 +88,9 @@ export function JourneyClient({
     } else {
       main?.setAttribute("data-started", "");
       syncing = true;
+      // a section trigger can toggle while it is created, before the subscription above existed (a
+      // visitor who scrolled before hydration — WebKit under load, Phase 13): sync what is current
+      syncUrl(getJourney().section, titles, homeTitle);
     }
 
     return () => {
@@ -94,6 +98,7 @@ export function JourneyClient({
       unsubscribe();
       offHistory();
       offScroll();
+      releaseTitle();
       document.removeEventListener("click", onClick);
       triggers.forEach((t) => t.kill());
     };
