@@ -37,7 +37,7 @@ export function HumanMoment({ media }: { media: ResolvedAsset }) {
 
   return (
     <section aria-hidden="true" className="moment" data-moment="human">
-      <div ref={frameRef} data-part="frame" data-anim="" className="moment-frame">
+      <div ref={frameRef} data-part="frame" data-anim="" data-scene-root="" className="moment-frame">
         <div data-part="window" className="moment-window">
           <Still asset={media} sizes="100vw" fill />
         </div>

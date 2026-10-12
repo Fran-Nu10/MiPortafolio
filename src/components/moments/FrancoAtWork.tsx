@@ -81,7 +81,7 @@ export function FrancoAtWork({ media }: { media: ResolvedAsset }) {
   return (
     <section aria-label="Franco trabajando" aria-hidden={real && rm ? undefined : true} className="at-work" data-moment="at-work" data-placeholder-media={real ? undefined : ""} style={vars}>
       <div data-part="pin" className="at-work-pin">
-        <div ref={stageRef} data-part="stage" data-anim="" className="at-work-stage">
+        <div ref={stageRef} data-part="stage" data-anim="" data-scene-root="" className="at-work-stage">
           <figure data-part="frame" className="at-work-frame">
             {!real ? (
               // the placeholder: a flat field, a 1px inner rule and a lighter monitor block — no text, no figure, no stock imagery

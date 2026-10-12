@@ -88,6 +88,62 @@ export function queueRefresh() {
 const isDev = process.env.NODE_ENV !== "production";
 
 /**
+ * Deferred builds (Phase 12, measured). Building every scene inside the hydration commit made one
+ * long task (≈ 0.5 s on Lighthouse's mobile CPU) and delayed the opening. A scene whose root starts
+ * more than 1.5 viewports below the viewport builds in its own task instead, in document order: its
+ * growth only moves content below the viewport, so nothing visible shifts; until then it shows its
+ * CSS first state (Spec §24 "JS delayed"). Scenes above or near the viewport build at once.
+ * `scenesReady()` resolves when the queue has drained (deep links and reloads land after it).
+ */
+const pending: { root: HTMLElement; run: () => void }[] = [];
+let draining = 0;
+let waiters: (() => void)[] = [];
+function drain() {
+  draining = 0;
+  const next = pending.shift();
+  if (next) {
+    next.run();
+    draining = window.setTimeout(drain, 0);
+    return;
+  }
+  const w = waiters;
+  waiters = [];
+  w.forEach((fn) => fn());
+}
+function enqueueBuild(root: HTMLElement, run: () => void) {
+  const job = { root, run };
+  pending.push(job);
+  // document order: a scene above another builds first, so heights settle top-down
+  pending.sort((a, b) => (a.root.compareDocumentPosition(b.root) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+  if (!draining) draining = window.setTimeout(drain, 0);
+  return () => {
+    const i = pending.indexOf(job);
+    if (i >= 0) pending.splice(i, 1);
+  };
+}
+/**
+ * Resolves once every scene in the document has built (each scene root carries `data-scene-root`
+ * in the server HTML; `data-scene-built` is set by its first build, whatever it returns) and the
+ * queue has drained. Sections hydrate progressively (Suspense boundaries in the Journey), so a
+ * scene may not even have enqueued yet when this is first asked. Gives up after 4 s: a scene that
+ * never builds falls back to its static layout (Spec §24) and must not hold the landing.
+ */
+export function scenesReady(): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  const t0 = performance.now();
+  return new Promise((resolve) => {
+    const check = () => {
+      const unbuilt = document.querySelector("[data-scene-root]:not([data-scene-built])");
+      if ((!unbuilt && !pending.length && !draining) || performance.now() - t0 > 4000) return resolve();
+      if (!unbuilt && (pending.length || draining)) waiters.push(check);
+      else requestAnimationFrame(check);
+    };
+    check();
+  });
+}
+const DEFER_BELOW_VIEWPORTS = 1.5;
+
+/**
  * Built scenes by id: navigation asks where a scene starts or where one of its labels is
  * ("enter Rayo at s:ISOLATE") without knowing pin lengths. Label positions are 0–1 of the pin.
  */
@@ -121,6 +177,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
     let mm: gsap.MatchMedia | null = null;
 
     const build = (conditions: SceneConditions) => {
+      root.setAttribute("data-scene-built", "");
       const tier = tierFromConditions(conditions);
       const rm = conditions.rm;
       const pinned = (o.pin ?? true) && !conditions.tiny;
@@ -298,7 +355,13 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
       mm = gsap.matchMedia();
       mm.add(SCENE_CONDITIONS, (ctx) => build(ctx.conditions as SceneConditions), root);
     };
-    setup();
+    let cancelDeferred: (() => void) | null = null;
+    if (root.getBoundingClientRect().top > window.innerHeight * (1 + DEFER_BELOW_VIEWPORTS)) {
+      cancelDeferred = enqueueBuild(root, () => {
+        cancelDeferred = null;
+        setup();
+      });
+    } else setup();
     // web fonts change measured geometry: refresh once they are in
     document.fonts?.ready.then(queueRefresh).catch(() => {});
 
@@ -311,6 +374,8 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
         width = window.innerWidth;
+        // still queued: it will build once, at the new width
+        if (cancelDeferred) return;
         const y = window.scrollY;
         mm?.revert();
         setup();
@@ -319,6 +384,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
     };
     window.addEventListener("resize", onResize);
     return () => {
+      cancelDeferred?.();
       window.removeEventListener("resize", onResize);
       window.clearTimeout(timer);
       mm?.revert();

@@ -41,6 +41,18 @@ export function isUsable(c: AssetContract): boolean {
   return true;
 }
 
+/**
+ * What a resolved asset carries to the client: geometry and timing only. The production notes
+ * (`source`) and the unapproved candidate files (`candidates`) are internal — they were reaching the
+ * page's RSC payload (Phase 12).
+ */
+function publicMeta(meta: AssetContract["meta"]): NonNullable<AssetContract["meta"]> {
+  if (!meta) return {};
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { source, candidates, ...rest } = meta;
+  return rest;
+}
+
 export function resolveAsset(key: AssetKey, seen: Set<AssetKey> = new Set()): ResolvedAsset {
   const c = getContract(key);
   if (seen.has(key)) throw new Error(`Asset poster cycle at "${key}"`);
@@ -51,7 +63,7 @@ export function resolveAsset(key: AssetKey, seen: Set<AssetKey> = new Set()): Re
     alt: c.alt,
     aspect: { desktop: c.aspect.desktop, mobile: c.aspect.mobile ?? c.aspect.desktop },
     surface: c.surface ?? "black",
-    meta: c.meta ?? {},
+    meta: publicMeta(c.meta),
   };
   const posterResolved = c.poster ? resolveAsset(c.poster, seen) : null;
   const poster = posterResolved && posterResolved.status !== "placeholder" ? posterResolved : null;

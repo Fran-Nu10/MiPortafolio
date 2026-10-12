@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import type { ResolvedAsset } from "@/lib/resolved";
+import { REEL_SIZES } from "@/lib/reel";
 import { EVIDENCE_CYCLE, finalStep, nextStep, type EvidenceId } from "@/lib/capabilities-rail";
 import { Cutout } from "@/components/media/Cutout";
 import { Still } from "@/components/media/Still";
@@ -61,7 +62,9 @@ export function EvidenceElement({ data, running, rm, scrub = false }: { data: Ev
         <div className="ev ev-posters" {...attrs} style={{ "--n": data.posters.length } as CSSProperties}>
           {data.posters.map((p, i) => (
             <div key={p.name} className="ev-poster" data-ev-step={i} data-name={p.name}>
-              <Still asset={p.asset} sizes="(min-width: 1024px) 30vw, 100vw" fill />
+              {/* the reel's own `sizes`: the browser reuses the poster it already downloaded for the reel
+                  instead of fetching a second width of the same capture (Phase 12, measured) */}
+              <Still asset={p.asset} sizes={REEL_SIZES} fill />
             </div>
           ))}
         </div>

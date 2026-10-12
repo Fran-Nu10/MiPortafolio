@@ -553,6 +553,25 @@ html.js main:not([data-initial]) .hero[data-anim]:not([data-built]) [data-lqip] 
     clip-path: inset(43% 0% 43% 0%);
   }
 }
+/* O2 without JS timing: if the scene has not built by then (a slow device), the index "00" fades in
+   at the band's end — or, with a portrait, at the 2.5 s decode deadline (Spec §02 S1). A built scene
+   continues from this value (OpeningHero reads it before taking over). Phase 12: the opening's first
+   content no longer waits for the whole bundle on slow phones (Lighthouse LCP). */
+@media (prefers-reduced-motion: no-preference) {
+  /* a visibility step, not an opacity fade: a compositor-only opacity animation never reaches the
+     main thread's paint, so the browser would not count the index as shown until JS repainted it */
+  html.js main:not([data-initial]) .hero[data-anim][data-opening]:not([data-built]) [data-part="index-0"] {
+    animation: hero-o2 0s linear 1.2s forwards;
+  }
+  html.js main:not([data-initial]) .hero[data-anim][data-opening][data-portrait="real"]:not([data-built]) [data-part="index-0"] {
+    animation-delay: 2.5s;
+  }
+}
+@keyframes hero-o2 {
+  to {
+    visibility: visible;
+  }
+}
 @keyframes hero-rescue-clip {
   to {
     clip-path: inset(0% 0% 0% 0%);

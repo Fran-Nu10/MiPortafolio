@@ -90,11 +90,13 @@ export function OpeningHero({
   return (
     <section
       ref={ref}
+      data-scene-root=""
       id="inicio"
       aria-label="Franco Núñez"
       data-section="inicio"
       data-anim=""
       data-opening={skipOpening ? undefined : ""}
+      data-portrait={portrait.status === "placeholder" ? "none" : "real"}
       className="hero"
     >
       {portrait.status !== "placeholder" ? <PortraitPreload portrait={portrait} /> : null}
@@ -195,9 +197,13 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
   const { gsap, root } = api;
   if (!api.pinned) return staticHero(api);
   const p = parts(api);
+  // a late build (slow device): CSS may already have reached O2 on its own (the index "00" fading
+  // in at the band's end, or at the 2.5 s decode deadline with a portrait — Spec §02 S1 timing
+  // guarantees). Read it before takeOver switches the CSS off, and continue from there.
+  const cssIdx = getComputedStyle(p.idx0).visibility === "visible" ? parseFloat(getComputedStyle(p.idx0).opacity) || 0 : 0;
   const cssInset = takeOver(api, p.band);
   const H = p.stage.offsetHeight;
-  const opening = !played.current && window.scrollY <= 0 && root.hasAttribute("data-opening");
+  const opening = !played.current && window.scrollY <= 0 && root.hasAttribute("data-opening") && cssIdx === 0;
   if (!opening) root.removeAttribute("data-opening");
 
   // the support line grows to statement size, as far as the viewport allows…
@@ -263,7 +269,8 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
     // rebuild, deep link or restored scroll: the opening is over
     played.current = true;
     gsap.set(p.band, { clipPath: OPEN });
-    gsap.set(p.idx0, { autoAlpha: 1 });
+    if (cssIdx > 0 && cssIdx < 1) gsap.fromTo(p.idx0, { autoAlpha: cssIdx }, { autoAlpha: 1, duration: 0.4 * (1 - cssIdx), ease: EASE.settle });
+    else gsap.set(p.idx0, { autoAlpha: 1 });
     if (sharp && p.lqip) {
       if (sharp.complete && sharp.naturalWidth) crossfade(0);
       else sharp.decode().then(() => crossfade(OPENING.focus), () => {});

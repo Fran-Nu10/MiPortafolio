@@ -5,7 +5,7 @@ import type { ProjectSlug } from "@/data/types";
 import { registerGsap, ScrollTrigger } from "@/lib/motion";
 import { getJourney, setJourney, subscribeJourney, type SectionId } from "@/lib/journey-store";
 import { installHistory, navigate, reloadPosition, sectionForHref, sectionScroll, syncUrl, trackScrollPosition } from "@/lib/journey-nav";
-import { queueRefresh } from "@/lib/useScene";
+import { queueRefresh, scenesReady } from "@/lib/useScene";
 
 /**
  * Mounts once per journey (Spec §03, §20). Renders nothing.
@@ -65,6 +65,13 @@ export function JourneyClient({
     const start = () => {
       if (cancelled) return;
       ScrollTrigger.refresh();
+      // the jump waits two frames after the refresh: issued in the same frame as the pins' layout
+      // changes, Chromium measured the whole stage as one layout shift of 1.0 (Lighthouse CLS on
+      // every deep link, Phase 12). The hero is still out of sight meanwhile: nothing flashes.
+      requestAnimationFrame(() => requestAnimationFrame(land));
+    };
+    const land = () => {
+      if (cancelled) return;
       const y = remembered ?? (initial ? sectionScroll(initial) : null);
       if (y !== null) window.scrollTo({ top: y, behavior: "instant" });
       history.scrollRestoration = "auto";
@@ -75,7 +82,8 @@ export function JourneyClient({
     };
     if (initial || remembered !== null) {
       history.scrollRestoration = "manual";
-      (document.fonts?.ready ?? Promise.resolve()).then(() => requestAnimationFrame(start));
+      // every scene must be built (pins sized) before the landing position is measured
+      (document.fonts?.ready ?? Promise.resolve()).then(scenesReady).then(() => requestAnimationFrame(start));
     } else {
       main?.setAttribute("data-started", "");
       syncing = true;

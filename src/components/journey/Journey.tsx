@@ -156,6 +156,8 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
           items={reelItems}
           copy={{ hint: SITE.reel.hint, restHint: SITE.reel.restHint, prev: SITE.reel.prev, next: SITE.reel.next, a11y: SITE.reel.a11y, cursor: SITE.reel.cursor }}
         />
+        {/* no Suspense boundaries here (tried in Phase 12 for progressive hydration): React outlines
+            large boundaries into hidden nodes revealed by a script, which empties the no-JS document */}
         {PROJECTS.map((p) => (
           <ProjectWorld key={p.id} project={p} world={worldFor(p)} proof={proofFor(p)}>
             {p.id === "rayo-smash" && FEATURES.humanMoment ? <HumanMoment media={resolveAsset("moments.human")} /> : null}

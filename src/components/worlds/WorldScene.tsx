@@ -132,7 +132,7 @@ export function WorldScene({
       </h2>
       {/* the stage's pin: as tall as the stage plus the scene's length (set by the scene) */}
       <div data-part="pin" className="world-pin">
-        <div ref={stageRef} data-part="stage" data-anim="" className="world-stage">
+        <div ref={stageRef} data-part="stage" data-anim="" data-scene-root="" className="world-stage">
           <div data-part="env" className="world-env" />
           <div data-part="screen" className="world-screen">
             <Still asset={world.poster} sizes={REEL_SIZES} fill priority={world.priority} />
