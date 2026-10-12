@@ -1,10 +1,14 @@
 # MiPortafolio — Franco Núñez
 
-Portfolio personal. Dirección creativa: **REVELADO 2.2** (diseño congelado). La implementación avanza por fases; la versión anterior (ENSAMBLE) queda en el historial de git.
+Portfolio personal. Dirección creativa: **REVELADO 2.2** (diseño congelado). La versión anterior (ENSAMBLE) queda en el historial de git.
 
-> **Para implementar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`. Fases hechas: `docs/06-phase0-audit.md` (auditoría), `docs/07-phase1-foundation.md` (foundation), `docs/08-phase2-opening-hero.md` (opening + hero), `docs/09-phase3-project-reel.md` (reel), `docs/10-phase4-world-system.md` (sistema de mundos), `docs/11-phase5-travelsuite-world.md` (mundo TravelSuite360), `docs/12-phase6-rayo-world.md` (mundo Rayo Smash), `docs/13-phase7-santi-world.md` (mundo Santi Nuca) `docs/14-phase8-chef-world.md · 15-phase9-capabilities-profile.md · 16-phase10-at-work-contact-end.md · 17-phase11-responsive-a11y-rm.md` (mundo Chef Arturo) `docs/15-phase9-capabilities-profile.md · 16-phase10-at-work-contact-end.md · 17-phase11-responsive-a11y-rm.md` (capacidades + perfil) `docs/16-phase10-at-work-contact-end.md · 17-phase11-responsive-a11y-rm.md` (Franco at work, contacto, cierre) y `docs/17-phase11-responsive-a11y-rm.md` (consolidación responsive, accesibilidad y reduced motion).
+**Estado: RELEASE CANDIDATE TÉCNICO — LANZAMIENTO BLOQUEADO POR DEPENDENCIAS EXTERNAS.** Las 14 fases del Spec (0–13) están implementadas y documentadas; la experiencia completa funciona en los cuatro tiers, con reduced motion, sin JavaScript y con medios bloqueados. El lanzamiento espera material y autorizaciones que no existen todavía (retrato del hero, material de TravelSuite360 con firma de privacidad, grabaciones de las cuatro pruebas, permisos de Santi Nuca y Chef Arturo, variables de Resend y un envío real, dominio). `npm run check:launch` falla a propósito hasta entonces. Detalle: [`docs/20-revelado-2.2-closure.md`](docs/20-revelado-2.2-closure.md).
 
-Estado: **Phase 11 · consolidación responsive / accesibilidad / reduced motion hecha.** El opening, el hero FRANCO / NÚÑEZ, el reel de cuatro productos (drag, swipe, trackpad, teclado, una pieza por gesto) y el paso del reel a cada mundo (el mismo rectángulo, SCREEN → ISOLATE → ESCAPE → EXPAND, Atrás vuelve al reel, deep links `/trabajo/{slug}`, overlay 01–04) el mundo de TravelSuite360 completo (TS00–TS12: de la consulta a la reserva, el gran reveal y la costura roja hacia Rayo) el mundo de Rayo Smash (R00–R07: la hamburguesa escapa del hero, capa por capa, la cámara entre las capas, la reconstrucción y la línea del menú) el mundo de Santi Nuca (N00–N05: la fotografía sale de la página, el negro se vuelve papel, díptico, tríptico, Forma · Línea · Textura y el sistema) el mundo de Chef Arturo (C00–C07: la foto escapa de la página de producto, macro, retroceso, catálogo, producto, compra y cierre), el riel de capacidades (busto, seis capacidades con evidencia viva de los proyectos; pinneado en desktop, apilado en móvil), el perfil, el formulario (sin JS también; éxito sólo con 2xx de Resend) y el cierre funcionan; Franco at work y el momento humano están construidos pero apagados por flag hasta tener su video/still en todos los tiers, con reduced motion y sin JavaScript; el rendimiento con los assets definitivos sigue como documento estático legible con el copy real y placeholders honestos, y ganan su motion fase por fase. Stack: Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP 3.15 (+ ScrollTrigger). Sin otras dependencias de runtime.
+> **Para trabajar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes, en orden de autoridad: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`.
+
+Stack: Next.js 16 · React 19 · TypeScript strict · Tailwind v4 · GSAP 3.15 (+ ScrollTrigger, CustomEase). Sin otras dependencias de runtime. Desarrollo: Vitest 3, Playwright 1.64 (+ axe-core).
+
+## Comandos
 
 ```
 npm install
@@ -12,37 +16,71 @@ npm run dev             # http://localhost:3000
 npm run build           # corre antes check:assets
 npm run lint
 npx tsc --noEmit
-npx vitest run          # tests de contenido y unidades
-npx playwright test     # e2e sobre el build de producción
-npm run check:launch    # falla mientras falten assets que bloquean el lanzamiento
+npx vitest run          # contenido + unidades (los chequeos de HTML usan el build)
+npx playwright test     # e2e sobre el build de producción (Chromium, 6 proyectos)
+CROSS_BROWSER=1 npx playwright test --project=webkit-1440 --project=webkit-390 --project=firefox-1440 --workers 3
+npm run check:assets    # contratos de assets (preview: avisa)
+npm run check:launch    # modo lanzamiento: falla mientras haya slots bloqueantes en placeholder
 ```
 
-Entrega del brief (formulario final): copiar `.env.example` a `.env.local` y completar `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM`. Sin esas variables el formulario muestra un error honesto: "Brief recibido." solo aparece si Resend respondió 2xx.
+WebKit y Firefox para los e2e: `npx playwright install webkit firefox`. Los e2e levantan un **Resend simulado** (`tests/e2e/mock-resend.mjs`): ningún test envía correo real. Para probar los momentos (Franco at work, momento humano) con sus placeholders: `PREVIEW_MOMENTS=1 npm run build`.
 
-## Estructura
+## Variables de entorno
+
+| Variable | Dónde | Para qué |
+|---|---|---|
+| `RESEND_API_KEY` | producción (servidor) | API de Resend |
+| `CONTACT_TO` | producción (servidor) | casilla que recibe los briefs |
+| `CONTACT_FROM` | producción (servidor) | remitente en un dominio verificado en Resend |
+| `NEXT_PUBLIC_SHOW_ASSET_KEYS` | sólo desarrollo / preview | imprime la clave del asset sobre cada placeholder |
+| `RESEND_API_URL` | **sólo tests** | apunta la entrega al stand-in local; nunca en producción |
+| `PREVIEW_MOMENTS` | sólo builds de preview | muestra las secciones apagadas por flag con sus placeholders; ignorado con `VERCEL_ENV=production` |
+
+Sin las tres primeras el formulario responde con un error honesto: «Brief recibido.» sólo aparece tras un 2xx de Resend. Ninguna llega al bundle del cliente (verificado en Phase 13).
+
+## Documentación
 
 ```
 docs/
   05b-content-master.md                 copy, hechos, atribuciones (autoridad 1)
   05a-revelado-2.2.md                   experiencia y dirección de arte (autoridad 2)
   05-revelado-implementation-spec.md    arquitectura, fases, QA (autoridad 3)
-  06-phase0-audit.md · 07-phase1-foundation.md · 08-phase2-opening-hero.md · 09-phase3-project-reel.md · 10-phase4-world-system.md · 11-phase5-travelsuite-world.md · 12-phase6-rayo-world.md · 13-phase7-santi-world.md · 14-phase8-chef-world.md · 15-phase9-capabilities-profile.md · 16-phase10-at-work-contact-end.md · 17-phase11-responsive-a11y-rm.md
+  06-phase0-audit.md                    Phase 0 · auditoría
+  07-phase1-foundation.md               Phase 1 · foundation
+  08-phase2-opening-hero.md             Phase 2 · opening + hero
+  09-phase3-project-reel.md             Phase 3 · reel
+  10-phase4-world-system.md             Phase 4 · sistema de mundos
+  11-phase5-travelsuite-world.md        Phase 5 · TravelSuite360
+  12-phase6-rayo-world.md               Phase 6 · Rayo Smash
+  13-phase7-santi-world.md              Phase 7 · Santi Nuca
+  14-phase8-chef-world.md               Phase 8 · Chef Arturo
+  15-phase9-capabilities-profile.md     Phase 9 · capacidades + perfil
+  16-phase10-at-work-contact-end.md     Phase 10 · Franco at work, contacto, cierre
+  17-phase11-responsive-a11y-rm.md      Phase 11 · responsive, accesibilidad, reduced motion
+  18-phase12-performance-media.md       Phase 12 · rendimiento + medios
+  19-phase13-qa-release.md              Phase 13 · QA final + release candidate (A1–A21)
+  20-revelado-2.2-closure.md            cierre: readiness, checklist de despliegue, rollback, inventario, autorizaciones
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
+```
+
+## Estructura
+
+```
 src/
   app/                                  layout · page · trabajo/[slug] · not-found · actions/brief · globals.css
   components/journey/                   Journey (server) · JourneyClient
   components/{opening,reel,worlds,moments,capabilities,profile,contact,layout}/
   components/media/                     Still · Cutout · LoopVideo · ProofMedia · Placeholder
-  data/                                 site · projects · capabilities · profile · assets (contratos) · types
-  lib/                                  motion · tiers · useScene · journey-store · geometry · route-sync
-                                        · assets · media · useInView · brief · content
+  data/                                 site · projects · capabilities · profile · assets (contratos) · geometría derivada
+  lib/                                  motion · tiers · useScene · journey-store · journey-nav · route-sync · geometry
+                                        · assets · media · brief · content · *-world (geometría pura de cada mundo)
   fonts/                                Schibsted Grotesk (variable) · IBM Plex Mono 400
-scripts/check-assets.mjs                validación de contratos de assets (prebuild)
-scripts/media.mjs                       grano y cutouts AVIF/WebP + LQIP (sharp)
-tests/                                  content + foundation (Vitest) · e2e (Playwright)
-public/projects/                        capturas reales (TravelSuite360: no aprobadas para publicar, ver docs/07)
+scripts/                                check-assets · media · derive-* / gen-* (medios derivados de capturas reales)
+tests/                                  Vitest (contenido, unidades) · e2e (Playwright)
+public/projects/                        capturas reales; las de TravelSuite360 NO están aprobadas y no se sirven (404)
+public/media/                           medios derivados (AVIF/WebP, clip de Rayo)
 ```
 
 ## Reglas no negociables (resumen)
 
-No inventar métricas, clientes, testimonios, funcionalidades ni pantallas. Lo no confirmado no se publica. Los placeholders nunca se presentan como evidencia. Scroll vertical nativo siempre; la rueda vertical nunca se captura.
+No inventar métricas, clientes, testimonios, funcionalidades ni pantallas. Lo no confirmado (`[CONFIRMAR]`) no se publica. Los placeholders nunca se presentan como evidencia. Scroll vertical nativo siempre; la rueda vertical nunca se captura. TravelSuite360: sólo datos demo y firma de privacidad de dos personas antes de publicar cualquier medio.
