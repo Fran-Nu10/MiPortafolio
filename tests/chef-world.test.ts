@@ -76,7 +76,9 @@ describe("the facts (Content Master 09, Spec §11)", () => {
     const product = resolveAsset("chef.product");
     expect(product.status).toBe("derived");
     expect(product.alt).toBe("Cookie levain de pistacho y chocolate blanco");
-    expect(product.meta.source).toMatch(/provisional/i);
+    // the production note lives in the contract (never sent to the client)
+    expect(getContract("chef.product").meta?.source).toMatch(/provisional/i);
+    expect(product.meta.source).toBeUndefined();
     for (const n of [1, 2, 3]) expect(resolveAsset(`chef.catalog.${n}`).status).toBe("derived");
     expect(resolveAsset("chef.macro.loop").status).toBe("placeholder");
   });

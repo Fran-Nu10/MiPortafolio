@@ -65,7 +65,8 @@ describe("attribution (Content Master 08, Spec §10)", () => {
       expect(a.status).toBe("derived");
       expect(a.alt.endsWith("— fotografía de Santi Nuca")).toBe(true);
       expect(a.alt).not.toMatch(/franco/i);
-      expect(a.meta.source).toMatch(/Santi Nuca/);
+      expect(getContract(p.key).meta?.source).toMatch(/Santi Nuca/);
+      expect(a.meta.source).toBeUndefined();
     }
     expect(santi.credit).toEqual({ label: "Fotografía", holder: "Santi Nuca" });
     expect(santi.role).toBe("Diseño y desarrollo");

@@ -139,6 +139,18 @@ test.describe("routes", () => {
   });
 });
 
+test.describe("unpublished media (Spec §23, Phase 12)", () => {
+  test("TravelSuite360's unapproved captures are never served, directly or through the optimizer", async ({ request }, info) => {
+    test.skip(info.project.name !== "xl-1440", "once");
+    for (const f of ["travelsuite360-crm.png", "travelsuite360-travelchat.png", "travelsuite360-ai-assistant.png", "travelsuite360-reportes-financieros.png"]) {
+      expect((await request.get(`/projects/travelsuite360/${f}`)).status(), f).toBe(404);
+      expect((await request.get(`/_next/image?url=${encodeURIComponent(`/projects/travelsuite360/${f}`)}&w=640&q=75`)).status(), f).toBeGreaterThanOrEqual(400);
+    }
+    // the approved captures still are
+    expect((await request.get("/projects/santi-nuca/santi-nuca-opening.png")).status()).toBe(200);
+  });
+});
+
 test.describe("with JavaScript", () => {
   test("the vertical wheel is never captured", async ({ page, isMobile }) => {
     test.skip(isMobile, "wheel is a desktop input");

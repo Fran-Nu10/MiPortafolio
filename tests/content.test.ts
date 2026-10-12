@@ -309,3 +309,20 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
 function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+// ── Phase 12 · privacy of the payload and of public/ ─────────────────────────
+
+describe("rule 7 · internal notes and unapproved media never reach the client", () => {
+  it("resolved assets carry no production notes and no candidate files", () => {
+    for (const a of ASSETS) {
+      const r = resolveAsset(a.key);
+      expect(r.meta, a.key).not.toHaveProperty("source");
+      expect(r.meta, a.key).not.toHaveProperty("candidates");
+    }
+  });
+  it("the built HTML names none of the unapproved TravelSuite360 captures", () => {
+    const html = join(process.cwd(), ".next/server/app/index.html");
+    if (!existsSync(html)) return;
+    expect(readFileSync(html, "utf8")).not.toMatch(/projects\/travelsuite360\//);
+  });
+});
