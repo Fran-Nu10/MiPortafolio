@@ -30,3 +30,11 @@ export async function jump(page: Page, y: number): Promise<void> {
   await settled(page);
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
 }
+
+/**
+ * Every scene in the document has built (scenes below the first viewports build in their own tasks
+ * after hydration — Phase 12; slower engines take a few hundred milliseconds more).
+ */
+export async function scenesBuilt(page: Page): Promise<void> {
+  await page.waitForFunction(() => !document.querySelector("[data-scene-root]:not([data-scene-built])"), undefined, { timeout: 10_000 });
+}

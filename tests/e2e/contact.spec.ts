@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { scenesBuilt } from "./scroll";
 import { MOCK_PORT } from "../../playwright.config";
 
 /**
@@ -28,6 +29,7 @@ const reduced = (page: Page) => page.evaluate(() => matchMedia("(prefers-reduced
 async function openForm(page: Page) {
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.locator("main")).toHaveAttribute("data-started", "");
+  await scenesBuilt(page);
   await page.evaluate(() => document.getElementById("contacto")!.scrollIntoView({ behavior: "instant" }));
   await expect(page.locator(".brief-form")).toHaveAttribute("data-state", "idle");
 }
@@ -117,6 +119,27 @@ test.describe("the six states (Spec §14)", () => {
     await fill(page, { email: "ana@example.com" });
     await expect(page.locator("#brief-email-error")).toHaveCount(0);
     await expect(page.getByLabel("Email")).not.toHaveAttribute("aria-invalid", "true");
+  });
+});
+
+test.describe("transport failures (Spec §24, Phase 13)", () => {
+  test("offline, or the action endpoint failing: the honest route error, values kept, the page intact", async ({ page, context }) => {
+    for (const mode of ["offline", "500"] as const) {
+      await openForm(page);
+      await fill(page, { name: "Ana", email: "ana@example.com", brief: "Una tienda para mi pastelería." });
+      await page.waitForTimeout(3100);
+      if (mode === "offline") await context.setOffline(true);
+      else await page.route("**/*", (r) => (r.request().method() === "POST" ? r.fulfill({ status: 500, body: "boom" }) : r.continue()));
+      await page.getByRole("button", { name: "Enviar" }).click();
+      await expect(page.locator('.brief-form [role="alert"]'), mode).toHaveText("No se envió. Probá de nuevo.");
+      await expect(page.locator(".end")).toHaveCount(0);
+      await expect(page.getByLabel("Nombre")).toHaveValue("Ana");
+      await expect(page.getByLabel("¿Qué estamos construyendo?")).toHaveValue("Una tienda para mi pastelería.");
+      // the journey is still there (not Next's error screen)
+      await expect(page.locator("#capacidades")).toHaveCount(1);
+      await context.setOffline(false);
+      await page.unroute("**/*");
+    }
   });
 });
 

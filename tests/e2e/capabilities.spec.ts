@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { watchConsole } from "./console";
-import { settled } from "./scroll";
+import { settled, scenesBuilt } from "./scroll";
 
 /**
  * Phase 9 acceptance (Spec §26): the rail pinned on lg/xl and stacked on md/sm · focus on an
@@ -23,6 +23,7 @@ const reduced = (page: Page) => page.evaluate(() => matchMedia("(prefers-reduced
 async function open(page: Page) {
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.locator("main")).toHaveAttribute("data-started", "");
+  await scenesBuilt(page);
 }
 
 /** the pin's span (holder minus stage): top of the section's pin and its scrollable length */
@@ -291,7 +292,9 @@ test.describe("accessibility", () => {
     await link.scrollIntoViewIfNeeded();
     await link.focus();
     await settled(page);
-    await link.click();
+    // activated from the keyboard: a pointer click on a card the rail is still carrying can land on
+    // its neighbour (Playwright re-scrolls the target before clicking, which moves the rail)
+    await link.press("Enter");
     await expect.poll(() => page.evaluate(() => location.pathname)).toBe("/trabajo/chef-arturo");
     await expect(page.locator("main")).toHaveAttribute("data-started", "");
     const v = page.viewportSize()!;

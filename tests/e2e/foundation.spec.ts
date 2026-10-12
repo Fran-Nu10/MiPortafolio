@@ -139,6 +139,25 @@ test.describe("routes", () => {
   });
 });
 
+test.describe("a failed bundle (Spec §24 / §27 \"block GSAP chunk only\", Phase 13)", () => {
+  test("if an app chunk fails to load, the page falls back to the static, readable document", async ({ page }, info) => {
+    test.skip(info.project.name !== "xl-1440" && info.project.name !== "sm-390", "twice");
+    const html = await (await page.request.get("/")).text();
+    const chunks = [...html.matchAll(/src="(\/_next\/static\/chunks\/[^"]+\.js)"/g)].map((m) => m[1]);
+    let gsap: string | undefined;
+    for (const c of chunks) if ((await (await page.request.get(c)).text()).includes("ScrollTrigger")) gsap = c;
+    expect(gsap, "the chunk carrying GSAP").toBeTruthy();
+    await page.route("**/*", (r) => (r.request().url().endsWith(gsap!) ? r.abort() : r.continue()));
+    await page.goto("/", { waitUntil: "networkidle" });
+    await expect(page.locator("html")).toHaveAttribute("data-js-failed", "");
+    expect(await page.locator("html").getAttribute("class")).not.toMatch(/js/);
+    // the worlds read as their static compositions: names and copy visible, no stacked layers
+    for (const name of ["TravelSuite360", "Rayo Smash", "Santi Nuca", "Chef Arturo"]) await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+    await expect(page.locator("#travelsuite360").getByText("Necesito viajar a Punta Cana en julio, somos cuatro.", { exact: true }).filter({ visible: true }).first()).toBeVisible();
+    expect(await page.evaluate((w) => document.documentElement.scrollWidth - w, page.viewportSize()!.width)).toBeLessThanOrEqual(0);
+  });
+});
+
 test.describe("unpublished media (Spec §23, Phase 12)", () => {
   test("TravelSuite360's unapproved captures are never served, directly or through the optimizer", async ({ request }, info) => {
     test.skip(info.project.name !== "xl-1440", "once");

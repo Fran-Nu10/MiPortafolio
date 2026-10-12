@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { scenesBuilt } from "./scroll";
 
 /**
  * Phase 10: Franco at work (Spec §13) and the human moment (Spec §02 S7). Both ship behind
@@ -17,6 +18,7 @@ const tiny = (page: Page) => {
 async function open(page: Page) {
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.locator("main")).toHaveAttribute("data-started", "");
+  await scenesBuilt(page);
 }
 
 const pin = (page: Page, sel: string) =>
