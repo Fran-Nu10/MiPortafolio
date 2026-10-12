@@ -2,7 +2,7 @@
 
 Portfolio personal. Dirección creativa: **REVELADO 2.2** (diseño congelado). La versión anterior (ENSAMBLE) queda en el historial de git.
 
-**Estado: RELEASE CANDIDATE TÉCNICO — LANZAMIENTO BLOQUEADO POR DEPENDENCIAS EXTERNAS.** Las 14 fases del Spec (0–13) están implementadas y documentadas; la experiencia completa funciona en los cuatro tiers, con reduced motion, sin JavaScript y con medios bloqueados. El lanzamiento espera material y autorizaciones que no existen todavía (retrato del hero, material de TravelSuite360 con firma de privacidad, grabaciones de las cuatro pruebas, permisos de Santi Nuca y Chef Arturo, variables de Resend y un envío real, dominio). `npm run check:launch` falla a propósito hasta entonces. Detalle: [`docs/20-revelado-2.2-closure.md`](docs/20-revelado-2.2-closure.md).
+**Estado: publicado en Vercel Production como lanzamiento provisional** (autorizado por Franco, 2026-10-12): **https://mi-portafolio-dusky-three.vercel.app**. Las 14 fases del Spec (0–13) están implementadas y documentadas; la experiencia completa funciona en los cuatro tiers, con reduced motion, sin JavaScript y con medios bloqueados. Seis slots siguen en placeholder honesto (retrato del hero, material de TravelSuite360, las cuatro pruebas) por una excepción explícita en `src/data/launch.ts`; faltan además las variables de Resend, el dominio y permisos. `npm run check:launch` sigue fallando hasta que todo sea final. Detalle: [`docs/21-production-launch.md`](docs/21-production-launch.md) y [`docs/20-revelado-2.2-closure.md`](docs/20-revelado-2.2-closure.md).
 
 > **Para trabajar, empezá por `CLAUDE.md`** (orden de autoridad y reglas). Documentos vigentes, en orden de autoridad: `docs/05b-content-master.md` → `docs/05a-revelado-2.2.md` → `docs/05-revelado-implementation-spec.md`.
 
@@ -20,7 +20,8 @@ npx vitest run          # contenido + unidades (los chequeos de HTML usan el bui
 npx playwright test     # e2e sobre el build de producción (Chromium, 6 proyectos)
 CROSS_BROWSER=1 npx playwright test --project=webkit-1440 --project=webkit-390 --project=firefox-1440 --workers 3
 npm run check:assets    # contratos de assets (preview: avisa)
-npm run check:launch    # modo lanzamiento: falla mientras haya slots bloqueantes en placeholder
+npm run check:production  # como el build de Vercel producción: acepta sólo los slots de src/data/launch.ts
+npm run check:launch    # lanzamiento definitivo: falla mientras haya slots bloqueantes en placeholder
 ```
 
 WebKit y Firefox para los e2e: `npx playwright install webkit firefox`. Los e2e levantan un **Resend simulado** (`tests/e2e/mock-resend.mjs`): ningún test envía correo real. Para probar los momentos (Franco at work, momento humano) con sus placeholders: `PREVIEW_MOMENTS=1 npm run build`.
@@ -60,6 +61,7 @@ docs/
   18-phase12-performance-media.md       Phase 12 · rendimiento + medios
   19-phase13-qa-release.md              Phase 13 · QA final + release candidate (A1–A21)
   20-revelado-2.2-closure.md            cierre: readiness, checklist de despliegue, rollback, inventario, autorizaciones
+  21-production-launch.md               lanzamiento provisional en Vercel: registro, verificación, pendientes, reemplazo
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 ```
 

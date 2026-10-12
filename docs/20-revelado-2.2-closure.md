@@ -2,6 +2,8 @@
 
 Fecha: 2026-10-11 · Rama `main` (local, **sin push**) · Último commit de cierre: ver `git log` · Autoridad: Content Master rev 26 → REVELADO 2.2 → Master Implementation Spec rev 37.
 
+> **Actualización 2026-10-12:** Franco autorizó publicar con los assets provisionales. El sitio está en Vercel Production como **lanzamiento provisional** (`docs/21-production-launch.md`); la clasificación de abajo sigue describiendo el lanzamiento definitivo.
+
 ## 1. Clasificación
 
 # RELEASE CANDIDATE TÉCNICO — LANZAMIENTO BLOQUEADO POR DEPENDENCIAS EXTERNAS
