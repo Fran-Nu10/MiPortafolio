@@ -10,7 +10,10 @@
  *
  * Launch-blocking slots that still resolve to a placeholder:
  *  - warn by default (development, preview builds)
- *  - fail with `--launch`, or automatically on a Vercel production build (VERCEL_ENV=production)
+ *  - fail with `--launch` (the final launch criterion: no exceptions)
+ *  - on a Vercel production build (VERCEL_ENV=production, or `--production` locally): fail, except
+ *    the slots explicitly listed in `src/data/launch.ts` (provisional launch, authorized by Franco),
+ *    which are printed as pending on every build
  *
  * Loads the TypeScript data files through Node's type stripping (Node ≥ 22.18).
  */
@@ -24,8 +27,11 @@ const load = (rel) => import(pathToFileURL(join(ROOT, rel)).href);
 const { ASSETS } = await load("src/data/assets.ts");
 const { PROJECTS } = await load("src/data/projects.ts");
 const { SITE } = await load("src/data/site.ts");
+const { PROVISIONAL_LAUNCH } = await load("src/data/launch.ts");
 
-const strict = process.argv.includes("--launch") || process.env.VERCEL_ENV === "production";
+const final = process.argv.includes("--launch");
+const production = !final && (process.argv.includes("--production") || process.env.VERCEL_ENV === "production");
+const strict = final || production;
 
 /** compressed-size budgets per kind (Spec §18), bytes — desktop / mobile */
 const KB = 1024;
@@ -111,14 +117,26 @@ console.log(
   `check-assets: ${ASSETS.length} contracts · ${counts.final ?? 0} final · ${counts.derived ?? 0} derived · ${counts.placeholder ?? 0} placeholder`,
 );
 for (const w of warnings) console.warn(`  warn  ${w}`);
-if (blockers.length) {
-  const list = blockers.map((c) => c.key).join(", ");
-  if (strict) errors.push(`launch-blocking slots still on placeholder: ${list}`);
-  else console.warn(`  warn  launch-blocking placeholders (a production launch build will fail): ${list}`);
+const allowed = new Set(production ? PROVISIONAL_LAUNCH.slots : []);
+const unlisted = blockers.filter((c) => !allowed.has(c.key));
+const provisional = blockers.filter((c) => allowed.has(c.key));
+for (const k of PROVISIONAL_LAUNCH.slots) {
+  if (!keys.has(k)) errors.push(`src/data/launch.ts lists "${k}", which is not in the registry`);
+  else if (production && !blockers.some((c) => c.key === k)) warnings.push(`src/data/launch.ts still lists "${k}", which is no longer a placeholder: remove it`);
 }
+if (provisional.length) {
+  console.warn(`  PROVISIONAL LAUNCH (authorized by ${PROVISIONAL_LAUNCH.authorizedBy}, ${PROVISIONAL_LAUNCH.date}) — still pending, shown as honest placeholders:`);
+  for (const c of provisional) console.warn(`    pending  ${c.key}`);
+}
+if (unlisted.length) {
+  const list = unlisted.map((c) => c.key).join(", ");
+  if (strict) errors.push(`launch-blocking slots still on placeholder: ${list}`);
+  else console.warn(`  warn  launch-blocking placeholders (check:launch fails; production accepts only the slots in src/data/launch.ts): ${list}`);
+}
+const mode = final ? " (launch mode)" : production ? (provisional.length ? " (production · provisional launch)" : " (production)") : "";
 if (errors.length) {
   for (const e of errors) console.error(`  error ${e}`);
-  console.error(`check-assets: ${errors.length} error(s)${strict ? " (launch mode)" : ""}`);
+  console.error(`check-assets: ${errors.length} error(s)${mode}`);
   process.exit(1);
 }
-console.log(`check-assets: ok${strict ? " (launch mode)" : ""}`);
+console.log(`check-assets: ok${mode}`);

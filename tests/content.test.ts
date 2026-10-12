@@ -3,6 +3,7 @@
  * claim audit becomes build failures instead of reviews. The rendered-HTML checks run when a
  * production build exists (`npm run build` first).
  */
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -11,6 +12,7 @@ import { CAPABILITIES } from "@/data/capabilities";
 import { PROFILE } from "@/data/profile";
 import { PROJECTS, getProject } from "@/data/projects";
 import { SITE } from "@/data/site";
+import { PROVISIONAL_LAUNCH } from "@/data/launch";
 import type { Gated } from "@/data/types";
 import { hasAsset, launchBlockers, resolveAsset } from "@/lib/assets";
 import { CHEF_PAYMENTS_PROOF, confirmed, proofCaption, routeErrorText, stackLine } from "@/lib/content";
@@ -324,5 +326,38 @@ describe("rule 7 · internal notes and unapproved media never reach the client",
     const html = join(process.cwd(), ".next/server/app/index.html");
     if (!existsSync(html)) return;
     expect(readFileSync(html, "utf8")).not.toMatch(/projects\/travelsuite360\//);
+  });
+});
+
+// ── provisional launch (src/data/launch.ts, authorized 2026-10-12) ───────────
+
+describe("rule 8 · the provisional launch is explicit and closed", () => {
+  it("lists exactly the launch-blocking slots still on placeholder, with who authorized it and when", () => {
+    expect(PROVISIONAL_LAUNCH.authorizedBy).toBe("Franco Núñez");
+    expect(PROVISIONAL_LAUNCH.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect([...PROVISIONAL_LAUNCH.slots].sort()).toEqual(launchBlockers().map((c) => c.key).sort());
+  });
+  it("never publishes TravelSuite360 media: a listed TS slot stays a placeholder without the §23 sign-off", () => {
+    for (const k of PROVISIONAL_LAUNCH.slots.filter((k) => k.startsWith("ts."))) {
+      expect(resolveAsset(k).status).toBe("placeholder");
+      expect(ASSETS.find((a) => a.key === k)?.privacyChecked).not.toBe(true);
+    }
+  });
+  it("the production checker accepts the listed slots and the final launch check still fails", () => {
+    const run = (flag: string) => {
+      try {
+        execFileSync(process.execPath, ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/check-assets.mjs", flag], { encoding: "utf8", stdio: "pipe" });
+        return 0;
+      } catch (e) {
+        return (e as { status: number }).status;
+      }
+    };
+    expect(run("--production")).toBe(0);
+    expect(run("--launch")).toBe(1);
+  });
+  it("the built HTML never prints asset keys on placeholders", () => {
+    const html = join(process.cwd(), ".next/server/app/index.html");
+    if (!existsSync(html)) return;
+    expect(readFileSync(html, "utf8")).not.toMatch(/class="placeholder-key"/);
   });
 });
