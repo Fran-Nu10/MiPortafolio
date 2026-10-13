@@ -1,6 +1,6 @@
 # 22 · Declaración comercial — MOSTRAR → CONVENCER → CONVERTIR
 
-Fecha: 2026-10-13 · Pedido por Franco («REVELADO 2.2 — Nueva secuencia cinematográfica comercial») · Copy: Content Master §20 (addendum de esta fecha) · Commits locales `c8de26f`, `5b7feb6`, `eab65ed`, `f6c80e2` (sin push ni deploy).
+Fecha: 2026-10-13 · Pedido por Franco («REVELADO 2.2 — Nueva secuencia cinematográfica comercial») · **Aprobada por Franco el mismo día, con su ubicación después de Capacidades** (§2, §7) · Copy: Content Master §20 (addendum de esta fecha) · Commits locales `c8de26f`, `5b7feb6`, `eab65ed`, `f6c80e2` (sin push ni deploy).
 
 ## 1. Qué es
 
@@ -10,7 +10,7 @@ Es independiente de TravelSuite360. No usa nada de su copy, sus datos, su narrat
 
 ## 2. Ubicación en el Journey
 
-**Después de Capacidades y antes de Perfil**: `… Chef Arturo → Capacidades → **Propuesta** → Perfil → «Ahora, el tuyo.»`. Es un id de sección nuevo, `propuesta`, y la URL pasa a `/#propuesta` mientras está en vista (con `replaceState`, nunca una entrada nueva de historial).
+**Después de Capacidades y antes de Perfil** (aprobado por Franco, 2026-10-13): `… Chef Arturo → Capacidades → **Propuesta** → Perfil → «Ahora, el tuyo.»`. Es un id de sección nuevo, `propuesta`, y la URL pasa a `/#propuesta` mientras está en vista (con `replaceState`, nunca una entrada nueva de historial).
 
 La preferencia inicial era ubicarla antes de Capacidades. La moví por tres costuras ya diseñadas:
 
@@ -20,7 +20,7 @@ La preferencia inicial era ubicarla antes de Capacidades. La moví por tres cost
 
 Capacidades sigue siendo «lo construido»: cada capacidad muestra evidencia de los cuatro mundos. El puente que se pidió ocurre igual, a la salida del riel. Además, la sexta capacidad, «Adquisición de clientes», desemboca en CONVERTIR, el cierre en primera persona («Diseño y desarrollo…») entrega a Perfil, que es la única otra voz en primera persona del sitio, y Perfil entrega a «Ahora, el tuyo.».
 
-**Cómo moverla, si lo decidís:** el componente no depende de su posición. Hay que pasar `<Declaration>` antes de `<CapabilitiesRail>` en `src/components/journey/Journey.tsx` y actualizar el orden esperado en `tests/e2e/declaration.spec.ts`. Las tres costuras de arriba quedarían como riesgos aceptados.
+**Si alguna vez se moviera:** el componente no depende de su posición. Hay que pasar `<Declaration>` antes de `<CapabilitiesRail>` en `src/components/journey/Journey.tsx` y actualizar el orden esperado en `tests/e2e/declaration.spec.ts`. Las tres costuras de arriba quedarían como riesgos aceptados.
 
 No cambió nada más del orden. Los cuatro mundos, el reel, los deep links, la historia y las transiciones existentes siguen igual; la suite completa lo confirma.
 
@@ -85,11 +85,11 @@ Las demás escenas no cambiaron. El presupuesto de JS (170 KB) ya se excedía an
 
 Es exactamente el aprobado en el pedido: Content Master §20, en `SITE.declaration` de `src/data/site.ts`, con test palabra por palabra. Para su tipografía, la línea del acto III se parte en `first / lead / word / mark` (`splitFinal`); el texto del DOM se lee igual, «Que no solo te vean. Que te elijan.», y está testeado. El encabezado de la sección (sólo para lectores de pantalla) es «MOSTRAR. CONVENCER. CONVERTIR.», la línea del concepto del pedido.
 
-**Tensiones con el Content Master que quedan registradas** (no se cambió el copy; decide Franco):
+**Voz: decisiones de Franco (2026-10-13), registradas en el Content Master §20:**
 
-- La regla de voz §02 («nunca hablar de "soluciones"») choca con «soluciones», que es una de las diez palabras del acto I aprobadas. Aparece sola, como palabra del campo, no en una frase.
-- La regla §02.3 («Franco aparece en el perfil y en el cierre») y la nota de Spec §12 sobre Perfil como única primera persona chocan con la conclusión, que está en primera persona («Diseño y desarrollo…»). Como la sección termina justo antes de Perfil, las dos voces quedan juntas.
-- La segunda persona («Tenés», «tus clientes», «te elijan») es nueva en el sitio, que hasta ahora hablaba del trabajo. Es el objetivo explícito de la sección.
+- **«soluciones» → «oportunidades»** en el campo del acto I. La regla §02 («nunca hablar de "soluciones"») se cumple sin excepción; un test lo verifica.
+- **Excepción explícita de voz, sólo en esta sección: segunda persona** dirigida al visitante («Tenés», «tus clientes», «te elijan»). En el resto del sitio sigue valiendo §02.3: el sujeto es el trabajo.
+- **Excepción explícita de voz, sólo en esta sección: el cierre en primera persona** («Diseño y desarrollo…») fuera del Perfil. Como la sección termina justo antes de Perfil, las dos voces quedan juntas.
 
 ## 8. Verificación
 
@@ -124,8 +124,8 @@ Es exactamente el aprobado en el pedido: Content Master §20, en `SITE.declarati
 
 ## 10. Riesgos y pendientes
 
-1. **Ubicación:** difiere de la preferencia inicial, por las razones de §2. Moverla es un cambio de una línea más el test.
-2. **Content Master:** el §20 es un addendum local del export. Hay que pasarlo al Claude Doc de origen. Quedan además las tres tensiones de voz de §7.
+1. **Ubicación:** aprobada después de Capacidades (§2). Las tres costuras originales quedan intactas.
+2. **Content Master:** el §20 es un addendum local del export, con las decisiones de voz de §7 ya registradas. Falta pasarlo al Claude Doc de origen.
 3. **Campo latente:** en `CAMPO`, las palabras están a .12–.42 de opacidad a propósito («casi imperceptibles»). Se vuelven legibles en el estado siguiente, y en RM y sin JS se leen siempre al 100 %.
 4. **Presupuesto de JS:** sigue excedido como antes (227,8 KB brotli contra 170 KB). Esta sección suma +2,3 KB.
-5. **Producción:** nada desplegado. Cada push a `main` despliega solo a Vercel Production (docs/21), así que el push requiere tu autorización.
+5. **Producción:** la primera versión está publicada desde `a1e799e`. El cambio «soluciones» → «oportunidades» y la documentación de las decisiones quedan en un commit local, sin push ni deploy, hasta tu autorización (cada push a `main` despliega solo a Vercel Production, docs/21).

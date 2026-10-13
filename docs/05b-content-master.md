@@ -689,13 +689,13 @@ Las figuras no llevan copy. No hay "Franco en su escritorio", no hay "proceso", 
 
 **Qué pasa después.** Con 1–5 respondidas, el copy queda cerrado sin otra ronda. 6–10 se completan al implementar. 11–14 no bloquean nada.
 
-## 20 — Declaración comercial (addendum local, 2026-10-13)
+## 20 — Declaración comercial (addendum local, 2026-10-13 · aprobada)
 
-> **Addendum de este export, no del Claude Doc de origen (pendiente de sincronizar).** Copy aprobado por Franco en el pedido «REVELADO 2.2 — Nueva secuencia cinematográfica comercial» (2026-10-13). Implementación: `docs/22-commercial-declaration.md`. Ubicación: entre Capacidades y Perfil.
+> **Addendum de este export, no del Claude Doc de origen (pendiente de sincronizar).** Copy aprobado por Franco en el pedido «REVELADO 2.2 — Nueva secuencia cinematográfica comercial» (2026-10-13). Implementación: `docs/22-commercial-declaration.md`. **Ubicación aprobada por Franco (2026-10-13): después de Capacidades, antes de Perfil.**
 
 **Concepto:** MOSTRAR. CONVENCER. CONVERTIR. Qué puede hacer el trabajo por el negocio de quien mira, sin prometer resultados económicos.
 
-**Acto I — MOSTRAR.** Palabras: productos · servicios · identidad · experiencia · calidad · ideas · atención · detalles · soluciones · valor. Protagonista: **MOSTRAR.** Línea: **«Tenés algo que vale la pena mostrar.»**
+**Acto I — MOSTRAR.** Palabras: productos · servicios · identidad · experiencia · calidad · ideas · atención · detalles · oportunidades · valor. Protagonista: **MOSTRAR.** Línea: **«Tenés algo que vale la pena mostrar.»**
 
 **Acto II — CONVENCER.** Palabras: claridad · identidad · confianza · diferenciación · facilidad · experiencia. Protagonista: **CONVENCER.** Línea: **«Hagamos que tus clientes descubran por qué elegirte.»**
 
@@ -703,4 +703,12 @@ Las figuras no llevan copy. No hay "Franco en su escritorio", no hay "proceso", 
 
 **Cierre (conclusión, no titular):** «Diseño y desarrollo productos digitales pensados para mostrar lo mejor de tu negocio y convertir el interés en acción.»
 
-**Reglas:** nada de TravelSuite360 (ni copy, ni datos, ni narrativa); sin métricas, sin garantías, sin resultados. **Excepciones aprobadas a §02** (registradas, a confirmar al sincronizar): «soluciones» como palabra del campo del acto I; el cierre en primera persona fuera del Perfil; la segunda persona dirigida al visitante.
+**Reglas:** nada de TravelSuite360 (ni copy, ni datos, ni narrativa); sin métricas, sin garantías, sin resultados.
+
+**Decisiones de Franco (2026-10-13) sobre la voz (§02):**
+
+1. **Excepción explícita, sólo para esta sección: segunda persona.** La declaración le habla al visitante («Tenés», «tus clientes», «te elijan»). En el resto del sitio sigue valiendo §02.3: el sujeto es el trabajo.
+2. **Excepción explícita, sólo para esta sección: el cierre en primera persona** («Diseño y desarrollo…») fuera del Perfil. El Perfil sigue siendo el único bloque en primera persona del resto del sitio.
+3. **«soluciones» se reemplazó por «oportunidades»** en el campo del acto I: §02 («nunca hablar de "soluciones"») se cumple sin excepción.
+
+Pendiente: sincronizar esta sección con el Claude Doc de origen.

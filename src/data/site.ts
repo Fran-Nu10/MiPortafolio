@@ -71,7 +71,9 @@ export const SITE = {
    * The commercial declaration (Content Master 20, approved by Franco on 2026-10-13): MOSTRAR →
    * CONVENCER → CONVERTIR, between the capabilities and the profile. Its own vocabulary — nothing
    * here comes from a project (no TravelSuite360 copy, data or narrative). The actions are kinds
-   * of businesses' possibilities, never results.
+   * of businesses' possibilities, never results. Voice exceptions approved for this section only
+   * (Content Master 20): the visitor is addressed in the second person, and the conclusion is in
+   * the first person outside the profile.
    */
   declaration: {
     /** sr-only section heading: the three words are the visual titles */
@@ -79,7 +81,7 @@ export const SITE = {
     acts: [
       {
         title: "MOSTRAR.",
-        words: ["productos", "servicios", "identidad", "experiencia", "calidad", "ideas", "atención", "detalles", "soluciones", "valor"],
+        words: ["productos", "servicios", "identidad", "experiencia", "calidad", "ideas", "atención", "detalles", "oportunidades", "valor"],
         line: "Tenés algo que vale la pena mostrar.",
       },
       {

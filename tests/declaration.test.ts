@@ -30,7 +30,7 @@ describe("copy · Content Master 20 (approved 2026-10-13)", () => {
   it("act I · MOSTRAR", () => {
     expect(I.title).toBe("MOSTRAR.");
     expect(I.line).toBe("Tenés algo que vale la pena mostrar.");
-    expect(I.words).toEqual(["productos", "servicios", "identidad", "experiencia", "calidad", "ideas", "atención", "detalles", "soluciones", "valor"]);
+    expect(I.words).toEqual(["productos", "servicios", "identidad", "experiencia", "calidad", "ideas", "atención", "detalles", "oportunidades", "valor"]);
   });
 
   it("act II · CONVENCER", () => {
@@ -54,6 +54,19 @@ describe("copy · Content Master 20 (approved 2026-10-13)", () => {
     const f = splitFinal(III.line);
     expect(f).toEqual({ first: "Que no solo te vean.", lead: "Que te", word: "elijan", mark: "." });
     expect(`${f.first} ${f.lead} ${f.word}${f.mark}`).toBe(III.line);
+  });
+
+  it("«soluciones» was replaced by «oportunidades» (Content Master 02: never «soluciones»)", () => {
+    const all = [D.heading, D.close, ...D.acts.flatMap((a) => [a.title, a.line, ...a.words])];
+    for (const s of all) expect(s, s).not.toMatch(/soluci[oó]n/i);
+    expect(I.words[8]).toBe("oportunidades");
+  });
+
+  it("the approved voice exceptions: second person to the visitor, the conclusion in the first person", () => {
+    expect(I.line).toMatch(/^Tenés /);
+    expect(II.line).toMatch(/\btus clientes\b/);
+    expect(III.line).toMatch(/\bte elijan\.$/);
+    expect(D.close).toMatch(/^Diseño y desarrollo /);
   });
 
   it("promises no result: no numbers, no percentages, no guarantees", () => {
