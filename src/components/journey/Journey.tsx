@@ -14,9 +14,11 @@ import { pathForSection } from "@/lib/route-sync";
 import { TS_KEY_WORDS, splitField, splitList } from "@/lib/ts-world";
 import { splitPurchaseLine } from "@/lib/chef-world";
 import { resolveEvidence } from "@/lib/capabilities-rail";
+import { splitFinal } from "@/lib/declaration";
 import { CapabilitiesRail, type CapabilityCardView } from "@/components/capabilities/CapabilitiesRail";
 import type { EvidenceData } from "@/components/capabilities/EvidenceElement";
 import { FinalCta } from "@/components/contact/FinalCta";
+import { Declaration } from "@/components/declaration/Declaration";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { FrancoAtWork } from "@/components/moments/FrancoAtWork";
 import { HumanMoment } from "@/components/moments/HumanMoment";
@@ -171,6 +173,15 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
             subKicker: SITE.capabilities.subKicker,
             bust: resolveAsset("franco.bust"),
             items: CAPABILITIES.map(capabilityCard),
+          }}
+        />
+        {/* the bridge from what was built to what can be built for the visitor (docs/22 §2) */}
+        <Declaration
+          view={{
+            heading: SITE.declaration.heading,
+            acts: SITE.declaration.acts.map((a) => ({ title: a.title, words: [...a.words], line: a.line })),
+            final: splitFinal(SITE.declaration.acts[2].line),
+            close: SITE.declaration.close,
           }}
         />
         <Profile

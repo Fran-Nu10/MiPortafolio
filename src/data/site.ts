@@ -1,6 +1,7 @@
 /**
  * Global copy (Spec §21 `Site`). Every string is verbatim from the Content Master rev 26:
  * 03 navigation · 04 hero · 05 reel · 11/14 capabilities seam · 15 CTA · 16 microcopy · 17 meta.
+ * `declaration` is Content Master 20 (approved by Franco on 2026-10-13).
  */
 export const SITE = {
   name: "Franco Núñez",
@@ -64,6 +65,36 @@ export const SITE = {
     seam: "Todo lo anterior pasó por las mismas manos.",
     kicker: "Cinco cosas que se repiten en los cuatro productos. Y una sexta, después de publicar.",
     subKicker: "Después de publicar",
+  },
+
+  /**
+   * The commercial declaration (Content Master 20, approved by Franco on 2026-10-13): MOSTRAR →
+   * CONVENCER → CONVERTIR, between the capabilities and the profile. Its own vocabulary — nothing
+   * here comes from a project (no TravelSuite360 copy, data or narrative). The actions are kinds
+   * of businesses' possibilities, never results.
+   */
+  declaration: {
+    /** sr-only section heading: the three words are the visual titles */
+    heading: "MOSTRAR. CONVENCER. CONVERTIR.",
+    acts: [
+      {
+        title: "MOSTRAR.",
+        words: ["productos", "servicios", "identidad", "experiencia", "calidad", "ideas", "atención", "detalles", "soluciones", "valor"],
+        line: "Tenés algo que vale la pena mostrar.",
+      },
+      {
+        title: "CONVENCER.",
+        words: ["claridad", "identidad", "confianza", "diferenciación", "facilidad", "experiencia"],
+        line: "Hagamos que tus clientes descubran por qué elegirte.",
+      },
+      {
+        title: "CONVERTIR.",
+        words: ["explorar", "consultar", "reservar", "comprar"],
+        line: "Que no solo te vean. Que te elijan.",
+      },
+    ],
+    /** the conclusion: body text, not another headline */
+    close: "Diseño y desarrollo productos digitales pensados para mostrar lo mejor de tu negocio y convertir el interés en acción.",
   },
 
   cta: {

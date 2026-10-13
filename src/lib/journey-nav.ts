@@ -55,6 +55,11 @@ export function sectionScroll(section: SectionId, label?: string): number {
     return el ? Math.max(0, docTop(el) - headerOffset()) : 0;
   }
   if (section === "inicio") return 0;
+  if (section === "propuesta") {
+    // a pinned stage: its first state, where the stage holds the top of the viewport
+    const holder = document.querySelector('#propuesta [data-part="pin"]');
+    if (holder && sceneScroll("propuesta") !== null) return Math.ceil(docTop(holder));
+  }
   if (section === "trabajo") {
     const stage = document.querySelector('#trabajo [data-part="stage"]');
     return stage ? docTop(stage) : 0;

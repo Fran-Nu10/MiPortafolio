@@ -2495,6 +2495,524 @@ a.capability-attr {
   transition: none;
 }
 
+/* ── S12b · the commercial declaration (Content Master 20, docs/22): MOSTRAR → CONVENCER →
+   CONVERTIR. Without JS, under reduced motion and on tiny viewports: a static editorial page, the
+   three acts stacked, every word legible. With motion: one sticky stage and a design space per
+   variant (wide 1440×900 · tablet 820×1180 · phone 390×844, the same conditions as
+   decVariant in lib/declaration), its type in container units. ─────────────────────────────── */
+.declaration {
+  padding: 16svh var(--gutter);
+  background: var(--color-black);
+}
+.dec-space {
+  display: grid;
+  gap: 16svh;
+  max-width: 1094px;
+  margin-inline: auto;
+}
+.dec-act {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+.dec-field,
+.dec-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-muted);
+}
+.dec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) {
+  .dec-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.dec-cell {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding-top: 10px;
+}
+.dec-rule {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--rule-strong);
+}
+.dec-gw,
+.dec-action {
+  font-weight: 500;
+}
+.dec-word {
+  margin: 0;
+  /* never wider than the column: CONVENCER. is 6.86em (+ a hair) */
+  font-size: min(calc(var(--type-display) * 1.3), calc((100vw - 2 * var(--gutter)) / 7));
+  font-weight: 900;
+  line-height: 0.9;
+  white-space: nowrap;
+}
+.dec-word-in {
+  display: block;
+}
+.dec-line {
+  max-width: 30ch;
+  margin: 0;
+  font-size: var(--type-lead);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.dec-final {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+.dec-final-a {
+  font-size: var(--type-lead);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.dec-final-b {
+  font-size: min(calc(var(--type-display) * 1.6), calc((100vw - 2 * var(--gutter)) / 3.4));
+  font-weight: 900;
+  line-height: 0.92;
+}
+.dec-final-in {
+  display: block;
+}
+/* the one red mark of the phrase: the decision */
+.dec-mark {
+  color: var(--color-signal);
+}
+.dec-close {
+  max-width: 40ch;
+  margin: 0;
+  font-size: var(--type-lead);
+  line-height: 1.4;
+}
+.dec-ap,
+.dec-track,
+.dec-dot,
+.dec-slot {
+  display: none;
+}
+
+@media (min-width: 360px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+  html.js .declaration:has(.dec-stage[data-anim]) {
+    padding: 0;
+  }
+  html.js .dec-stage[data-anim] {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    background: var(--color-black);
+  }
+  html.js .dec-stage[data-anim] .dec-space {
+    /* wide: the composition's measures, in the space's own units */
+    --g: 4.44cqw;
+    --wfs: 12.4cqw;
+    --wlh: 0.82;
+    --ifs: 1.5cqw;
+    --iy: 10%;
+    --w1: 47%;
+    --w2: 33%;
+    --w3: 66%;
+    --lfs: 2.3cqw;
+    --lw: 60cqw;
+    --gy0: 58%;
+    --gdy: 13%;
+    --gcw: 30.4cqw;
+    --gfs: 2.2cqw;
+    --afs: 2.5cqw;
+    --fafs: 2.3cqw;
+    --fay: 23%;
+    --fbfs: 20cqw;
+    --fby: 29%;
+    --cfs: 1.45cqw;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: block;
+    width: min(100%, 160svh);
+    max-width: none;
+    aspect-ratio: 1440 / 900;
+    margin: 0;
+    transform: translate(-50%, -50%);
+    container-type: size;
+  }
+  html.js .dec-stage[data-anim] .dec-act {
+    display: block;
+  }
+
+  /* I · the field: ten latent words, laid out at their first pose */
+  html.js .dec-stage[data-anim] .dec-field {
+    position: absolute;
+    inset: 0;
+    display: block;
+    color: var(--color-paper);
+  }
+  html.js .dec-stage[data-anim] .dec-fw {
+    position: absolute;
+    left: calc(var(--x) * 100%);
+    top: calc(var(--y) * 100%);
+    font-size: max(12px, calc(var(--fs) * 1cqw));
+    line-height: 1.1;
+    white-space: nowrap;
+    opacity: var(--o);
+    transform-origin: 0 0;
+  }
+  /* the protagonists: left on the gutter, centered on their line; hidden until revealed */
+  html.js .dec-stage[data-anim] .dec-word {
+    position: absolute;
+    left: var(--g);
+    top: calc(var(--wy) - var(--wfs) * var(--wlh) / 2);
+    font-size: var(--wfs);
+    line-height: var(--wlh);
+    transform-origin: 0 0;
+  }
+  html.js .dec-stage[data-anim] :is(.dec-word, .dec-ap)[data-w="1"],
+  html.js .dec-stage[data-anim] .dec-line[data-l="1"] {
+    --wy: var(--w1);
+    --em: 5.71;
+  }
+  html.js .dec-stage[data-anim] .dec-word[data-w="2"],
+  html.js .dec-stage[data-anim] .dec-line[data-l="2"] {
+    --wy: var(--w2);
+  }
+  html.js .dec-stage[data-anim] :is(.dec-word, .dec-ap)[data-w="3"] {
+    --wy: var(--w3);
+    --em: 6.66;
+  }
+  html.js .dec-stage[data-anim] :is(.dec-word[data-w="1"], .dec-word[data-w="3"]) {
+    clip-path: inset(50% 0 50% 0);
+  }
+  html.js .dec-stage[data-anim] .dec-word[data-w="2"] {
+    overflow: clip;
+  }
+  html.js .dec-stage[data-anim] .dec-word[data-w="2"] .dec-word-in {
+    transform: translateY(105%);
+  }
+  /* the red line of an aperture: as wide as its word, on its center line */
+  html.js .dec-stage[data-anim] .dec-ap {
+    position: absolute;
+    left: var(--g);
+    top: var(--wy);
+    display: block;
+    width: calc(var(--wfs) * var(--em));
+    height: 2px;
+    margin-top: -1px;
+    background: var(--color-signal);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+  html.js .dec-stage[data-anim] .dec-line {
+    position: absolute;
+    left: var(--g);
+    top: calc(var(--wy) + var(--wfs) * var(--wlh) / 2 + 2.2cqw);
+    max-width: var(--lw);
+    font-size: var(--lfs);
+    opacity: 0;
+  }
+
+  /* II · the grid */
+  html.js .dec-stage[data-anim] .dec-grid {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  html.js .dec-stage[data-anim] .dec-cell {
+    position: absolute;
+    left: calc(var(--g) + var(--col) * var(--gcw));
+    top: calc(var(--gy0) + var(--row) * var(--gdy));
+    display: block;
+    width: calc(var(--gcw) - 2cqw);
+    padding-top: 1.2cqw;
+  }
+  html.js .dec-stage[data-anim] .dec-cell:nth-child(3n + 1) {
+    --col: 0;
+  }
+  html.js .dec-stage[data-anim] .dec-cell:nth-child(3n + 2) {
+    --col: 1;
+  }
+  html.js .dec-stage[data-anim] .dec-cell:nth-child(3n) {
+    --col: 2;
+  }
+  html.js .dec-stage[data-anim] .dec-cell:nth-child(-n + 3) {
+    --row: 0;
+  }
+  html.js .dec-stage[data-anim] .dec-cell:nth-child(n + 4) {
+    --row: 1;
+  }
+  html.js .dec-stage[data-anim] .dec-rule {
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+  html.js .dec-stage[data-anim] .dec-n {
+    display: block;
+    opacity: 0;
+  }
+  html.js .dec-stage[data-anim] .dec-gw {
+    display: block;
+    margin-top: 0.4cqw;
+    font-size: var(--gfs);
+    line-height: 1.15;
+    white-space: nowrap;
+    opacity: 0;
+    transform-origin: 0 0;
+  }
+
+  /* III · the track, its four stops and the final phrase */
+  html.js .dec-stage[data-anim] .dec-act[data-act="3"] {
+    --tw: calc(var(--wfs) * 6.66);
+  }
+  html.js .dec-stage[data-anim] [data-k="0"] {
+    --k: 0;
+  }
+  html.js .dec-stage[data-anim] [data-k="1"] {
+    --k: 1;
+  }
+  html.js .dec-stage[data-anim] [data-k="2"] {
+    --k: 2;
+  }
+  html.js .dec-stage[data-anim] [data-k="3"] {
+    --k: 3;
+  }
+  html.js .dec-stage[data-anim] .dec-track {
+    position: absolute;
+    left: var(--g);
+    top: var(--w3);
+    display: block;
+    width: var(--tw);
+    height: 1px;
+    background: var(--rule-strong);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+  html.js .dec-stage[data-anim] .dec-actions {
+    position: absolute;
+    inset: 0;
+    display: block;
+    color: var(--color-paper);
+  }
+  html.js .dec-stage[data-anim] .dec-action {
+    position: absolute;
+    left: calc(var(--g) + var(--k) * var(--tw) / 3);
+    bottom: calc(100% - var(--w3) + 1.6cqw);
+    font-size: var(--afs);
+    line-height: 1.15;
+    white-space: nowrap;
+    opacity: 0;
+  }
+  html.js .dec-stage[data-anim] .dec-dot {
+    position: absolute;
+    left: calc(var(--g) + var(--k) * var(--tw) / 3);
+    top: var(--w3);
+    display: block;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: var(--color-signal);
+    transform: scale(0);
+  }
+  html.js .dec-stage[data-anim] .dec-final {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  html.js .dec-stage[data-anim] .dec-final-a {
+    position: absolute;
+    left: var(--g);
+    top: var(--fay);
+    font-size: var(--fafs);
+    line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0;
+  }
+  html.js .dec-stage[data-anim] .dec-final-b {
+    position: absolute;
+    left: var(--g);
+    top: var(--fby);
+    /* room for the descenders inside the rise mask */
+    padding-bottom: 0.16em;
+    font-size: var(--fbfs);
+    line-height: 0.88;
+    white-space: nowrap;
+    overflow: clip;
+  }
+  html.js .dec-stage[data-anim] .dec-final-in {
+    transform: translateY(120%);
+  }
+  html.js .dec-stage[data-anim] .dec-final-end {
+    display: block;
+  }
+  html.js .dec-stage[data-anim] .dec-close {
+    position: absolute;
+    left: 71cqw;
+    top: calc(var(--fby) + var(--fbfs) * 0.88 + 3cqw);
+    width: 24.5cqw;
+    max-width: none;
+    font-size: var(--cfs);
+    line-height: 1.4;
+    opacity: 0;
+  }
+  /* the running index: where each protagonist comes to rest */
+  html.js .dec-stage[data-anim] .dec-slot {
+    position: absolute;
+    left: var(--g);
+    top: calc(var(--iy) + (var(--n) - 1) * var(--ifs) * 1.05);
+    display: block;
+    width: 1px;
+    height: calc(var(--ifs) * var(--wlh));
+  }
+  html.js .dec-stage[data-anim] .dec-slot[data-i="1"] {
+    --n: 1;
+  }
+  html.js .dec-stage[data-anim] .dec-slot[data-i="2"] {
+    --n: 2;
+  }
+  html.js .dec-stage[data-anim] .dec-slot[data-i="3"] {
+    --n: 3;
+  }
+
+  /* depth: lg/xl only (Spec §15), on the landscape drawing */
+  @media (min-width: 1024px) {
+    html.js .dec-stage[data-anim] .dec-field {
+      perspective: 1400px;
+      perspective-origin: 47% 48%;
+    }
+    html.js .dec-stage[data-anim] .dec-fw {
+      transform: translateZ(var(--z));
+    }
+  }
+
+  /* phones: their own drawing — a portrait field, a two-column grid, the track as a column */
+  @media (max-width: 767.98px) {
+    html.js .dec-stage[data-anim] .dec-space {
+      --g: 4.1cqw;
+      --wfs: 13.2cqw;
+      --ifs: 4.4cqw;
+      --iy: 9%;
+      --w1: 46%;
+      --w2: 30%;
+      --w3: 74%;
+      --lfs: 5.4cqw;
+      --lw: 90cqw;
+      --gy0: 52%;
+      --gdy: 10%;
+      --gcw: 46cqw;
+      --gfs: 5.6cqw;
+      --afs: 7cqw;
+      --t0: 50%;
+      --th: 24%;
+      --fafs: 5.4cqw;
+      --fay: 30%;
+      --fbfs: 27cqw;
+      --fby: 36%;
+      --cfs: 4.4cqw;
+      width: min(100%, 46.2svh);
+      aspect-ratio: 390 / 844;
+    }
+    html.js .dec-stage[data-anim] .dec-fw {
+      left: calc(var(--px) * 100%);
+      top: calc(var(--py) * 100%);
+      font-size: max(12px, calc(var(--pfs) * 1cqw));
+      opacity: var(--po);
+    }
+    html.js .dec-stage[data-anim] .dec-cell:nth-child(odd) {
+      --col: 0;
+    }
+    html.js .dec-stage[data-anim] .dec-cell:nth-child(even) {
+      --col: 1;
+    }
+    html.js .dec-stage[data-anim] .dec-cell:nth-child(n) {
+      --row: 0;
+    }
+    html.js .dec-stage[data-anim] .dec-cell:nth-child(n + 3) {
+      --row: 1;
+    }
+    html.js .dec-stage[data-anim] .dec-cell:nth-child(n + 5) {
+      --row: 2;
+    }
+    html.js .dec-stage[data-anim] .dec-track {
+      left: calc(var(--g) + 4px);
+      top: var(--t0);
+      width: 1px;
+      height: var(--th);
+      transform: scaleY(0);
+      transform-origin: 50% 0;
+    }
+    html.js .dec-stage[data-anim] .dec-action {
+      left: calc(var(--g) + 7cqw);
+      top: calc(var(--t0) + var(--k) * var(--th) / 3);
+      bottom: auto;
+    }
+    html.js .dec-stage[data-anim] .dec-dot {
+      left: calc(var(--g) + 4.5px);
+      top: calc(var(--t0) + var(--k) * var(--th) / 3);
+    }
+    html.js .dec-stage[data-anim] .dec-close {
+      left: var(--g);
+      top: calc(var(--fby) + var(--fbfs) * 0.88 * 2 + 8cqw);
+      width: 88cqw;
+      line-height: 1.45;
+    }
+  }
+
+  /* portrait tablets: the portrait field, smaller; the landscape grid and track */
+  @media (min-width: 768px) and (max-aspect-ratio: 9/10) {
+    html.js .dec-stage[data-anim] .dec-space {
+      --g: 3.9cqw;
+      --wfs: 13.3cqw;
+      --ifs: 2.6cqw;
+      --iy: 8.5%;
+      --w1: 46%;
+      --w2: 30%;
+      --w3: 70%;
+      --lfs: 3.4cqw;
+      --lw: 80cqw;
+      --gy0: 50%;
+      --gdy: 10%;
+      --gcw: 30.7cqw;
+      --gfs: 3.6cqw;
+      --afs: 3.6cqw;
+      --fafs: 3.4cqw;
+      --fay: 28%;
+      --fbfs: 27cqw;
+      --fby: 33%;
+      --cfs: 2.6cqw;
+      width: min(100%, 69.5svh);
+      aspect-ratio: 820 / 1180;
+    }
+    html.js .dec-stage[data-anim] .dec-field {
+      perspective: none;
+    }
+    html.js .dec-stage[data-anim] .dec-fw {
+      left: calc(var(--px) * 100%);
+      top: calc(var(--py) * 100%);
+      font-size: max(12px, calc(var(--tfs) * 1cqw));
+      opacity: var(--po);
+      transform: none;
+    }
+    html.js .dec-stage[data-anim] .dec-close {
+      left: var(--g);
+      top: calc(var(--fby) + var(--fbfs) * 0.88 * 2 + 6cqw);
+      width: 70cqw;
+    }
+  }
+}
+
 /* ── S13 · profile ────────────────────────────────────────────────────────── */
 .profile {
   display: grid;

@@ -9,7 +9,7 @@ import type { ProjectSlug } from "@/data/types";
  * lives here — it stays inside GSAP timelines.
  */
 
-export type SectionId = "inicio" | "trabajo" | ProjectSlug | "capacidades" | "perfil" | "contacto";
+export type SectionId = "inicio" | "trabajo" | ProjectSlug | "capacidades" | "propuesta" | "perfil" | "contacto";
 
 export interface JourneyState {
   /** the opening reached O2: the header may fade in */

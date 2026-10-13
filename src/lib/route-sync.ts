@@ -6,7 +6,7 @@ import type { SectionId } from "./journey-store";
  * decides where the visitor starts and which metadata the server sends.
  *
  * - a world is the active section → `/trabajo/{slug}`
- * - capacidades / perfil / contacto → `/#{id}`
+ * - capacidades / propuesta / perfil / contacto → `/#{id}`
  * - anything else (opening, reel) → `/`
  *
  * Pure mapping, used on the server too. The history side (replaceState while scrolling,
@@ -14,7 +14,7 @@ import type { SectionId } from "./journey-store";
  */
 
 const PROJECT_SECTIONS: readonly ProjectSlug[] = ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"];
-const ANCHOR_SECTIONS = ["capacidades", "perfil", "contacto"] as const;
+const ANCHOR_SECTIONS = ["capacidades", "propuesta", "perfil", "contacto"] as const;
 
 export function isProjectSection(s: SectionId): s is ProjectSlug {
   return (PROJECT_SECTIONS as readonly string[]).includes(s);
