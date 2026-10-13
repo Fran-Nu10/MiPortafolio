@@ -2611,6 +2611,22 @@ a.capability-attr {
   html.js .declaration:has(.dec-stage[data-anim]) {
     padding: 0;
   }
+  /* the pin's length from the first paint: the stage plus DEC_UNITS (6.9) gestures of the tier
+     (lib/tiers pinLengthVh: 60vh sm · 70vh md, capped at 450vh · 80vh lg/xl); the scene sets the
+     same height and skips the document-wide refresh when nothing moved */
+  html.js .dec-pin:has(> .dec-stage[data-anim]) {
+    height: calc(100svh + 414vh);
+  }
+  @media (min-width: 768px) {
+    html.js .dec-pin:has(> .dec-stage[data-anim]) {
+      height: calc(100svh + 450vh);
+    }
+  }
+  @media (min-width: 1024px) {
+    html.js .dec-pin:has(> .dec-stage[data-anim]) {
+      height: calc(100svh + 552vh);
+    }
+  }
   html.js .dec-stage[data-anim] {
     position: sticky;
     top: 0;

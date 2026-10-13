@@ -62,6 +62,10 @@ export function Declaration({ view }: { view: DeclarationView }) {
   useScene(stageRef, {
     id: ID,
     pin: "sticky",
+    // the holder is DEC_UNITS gestures tall in CSS from the first paint (globals.css .dec-pin), so
+    // the scene can build when the visitor approaches, outside the page load
+    presized: true,
+    lazy: true,
     units: () => DEC_UNITS,
     build: (api) => {
       // the static editorial layout (CSS) under reduced motion and on tiny viewports
@@ -92,13 +96,23 @@ export function Declaration({ view }: { view: DeclarationView }) {
       const finalIn = pick('[data-part="final-in"]');
       const close = pick('[data-part="close"]');
 
+      // every measure first, before any write: the build never forces a style recalculation
+      // (it runs in its own task after hydration; Phase 12 budget)
+      const fieldBox = field.map((el) => box(el, space));
+      const wordBox = words.map((el) => box(el, space));
+      const slotBox = slots.map((el) => box(el, space));
+      const dotBox = dots.map((el) => box(el, space));
+      const line1 = box(ap1[0], space);
+      const last = dotBox[dotBox.length - 1];
+      const wordIn2 = words[1].querySelector<HTMLElement>('[data-part="word-in"]')!;
+
       const tl = gsap.timeline({ defaults: { ease: EASE.none } });
       for (const s of DEC_STATES) tl.addLabel(`s:${s}`, DEC_AT[s]);
 
       // a protagonist shrinks into its index line (top left), from its own layout box
       const toIndex = (i: number, state: (typeof DEC_STATES)[number]) => {
-        const w = box(words[i], space);
-        const s = box(slots[i], space);
+        const w = wordBox[i];
+        const s = slotBox[i];
         tl.fromTo(
           words[i],
           { x: 0, y: 0, scale: 1, transformOrigin: "0% 0%" },
@@ -108,9 +122,9 @@ export function Declaration({ view }: { view: DeclarationView }) {
       };
       // an aperture: the word opens from its center line, the two red edges part with it
       const aperture = (i: number, edges: HTMLElement[], state: (typeof DEC_STATES)[number], a: number, b: number) => {
-        const half = box(words[i], space).h / 2;
+        const half = wordBox[i].h / 2;
         tl.fromTo(words[i], { clipPath: "inset(50% 0% 50% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: span(state, a, b), ease: EASE.reveal, immediateRender: true }, within(state, a));
-        edges.forEach((e, k) => tl.fromTo(e, { y: 0 }, { y: k === 0 ? -half : half, duration: span(state, a, b), ease: EASE.reveal, immediateRender: false }, within(state, a)));
+        tl.fromTo(edges, { y: 0 }, { y: (k: number) => (k === 0 ? -half : half), duration: span(state, a, b), ease: EASE.reveal, immediateRender: false }, within(state, a));
         tl.fromTo(edges, { opacity: 1 }, { opacity: 0, duration: span(state, b - 0.12, b + 0.08), immediateRender: false }, within(state, b - 0.12));
       };
       const lineIn = (el: HTMLElement, state: (typeof DEC_STATES)[number], a: number, b: number) =>
@@ -119,34 +133,32 @@ export function Declaration({ view }: { view: DeclarationView }) {
         tl.fromTo(el, { opacity: 1, y: 0 }, { opacity: 0, y: -12, duration: span(state, 0, 0.25), immediateRender: false }, within(state, 0));
 
       // ── I · discovery: the latent field comes forward, into contrast ──
-      field.forEach((el, i) => {
-        const p = poses[i];
-        const f = foundPose(p);
-        tl.fromTo(
-          el,
-          { x: 0, y: 0, z: depth ? p.z : 0, scale: 1, opacity: p.o, transformOrigin: "0% 0%" },
-          { x: (f.x - p.x) * W, y: (f.y - p.y) * H, z: 0, opacity: f.o, duration: span("DESCUBRE", 0.05 + (i % 3) * 0.05, 1), ease: EASE.settle, immediateRender: true },
-          within("DESCUBRE", 0.05 + (i % 3) * 0.05),
-        );
-      });
+      const found = poses.map(foundPose);
+      const fx = (i: number) => (found[i].x - poses[i].x) * W;
+      const fy = (i: number) => (found[i].y - poses[i].y) * H;
+      tl.fromTo(
+        field,
+        { x: 0, y: 0, z: (i: number) => (depth ? poses[i].z : 0), scale: 1, opacity: (i: number) => poses[i].o, transformOrigin: "0% 0%" },
+        { x: fx, y: fy, z: 0, opacity: (i: number) => found[i].o, duration: span("DESCUBRE", 0.15, 1), ease: EASE.settle, stagger: (i: number) => (i % 3) * span("DESCUBRE", 0, 0.05), immediateRender: true },
+        within("DESCUBRE", 0.05),
+      );
 
       // ── … drawn into one red line, which opens on MOSTRAR. ──
-      const line1 = box(ap1[0], space);
-      const order = poses.map((p, i) => ({ i, x: foundPose(p).x })).sort((a, b) => a.x - b.x);
       const SHRINK = 0.35;
-      order.forEach(({ i }, rank) => {
-        const p = poses[i];
-        const f = foundPose(p);
-        const b = box(field[i], space);
-        const tx = line1.x + (rank / (order.length - 1)) * Math.max(0, line1.w - b.w * SHRINK);
-        const ty = line1.y + line1.h / 2 - (b.h * SHRINK) / 2;
-        tl.fromTo(
-          field[i],
-          { x: (f.x - p.x) * W, y: (f.y - p.y) * H, scale: 1, opacity: f.o },
-          { x: tx - b.x, y: ty - b.y, scale: SHRINK, opacity: 0, duration: span("MOSTRAR", 0.04 + rank * 0.02, 0.5), ease: EASE.reveal, immediateRender: false },
-          within("MOSTRAR", 0.04 + rank * 0.02),
-        );
-      });
+      const rank = new Map(
+        found
+          .map((f, i) => ({ i, x: f.x }))
+          .sort((a, b) => a.x - b.x)
+          .map(({ i }, r) => [i, r] as const),
+      );
+      const tx = (i: number) => line1.x + (rank.get(i)! / (field.length - 1)) * Math.max(0, line1.w - fieldBox[i].w * SHRINK) - fieldBox[i].x;
+      const ty = (i: number) => line1.y + line1.h / 2 - (fieldBox[i].h * SHRINK) / 2 - fieldBox[i].y;
+      tl.fromTo(
+        field,
+        { x: fx, y: fy, scale: 1, opacity: (i: number) => found[i].o },
+        { x: tx, y: ty, scale: SHRINK, opacity: 0, duration: span("MOSTRAR", 0.22, 0.5), ease: EASE.reveal, stagger: (i: number) => rank.get(i)! * span("MOSTRAR", 0, 0.02), immediateRender: false },
+        within("MOSTRAR", 0.04),
+      );
       tl.fromTo(ap1, { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, transformOrigin: "0% 50%", duration: span("MOSTRAR", 0, 0.4), ease: EASE.settle, immediateRender: true }, within("MOSTRAR", 0));
       aperture(0, ap1, "MOSTRAR", 0.48, 0.86);
       lineIn(lines[0], "MOSTRAR", 0.74, 1);
@@ -154,23 +166,18 @@ export function Declaration({ view }: { view: DeclarationView }) {
       // ── II · organization: MOSTRAR. to the index; six loose words settle into a grid ──
       toIndex(0, "ORDEN");
       lineOut(lines[0], "ORDEN");
-      cells.forEach((el, i) => {
-        const l = LOOSE[i];
-        tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: span("ORDEN", 0.12, 0.42), immediateRender: true }, within("ORDEN", 0.12 + i * 0.02));
-        tl.fromTo(
-          el,
-          { x: l.dx * W, y: l.dy * H, scale: l.scale, transformOrigin: "0% 0%" },
-          { x: 0, y: 0, scale: 1, transformOrigin: "0% 0%", duration: span("ORDEN", 0.3, 0.88), ease: EASE.reveal, immediateRender: true },
-          within("ORDEN", 0.3 + i * 0.015),
-        );
-      });
-      rules.forEach((el, i) =>
-        tl.fromTo(el, { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, transformOrigin: "0% 50%", duration: span("ORDEN", 0.45, 0.9), ease: EASE.settle, immediateRender: true }, within("ORDEN", 0.45 + i * 0.015)),
+      const cellStagger = (step: number) => (i: number) => i * span("ORDEN", 0, step);
+      tl.fromTo(cells, { opacity: 0 }, { opacity: 1, duration: span("ORDEN", 0.12, 0.42), stagger: cellStagger(0.02), immediateRender: true }, within("ORDEN", 0.12));
+      tl.fromTo(
+        cells,
+        { x: (i: number) => LOOSE[i].dx * W, y: (i: number) => LOOSE[i].dy * H, scale: (i: number) => LOOSE[i].scale, transformOrigin: "0% 0%" },
+        { x: 0, y: 0, scale: 1, transformOrigin: "0% 0%", duration: span("ORDEN", 0.3, 0.88), ease: EASE.reveal, stagger: cellStagger(0.015), immediateRender: true },
+        within("ORDEN", 0.3),
       );
+      tl.fromTo(rules, { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, transformOrigin: "0% 50%", duration: span("ORDEN", 0.45, 0.9), ease: EASE.settle, stagger: cellStagger(0.015), immediateRender: true }, within("ORDEN", 0.45));
       tl.fromTo(nums, { opacity: 0 }, { opacity: 1, duration: span("ORDEN", 0.65, 1), immediateRender: true }, within("ORDEN", 0.65));
 
       // … CONVENCER. rises over the grid, which steps back
-      const wordIn2 = words[1].querySelector<HTMLElement>('[data-part="word-in"]')!;
       tl.fromTo(cells, { opacity: 1 }, { opacity: 0.5, duration: span("CONVENCER", 0, 0.4), immediateRender: false }, within("CONVENCER", 0));
       // y stays 0: the CSS first state (translateY 105%) would otherwise be read as pixels
       tl.fromTo(wordIn2, { y: 0, yPercent: 105 }, { y: 0, yPercent: 0, duration: span("CONVENCER", 0.08, 0.72), ease: EASE.settle, immediateRender: true }, within("CONVENCER", 0.08));
@@ -186,22 +193,15 @@ export function Declaration({ view }: { view: DeclarationView }) {
       const trackOrigin = axis === "x" ? "0% 50%" : "50% 0%";
       tl.fromTo(track, { [trackProp]: 0, opacity: 1, transformOrigin: trackOrigin }, { [trackProp]: 1, transformOrigin: trackOrigin, duration: span("ACCION", 0.28, 0.66), ease: EASE.settle, immediateRender: true }, within("ACCION", 0.28));
       // the labels sit on their stops: the first starts there, the last ends there (horizontal track)
-      if (axis === "x") actions.forEach((el, k) => gsap.set(el, { xPercent: k === 0 ? 0 : k === actions.length - 1 ? -100 : -50 }));
+      if (axis === "x") gsap.set(actions, { xPercent: (k: number) => (k === 0 ? 0 : k === actions.length - 1 ? -100 : -50) });
       else gsap.set(actions, { yPercent: -50 });
       tl.fromTo(actions, { opacity: 0, [axis === "x" ? "y" : "x"]: axis === "x" ? 10 : -10 }, { opacity: 0.45, x: 0, y: 0, duration: span("ACCION", 0.4, 0.68), ease: EASE.settle, stagger: span("ACCION", 0, 0.03), immediateRender: true }, within("ACCION", 0.4));
-      actions.forEach((el, k) => {
-        // after its own arrival: one property, one tween at a time
-        const at = within("ACCION", 0.7 + k * 0.07);
-        tl.fromTo(el, { opacity: 0.45 }, { opacity: 1, duration: span("ACCION", 0, 0.07), immediateRender: false }, at);
-        tl.fromTo(dots[k], { scale: 0 }, { scale: 1, duration: span("ACCION", 0, 0.07), ease: EASE.settle, immediateRender: true }, at);
-      });
+      // each lights after its own arrival (one property, one tween at a time), with its stop
+      tl.fromTo(actions, { opacity: 0.45 }, { opacity: 1, duration: span("ACCION", 0, 0.07), stagger: span("ACCION", 0, 0.07), immediateRender: false }, within("ACCION", 0.7));
+      tl.fromTo(dots, { scale: 0 }, { scale: 1, duration: span("ACCION", 0, 0.07), ease: EASE.settle, stagger: span("ACCION", 0, 0.07), immediateRender: true }, within("ACCION", 0.7));
 
       // … they converge on one point; the point becomes the line; the line opens on CONVERTIR.
-      const last = box(dots[dots.length - 1], space);
-      dots.forEach((d) => {
-        const b = box(d, space);
-        tl.fromTo(d, { x: 0, y: 0 }, { x: last.x - b.x, y: last.y - b.y, duration: span("CONVERTIR", 0, 0.4), ease: EASE.reveal, immediateRender: false }, within("CONVERTIR", 0));
-      });
+      tl.fromTo(dots, { x: 0, y: 0 }, { x: (k: number) => last.x - dotBox[k].x, y: (k: number) => last.y - dotBox[k].y, duration: span("CONVERTIR", 0, 0.4), ease: EASE.reveal, immediateRender: false }, within("CONVERTIR", 0));
       const drift = axis === "x" ? { x: 0.03 * W } : { y: 0.03 * H };
       tl.fromTo(actions, { opacity: 1, x: 0, y: 0 }, { opacity: 0, ...drift, duration: span("CONVERTIR", 0, 0.38), ease: EASE.reveal, immediateRender: false }, within("CONVERTIR", 0));
       tl.fromTo(track, { opacity: 1 }, { opacity: 0, duration: span("CONVERTIR", 0.15, 0.45), immediateRender: false }, within("CONVERTIR", 0.15));
@@ -230,7 +230,7 @@ export function Declaration({ view }: { view: DeclarationView }) {
       </h2>
       {/* the stage's pin: as tall as the stage plus the choreography's length (set by the scene) */}
       <div data-part="pin" className="dec-pin">
-        <div ref={stageRef} data-part="stage" data-anim="" data-scene-root="" className="dec-stage">
+        <div ref={stageRef} data-part="stage" data-anim="" className="dec-stage">
           <div data-part="space" className="dec-space">
             <div className="dec-act" data-act="1">
               <ul className="dec-field">

@@ -52,6 +52,19 @@ export interface SceneOptions {
   pin?: boolean | "sticky";
   /** snap to `s:` labels after scrolling stops (default true; never under reduced motion) */
   snap?: boolean;
+  /**
+   * sticky pins only: the holder's height is already the pin length in CSS from the first paint. When
+   * the build leaves it unchanged nothing else moved, so the document-wide refresh is skipped (its
+   * reflow was a long task of its own after hydration — docs/22 §6); if it changed, it refreshes.
+   */
+  presized?: boolean;
+  /**
+   * presized sticky pins only: build when the section comes within a viewport of the screen instead
+   * of in the hydration queue — building moves nothing, so nothing has to be ready before the visitor
+   * gets there, and the build stays out of the load (docs/22 §6). The root carries no
+   * `data-scene-root`: `scenesReady()` does not wait for it.
+   */
+  lazy?: boolean;
   /** default 0.6 (worlds); 0.8 for the rail and Franco at work */
   scrub?: number;
   /** build the timeline inside the section's gsap.context; return null for a scene without scrub */
@@ -303,8 +316,11 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
       // sticky: the root sticks at the top of its parent, which is made as tall as the root plus
       // the pin length — no fixed positioning, so entering or leaving the pin never shifts layout
       const holder = pinned && o.pin === "sticky" ? root.parentElement : null;
+      let moved = true;
       if (holder) {
+        const before = holder.offsetHeight;
         holder.style.height = `${root.offsetHeight + (lengthVh * window.innerHeight) / 100}px`;
+        moved = !o.presized || Math.abs(holder.offsetHeight - before) > 1;
         reverts.push(() => holder.style.removeProperty("height"));
       }
       // a snap back to the first state lands on the first whole pixel inside the sticky pin (a
@@ -348,7 +364,9 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
       const retrack = () => requestAnimationFrame(track);
       ScrollTrigger.addEventListener("refresh", retrack);
       reverts.push(() => ScrollTrigger.removeEventListener("refresh", retrack));
-      queueRefresh();
+      // a presized holder that kept its height moved nothing: only this trigger needs measuring
+      if (moved) queueRefresh();
+      else scrollTrigger.refresh();
       if (o.id) scenes.set(o.id, { trigger: scrollTrigger, labels: Object.fromEntries(Object.entries(tl.labels).map(([k, t]) => [k, duration > 0 ? t / duration : 0])) });
 
       // A refresh (coalesced build refresh, fonts, resize) cancels a pending snap. If the visitor
@@ -394,7 +412,19 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
       mm.add(SCENE_CONDITIONS, (ctx) => build(ctx.conditions as SceneConditions), root);
     };
     let cancelDeferred: (() => void) | null = null;
-    if (root.getBoundingClientRect().top > window.innerHeight * (1 + DEFER_BELOW_VIEWPORTS)) {
+    if (o.lazy && typeof IntersectionObserver !== "undefined") {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          cancelDeferred = null;
+          anchored(root, setup);
+        },
+        { rootMargin: "100% 0px" },
+      );
+      io.observe(root.parentElement ?? root);
+      cancelDeferred = () => io.disconnect();
+    } else if (root.getBoundingClientRect().top > window.innerHeight * (1 + DEFER_BELOW_VIEWPORTS)) {
       cancelDeferred = enqueueBuild(root, () => {
         cancelDeferred = null;
         anchored(root, setup);
