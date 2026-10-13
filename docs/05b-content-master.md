@@ -688,3 +688,19 @@ Las figuras no llevan copy. No hay "Franco en su escritorio", no hay "proceso", 
 14. **Chef Arturo — créditos:** ¿se acredita marca y fotografía a quien corresponda ("Marca y fotografía · Chef Arturo")? Solo si conocés la autoría.
 
 **Qué pasa después.** Con 1–5 respondidas, el copy queda cerrado sin otra ronda. 6–10 se completan al implementar. 11–14 no bloquean nada.
+
+## 20 — Declaración comercial (addendum local, 2026-10-13)
+
+> **Addendum de este export, no del Claude Doc de origen (pendiente de sincronizar).** Copy aprobado por Franco en el pedido «REVELADO 2.2 — Nueva secuencia cinematográfica comercial» (2026-10-13). Implementación: `docs/22-commercial-declaration.md`. Ubicación: entre Capacidades y Perfil.
+
+**Concepto:** MOSTRAR. CONVENCER. CONVERTIR. Qué puede hacer el trabajo por el negocio de quien mira, sin prometer resultados económicos.
+
+**Acto I — MOSTRAR.** Palabras: productos · servicios · identidad · experiencia · calidad · ideas · atención · detalles · soluciones · valor. Protagonista: **MOSTRAR.** Línea: **«Tenés algo que vale la pena mostrar.»**
+
+**Acto II — CONVENCER.** Palabras: claridad · identidad · confianza · diferenciación · facilidad · experiencia. Protagonista: **CONVENCER.** Línea: **«Hagamos que tus clientes descubran por qué elegirte.»**
+
+**Acto III — CONVERTIR.** Acciones (posibilidades de distintos tipos de negocio, nunca resultados): explorar · consultar · reservar · comprar. Protagonista: **CONVERTIR.** Línea: **«Que no solo te vean. Que te elijan.»** (el momento de mayor impacto tipográfico).
+
+**Cierre (conclusión, no titular):** «Diseño y desarrollo productos digitales pensados para mostrar lo mejor de tu negocio y convertir el interés en acción.»
+
+**Reglas:** nada de TravelSuite360 (ni copy, ni datos, ni narrativa); sin métricas, sin garantías, sin resultados. **Excepciones aprobadas a §02** (registradas, a confirmar al sincronizar): «soluciones» como palabra del campo del acto I; el cierre en primera persona fuera del Perfil; la segunda persona dirigida al visitante.

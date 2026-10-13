@@ -62,6 +62,7 @@ docs/
   19-phase13-qa-release.md              Phase 13 · QA final + release candidate (A1–A21)
   20-revelado-2.2-closure.md            cierre: readiness, checklist de despliegue, rollback, inventario, autorizaciones
   21-production-launch.md               lanzamiento provisional en Vercel: registro, verificación, pendientes, reemplazo
+  22-commercial-declaration.md          declaración comercial MOSTRAR → CONVENCER → CONVERTIR (entre Capacidades y Perfil)
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 ```
 
@@ -71,7 +72,7 @@ docs/
 src/
   app/                                  layout · page · trabajo/[slug] · not-found · actions/brief · globals.css
   components/journey/                   Journey (server) · JourneyClient
-  components/{opening,reel,worlds,moments,capabilities,profile,contact,layout}/
+  components/{opening,reel,worlds,moments,capabilities,declaration,profile,contact,layout}/
   components/media/                     Still · Cutout · LoopVideo · ProofMedia · Placeholder
   data/                                 site · projects · capabilities · profile · assets (contratos) · geometría derivada
   lib/                                  motion · tiers · useScene · journey-store · journey-nav · route-sync · geometry
