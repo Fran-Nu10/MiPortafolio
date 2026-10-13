@@ -190,6 +190,21 @@ test.describe("the choreography (pinned, with motion)", () => {
     expect(await page.evaluate(() => history.length)).toBe(length);
   });
 
+  test("a reload inside the sequence returns to the same state (the scene builds on approach)", async ({ page }) => {
+    await open(page);
+    test.skip((await reduced(page)) || (await tiny(page)), "static editorial page");
+    await toState(page, "CONVENCER");
+    // the remembered position is written once scrolling settles (journey-nav)
+    await page.waitForTimeout(500);
+    const y = await page.evaluate(() => Math.round(window.scrollY));
+    await page.reload({ waitUntil: "networkidle" });
+    await expect(page.locator("main")).toHaveAttribute("data-started", "");
+    await expect.poll(() => page.evaluate(() => Math.round(window.scrollY)), { timeout: 8000 }).toBeGreaterThan(y - 3);
+    expect(Math.abs((await page.evaluate(() => Math.round(window.scrollY))) - y)).toBeLessThanOrEqual(3);
+    await expect(page.locator("#propuesta [data-part=stage]")).toHaveAttribute("data-state", "CONVENCER", { timeout: 8000 });
+    await expect.poll(async () => (await look(page, "#propuesta [data-part=word][data-w=\"2\"] [data-part=word-in]")).top - (await look(page, "#propuesta [data-part=word][data-w=\"2\"]")).top, { timeout: 4000 }).toBeLessThan(2);
+  });
+
   test("axe at the final state", async ({ page }) => {
     await open(page);
     test.skip((await reduced(page)) || (await tiny(page)), "static editorial page");
