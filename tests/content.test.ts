@@ -299,6 +299,12 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       ...PROJECTS.flatMap((p) => [p.name, proofCaption(p), p.role]),
       SITE.capabilities.seam,
       ...CAPABILITIES.map((c) => c.statement),
+      // the declaration (Content Master 20): every act's words, title and line, and the conclusion
+      ...SITE.declaration.acts.flatMap((a) => [a.title, ...a.words]),
+      SITE.declaration.acts[0].line,
+      SITE.declaration.acts[1].line,
+      "Que no solo te vean.",
+      SITE.declaration.close,
       PROFILE.core,
       SITE.cta.title,
       SITE.cta.fields.brief,

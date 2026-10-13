@@ -96,6 +96,7 @@ describe("route sync mapping", () => {
   it("worlds → /trabajo/{slug}; anchors → /#id; the rest → /", () => {
     expect(pathForSection("rayo-smash")).toBe("/trabajo/rayo-smash");
     expect(pathForSection("perfil")).toBe("/#perfil");
+    expect(pathForSection("propuesta")).toBe("/#propuesta");
     expect(pathForSection("trabajo")).toBe("/");
     expect(pathForSection("inicio")).toBe("/");
   });
@@ -103,6 +104,7 @@ describe("route sync mapping", () => {
     expect(sectionForLocation("/trabajo/santi-nuca")).toBe("santi-nuca");
     expect(sectionForLocation("/trabajo/nope")).toBeNull();
     expect(sectionForLocation("/", "#contacto")).toBe("contacto");
+    expect(sectionForLocation("/", "#propuesta")).toBe("propuesta");
     expect(sectionForLocation("/")).toBe("inicio");
   });
   it("an anchor wins over the path; any other fragment belongs to the browser", () => {
