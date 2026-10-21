@@ -42,11 +42,11 @@ describe("rail geometry (lg/xl)", () => {
     expect(l.overflow).toBe(l.railW - 1440 + 32);
     expect(l.lefts[5] + l.cardW - l.overflow).toBe(1440 - 32);
   });
-  it("the pin is one viewport of seam plus the overflow: ≈ 2.5–3 gestures, within the spec's ≈ 300vh", () => {
+  it("the pin is 0.6 of a viewport of seam plus the overflow: ≈ 2.2–2.6 gestures (docs/23 §3.2)", () => {
     const l = railLayout(1440, 32);
     const px = railPinPx(900, l.overflow);
-    expect(px / 900).toBeGreaterThan(2.2);
-    expect(px / 900).toBeLessThan(3.2);
+    expect(px / 900).toBeGreaterThan(1.9);
+    expect(px / 900).toBeLessThan(2.8);
     const units = railUnits(900, l.overflow, "xl");
     expect(pinLengthVh(units, "xl", false)).toBe(Math.round((px / 900) * 100));
   });
@@ -54,11 +54,11 @@ describe("rail geometry (lg/xl)", () => {
     const l = railLayout(1440, 32);
     const x = (s: number) => railX(s, 1440, 900, 32, l.overflow);
     expect(x(0)).toBe(1440 - 32);
-    expect(x(450)).toBe(1440 - 32);
-    expect(x(675)).toBeCloseTo((1440 - 32) / 2);
-    expect(x(900)).toBe(0);
-    expect(x(900 + 100)).toBe(-100);
-    expect(x(900 + l.overflow + 500)).toBe(-l.overflow);
+    expect(x(270)).toBe(1440 - 32);
+    expect(x(405)).toBeCloseTo((1440 - 32) / 2);
+    expect(x(540)).toBe(0);
+    expect(x(540 + 100)).toBe(-100);
+    expect(x(540 + l.overflow + 500)).toBe(-l.overflow);
   });
   it("focus on an off-screen card: the scroll that centers it, clamped to the rail's stretch", () => {
     const l = railLayout(1440, 32);
@@ -67,15 +67,15 @@ describe("rail geometry (lg/xl)", () => {
     // at that scroll the card's center is the viewport's center
     expect(l.lefts[3] + l.cardW / 2 + railX(s - pinStart, 1440, 900, 32, l.overflow)).toBeCloseTo(720);
     // the first card cannot be centered (the rail never moves right of 0): the rail's start
-    expect(cardScroll(pinStart, 1440, 900, l.overflow, l.lefts[0], l.cardW)).toBe(pinStart + 900);
+    expect(cardScroll(pinStart, 1440, 900, l.overflow, l.lefts[0], l.cardW)).toBe(pinStart + 540);
     // the last card: never past the rail's end
-    expect(cardScroll(pinStart, 1440, 900, l.overflow, l.lefts[5], l.cardW)).toBeLessThanOrEqual(pinStart + 900 + l.overflow);
+    expect(cardScroll(pinStart, 1440, 900, l.overflow, l.lefts[5], l.cardW)).toBeLessThanOrEqual(pinStart + 540 + l.overflow);
   });
   it("05's layers separate while the card crosses the viewport's right half, inside the rail's stretch", () => {
     const l = railLayout(1440, 32);
     const w = separationWindow(1440, 900, l.overflow, l.lefts[4], l.cardW);
-    expect(w.from).toBeGreaterThanOrEqual(900);
-    expect(w.to).toBeLessThanOrEqual(900 + l.overflow);
+    expect(w.from).toBeGreaterThanOrEqual(540);
+    expect(w.to).toBeLessThanOrEqual(540 + l.overflow);
     expect(w.to - w.from).toBeLessThanOrEqual(720);
     expect(w.to).toBeGreaterThan(w.from);
   });

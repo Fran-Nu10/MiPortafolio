@@ -5,7 +5,7 @@ import type { EvidenceSlotVariant } from "@/data/types";
 import { EASE, gsap, prefersReducedMotion, usePrefersReducedMotion } from "@/lib/motion";
 import type { ResolvedAsset } from "@/lib/resolved";
 import { getScene, useScene } from "@/lib/useScene";
-import { RAIL_ENTER_AT, SEAM_IN, cardScroll, railUnits, separationWindow } from "@/lib/capabilities-rail";
+import { RAIL_ENTER_AT, SEAM_IN, cardScroll, railUnits, seamPx, separationWindow } from "@/lib/capabilities-rail";
 import { Cutout } from "@/components/media/Cutout";
 import { EvidenceElement, type EvidenceData } from "./EvidenceElement";
 import { EvidenceSlot } from "./EvidenceSlot";
@@ -83,15 +83,16 @@ export function CapabilitiesRail({ view }: { view: CapabilitiesView }) {
       const tl = gsap.timeline({ defaults: { ease: EASE.none } });
       tl.addLabel("s:SEAM", 0);
       tl.fromTo(seam, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: SEAM_IN * vh, ease: EASE.settle }, 0);
-      const enterAt = RAIL_ENTER_AT * vh;
-      const enterDur = vh - enterAt;
+      const seamLen = seamPx(vh);
+      const enterAt = RAIL_ENTER_AT * seamLen;
+      const enterDur = seamLen - enterAt;
       tl.to(seam, { x: -0.5 * vw, opacity: 0, duration: enterDur }, enterAt);
       // placed after time 0: their start states must render now, or the kicker and the rail
       // would show in place until the playhead reaches them
       tl.fromTo(kicker, { opacity: 0 }, { opacity: 1, duration: enterDur * 0.6, ease: EASE.settle, immediateRender: true }, enterAt + enterDur * 0.2);
       tl.fromTo(rail, { x: vw - g }, { x: 0, duration: enterDur, immediateRender: true }, enterAt);
-      tl.addLabel("s:RAIL", vh);
-      tl.to(rail, { x: -overflow, duration: Math.max(1, overflow) }, vh);
+      tl.addLabel("s:RAIL", seamLen);
+      tl.to(rail, { x: -overflow, duration: Math.max(1, overflow) }, seamLen);
 
       // 05: the layers separate with the rail's own scroll (the only scroll-tied evidence)
       const five = q('[data-capability="5"]')[0];
@@ -205,6 +206,7 @@ function CapabilityCard({ c, subKicker, running, rm, scrub }: { c: CapabilityCar
       {/* the extended capability is set apart by space and the sub-kicker, nothing else */}
       {subKicker ? <p className="micro muted capability-sub">{subKicker}</p> : null}
       <article>
+        {/* level 1: the capability (its number is CSS, not text) · level 2: what it is for · level 3: its evidence, in a region of its own · level 4: the reference */}
         <h3 className="capability-name">{c.name}</h3>
         <p className="capability-statement">{c.statement}</p>
         <div aria-hidden="true" className="capability-evidence">

@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { watchConsole } from "./console";
 import { settled, scenesBuilt } from "./scroll";
+import { RAIL_ENTER_AT, SEAM_IN, SEAM_LEN } from "../../src/lib/capabilities-rail";
 
 /**
  * Phase 9 acceptance (Spec §26): the rail pinned on lg/xl and stacked on md/sm · focus on an
@@ -56,7 +57,7 @@ const cardRect = (page: Page, n: number) =>
   }, n);
 
 test.describe("the rail (Spec §12)", () => {
-  test("lg/xl: the section pins; the seam fills the first viewport; vertical scroll drives the rail horizontally to its end", async ({ page }, info) => {
+  test("lg/xl: the section pins; the seam holds its stretch (SEAM_LEN of a viewport); vertical scroll drives the rail horizontally to its end", async ({ page }, info) => {
     test.skip(!railTier(page), "the rail exists on lg/xl only");
     const problems = watchConsole(page);
     await open(page);
@@ -77,8 +78,8 @@ test.describe("the rail (Spec §12)", () => {
     await to(page, 0);
     await expect(page.locator("#capacidades [data-part=stage]")).toHaveAttribute("data-state", "SEAM");
     expect(await railX(page)).toBeGreaterThan(page.viewportSize()!.width * 0.9);
-    // the seam holds between its arrival (12% of a viewport) and the rail's entry (50%)
-    await to(page, (0.3 * vh) / p.len);
+    // the seam holds between its arrival (SEAM_IN of a viewport) and the rail's entry (RAIL_ENTER_AT of the seam)
+    await to(page, (((SEAM_IN + RAIL_ENTER_AT * SEAM_LEN) / 2) * vh) / p.len);
     const seamOf = () =>
       page.evaluate(() => {
         const el = document.querySelector<HTMLElement>("#capacidades [data-part=seam]")!;
@@ -94,7 +95,7 @@ test.describe("the rail (Spec §12)", () => {
     await info.attach("seam", { body: await page.screenshot(), contentType: "image/png" });
 
     // the rail in: x = 0, the first card at the gutter; the kicker shown
-    await to(page, vh / p.len);
+    await to(page, (SEAM_LEN * vh) / p.len);
     await expect(page.locator("#capacidades [data-part=stage]")).toHaveAttribute("data-state", "RAIL");
     // scrub 0.8 and a pin rounded to whole vh: within a few pixels once the playhead settles
     await expect.poll(async () => Math.abs(await railX(page))).toBeLessThan(6);
@@ -164,7 +165,7 @@ test.describe("the rail (Spec §12)", () => {
 });
 
 function vhFraction(page: Page, p: { len: number }) {
-  return page.viewportSize()!.height / p.len;
+  return (SEAM_LEN * page.viewportSize()!.height) / p.len;
 }
 
 test.describe("evidence", () => {
@@ -208,7 +209,7 @@ test.describe("evidence", () => {
       return;
     }
     // the first card in view: its loop runs and advances
-    if (p.rail) await to(page, page.viewportSize()!.height / p.len + 0.02);
+    if (p.rail) await to(page, (SEAM_LEN * page.viewportSize()!.height) / p.len + 0.02);
     else await page.locator('#capacidades [data-capability="1"]').scrollIntoViewIfNeeded();
     await expect(page.locator('[data-evidence-el="ts-flow"]')).toHaveAttribute("data-running", "");
     const step = await page.locator('[data-evidence-el="ts-flow"]').getAttribute("data-step");
@@ -315,7 +316,7 @@ test.describe("accessibility", () => {
   test("axe on the rail and the profile; every attribution link reaches its world; headings in order", async ({ page }) => {
     await open(page);
     const p = await pin(page);
-    if (p.rail && !(await reduced(page))) await to(page, page.viewportSize()!.height / p.len + 0.05);
+    if (p.rail && !(await reduced(page))) await to(page, (SEAM_LEN * page.viewportSize()!.height) / p.len + 0.05);
     else await page.locator("#capacidades").scrollIntoViewIfNeeded();
     const results = await new AxeBuilder({ page }).include("#capacidades").include("#perfil").analyze();
     expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);

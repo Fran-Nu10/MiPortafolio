@@ -181,6 +181,17 @@ function holdView() {
     for (const type of ["wheel", "touchstart", "keydown", "pointerdown"]) window.addEventListener(type, release, { passive: true });
   }
 }
+/**
+ * The journey lands somewhere on purpose (a reload's remembered place, a deep link): that position is
+ * authoritative. The section held while the scenes built (picked from a half-built document) is
+ * dropped and the landed one is held instead, so later refreshes keep the visitor where they landed
+ * rather than carrying them back to the stale section (docs/23 §3: a reload under reduced motion
+ * landed in another section once the rhythm pass changed the heights of the unbuilt document).
+ */
+export function anchorView() {
+  reading = null;
+  holdView();
+}
 function restoreView() {
   if (!reading) return;
   const delta = reading.el.getBoundingClientRect().top - reading.top;

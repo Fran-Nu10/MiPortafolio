@@ -37,14 +37,17 @@ export function railLayout(vw: number, gutter: number, count = 6, extendedAt = 5
 }
 
 /**
- * The pin, in scroll pixels: one viewport for the bust seam (the bust appears at the start,
- * holds, then slides out left as the rail enters over the seam's second half), then the rail's
- * own overflow, 1:1 with the scroll. ≈ 250vh at 1440×900.
+ * The pin, in scroll pixels: SEAM_LEN of a viewport for the bust seam (the bust appears at the
+ * start, holds, then slides out left as the rail enters over the seam's second half), then the
+ * rail's own overflow, 1:1 with the scroll. The seam was a full viewport until docs/23 §3.2: with
+ * only the bust and one line on screen it read as a dead stretch, so it is now 0.6 of one.
  */
+export const SEAM_LEN = 0.6;
+export const seamPx = (vh: number) => SEAM_LEN * vh;
 export const SEAM_IN = 0.12;
 export const RAIL_ENTER_AT = 0.5;
 export function railPinPx(vh: number, overflow: number): number {
-  return vh + overflow;
+  return seamPx(vh) + overflow;
 }
 
 /** the pin's length in gestures, for `useScene` (its length is units × GESTURE_VH[tier]) */
@@ -54,11 +57,12 @@ export function railUnits(vh: number, overflow: number, tier: Tier): number {
 
 /** the rail's x at a scroll offset `s` (px from the pin start), vw/vh the viewport */
 export function railX(s: number, vw: number, vh: number, gutter: number, overflow: number): number {
-  const enterStart = RAIL_ENTER_AT * vh;
+  const seam = seamPx(vh);
+  const enterStart = RAIL_ENTER_AT * seam;
   const off = vw - gutter;
   if (s <= enterStart) return off;
-  if (s < vh) return off * (1 - (s - enterStart) / (vh - enterStart));
-  return -Math.min(overflow, s - vh) || 0;
+  if (s < seam) return off * (1 - (s - enterStart) / (seam - enterStart));
+  return -Math.min(overflow, s - seam) || 0;
 }
 
 /**
@@ -68,15 +72,17 @@ export function railX(s: number, vw: number, vh: number, gutter: number, overflo
  */
 export function cardScroll(pinStart: number, vw: number, vh: number, overflow: number, left: number, cardW: number): number {
   const x = vw / 2 - left - cardW / 2;
-  const s = vh - x;
-  return pinStart + Math.min(overflow, Math.max(0, s - vh)) + vh;
+  const seam = seamPx(vh);
+  const s = seam - x;
+  return pinStart + Math.min(overflow, Math.max(0, s - seam)) + seam;
 }
 
 /** the stretch of scroll (px from the pin start) over which card 05's layers separate: the card's travel across the viewport's right half */
 export function separationWindow(vw: number, vh: number, overflow: number, left: number, cardW: number): { from: number; to: number } {
   // s at which the card is fully inside the right edge: left + cardW + x(s) = vw → x = vw − left − cardW
-  const from = vh + Math.max(0, left + cardW - vw);
-  const to = Math.min(vh + overflow, from + vw / 2);
+  const seam = seamPx(vh);
+  const from = seam + Math.max(0, left + cardW - vw);
+  const to = Math.min(seam + overflow, from + vw / 2);
   return { from, to: Math.max(to, from + 1) };
 }
 

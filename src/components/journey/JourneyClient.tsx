@@ -5,7 +5,7 @@ import type { ProjectSlug } from "@/data/types";
 import { registerGsap, ScrollTrigger } from "@/lib/motion";
 import { getJourney, setJourney, subscribeJourney, type SectionId } from "@/lib/journey-store";
 import { installHistory, navigate, releaseTitle, reloadPosition, sectionForHref, sectionScroll, syncUrl, trackScrollPosition } from "@/lib/journey-nav";
-import { queueRefresh, scenesReady } from "@/lib/useScene";
+import { anchorView, queueRefresh, scenesReady } from "@/lib/useScene";
 
 /**
  * Mounts once per journey (Spec §03, §20). Renders nothing.
@@ -74,6 +74,8 @@ export function JourneyClient({
       if (cancelled) return;
       const y = remembered ?? (initial ? sectionScroll(initial) : null);
       if (y !== null) window.scrollTo({ top: y, behavior: "instant" });
+      // the landing is authoritative: hold the landed section (not the one picked mid-build)
+      anchorView();
       history.scrollRestoration = "auto";
       // the hero was kept out of sight until now (no opening flash on deep links)
       main?.setAttribute("data-started", "");

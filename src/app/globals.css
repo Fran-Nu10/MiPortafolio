@@ -1181,7 +1181,8 @@ html.js .reel[data-anim] .reel-controls {
 /* ── worlds with JavaScript (Spec §07 stage) ──────────────────────────────────
    Descendant selectors on purpose: once pinned, ScrollTrigger wraps the stage in a pin-spacer. */
 html.js .world:has(.world-stage[data-anim]) {
-  padding: 0 0 10svh;
+  /* nothing after the pin: the proof begins where the scene ends (docs/23 §3.1) */
+  padding: 0;
 }
 /* the name is read by assistive tech here; the scenes show it later (TS10 and the others) */
 html.js .world:has(.world-stage[data-anim]) > .world-name {
@@ -1968,12 +1969,14 @@ html.js .world-stage[data-anim] .chef-layer {
 
 /* ── proofs with JavaScript: the window at the shared rectangle, centered in its stage ──── */
 html.js .proof {
+  /* the window no longer sits in a full-viewport stage: it starts near the top, the text follows it */
+  --sy: 12svh;
   position: relative;
-  padding: 0 0 14svh;
+  padding: 0 0 8svh;
 }
 html.js .proof .proof-figure {
   position: relative;
-  height: 100svh;
+  height: calc(var(--sy) + var(--h) + 88px);
   max-width: none;
   margin: 0;
 }
@@ -2008,7 +2011,7 @@ html.js .proof .proof-text {
 @media (max-width: 767.98px) {
   /* phone: the window sits higher, the caption under it, the text follows */
   html.js .proof {
-    --sy: 18svh;
+    --sy: 12svh;
   }
 }
 
