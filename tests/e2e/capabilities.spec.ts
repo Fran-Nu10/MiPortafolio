@@ -10,8 +10,10 @@ import { settled, scenesBuilt } from "./scroll";
  * in view, stills under reduced motion), the profile reveal, keyboard order, axe and no-JS.
  */
 
-const CORE = "Diseño y construyo productos digitales: la idea, la interfaz, el código y lo que pasa después de publicar. Soy socio de TravelSuite360 y llevo toda su área de software: un sistema que hoy operan tres agencias de viaje. Los otros tres productos de acá arriba los hice de punta a punta. Trabajo desde Uruguay con equipos en cualquier lugar.";
-const EXTENSION = "Construir es una parte. Que llegue a la gente es otra: cuando corresponde, también trabajo la adquisición de clientes con publicidad en Meta Ads.";
+const CORE = "Diseño y desarrollo productos digitales donde la estrategia, la experiencia de usuario y la ingeniería trabajan con un mismo propósito: crear valor real para cada negocio.";
+const BODY = ["Mi trabajo va más allá de construir una interfaz. Me involucro en cómo se presenta una marca, cómo interactúan sus clientes, cómo funcionan sus procesos y cómo convertir una idea en un producto digital sólido, escalable y preparado para crecer.", "Desde Uruguay, trabajo en proyectos de comercio electrónico, plataformas y sistemas de gestión, combinando criterio de producto, diseño y desarrollo con una visión comercial."];
+const ADS_TITLE = "Un gran producto también necesita llegar a las personas correctas.";
+const ADS = ["Me gusta pensar en todo el recorrido: desde la primera vez que alguien descubre un negocio hasta el momento en que decide consultar, reservar o comprar.", "Por eso, además de diseñar y desarrollar productos digitales, también trabajo con publicidad en Meta Ads. Campañas en Instagram y Facebook que ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad.", "Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla."];
 
 const railTier = (page: Page) => {
   const v = page.viewportSize()!;
@@ -97,7 +99,7 @@ test.describe("the rail (Spec §12)", () => {
     // scrub 0.8 and a pin rounded to whole vh: within a few pixels once the playhead settles
     await expect.poll(async () => Math.abs(await railX(page))).toBeLessThan(6);
     expect(Number(await page.locator("#capacidades [data-part=kicker]").evaluate((e) => getComputedStyle(e).opacity))).toBe(1);
-    await expect(page.locator("#capacidades [data-part=kicker]")).toHaveText("Cinco cosas que se repiten en los cuatro productos. Y una sexta, después de publicar.");
+    await expect(page.locator("#capacidades [data-part=kicker]")).toHaveText("Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.");
     await info.attach("rail in", { body: await page.screenshot(), contentType: "image/png" });
 
     // 1:1: 300 px of scroll move the rail 300 px
@@ -242,10 +244,38 @@ test.describe("profile (Spec §12, Content Master 13)", () => {
     const s = page.locator("#perfil");
     await expect(s.locator("h2")).toHaveText("Perfil");
     await expect(s.locator(".profile-core")).toHaveText(CORE);
-    await expect(s.locator(".profile-extension")).toHaveText(EXTENSION);
+    await expect(s.locator(".profile-detail p")).toHaveText(BODY);
+    // Meta Ads has a space of its own: a headline, three paragraphs, and the term in emphasis
+    await expect(s.locator("h3")).toHaveText(ADS_TITLE);
+    await expect(s.locator(".profile-ads-body p")).toHaveText(ADS);
+    await expect(s.locator(".profile-ads-em")).toHaveText("Meta Ads");
     expect(await s.locator("img, video, [data-placeholder]").count()).toBe(0);
     expect(await s.locator(".profile-meta").count()).toBe(0);
-    expect(await s.innerText()).not.toMatch(/fundador|solo\b|por mi cuenta|CONFIRMAR|hola@/i);
+    expect(await s.innerText()).not.toMatch(/fundador|solo\b|por mi cuenta|CONFIRMAR|hola@|TravelSuite|agencias de viaje/i);
+  });
+
+  test("hierarchy: the declaration is larger than the explanation, which is larger than nothing it replaced; Meta Ads sits below, set off by a rule", async ({ page }) => {
+    await open(page);
+    const s = page.locator("#perfil");
+    const size = (sel: string) => s.locator(sel).first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    const core = await size(".profile-core");
+    const detail = await size(".profile-detail p");
+    const adsTitle = await size(".profile-ads-title");
+    const adsBody = await size(".profile-ads-body p");
+    expect(core).toBeGreaterThan(detail * 1.35);
+    expect(adsTitle).toBeGreaterThan(adsBody * 1.3);
+    expect(core).toBeGreaterThanOrEqual(adsTitle);
+    // order down the page: declaration → explanation → Meta Ads
+    const tops = await s.evaluate((root) => [".profile-core", ".profile-detail", ".profile-ads"].map((q) => root.querySelector(q)!.getBoundingClientRect().top + window.scrollY));
+    expect(tops[0]).toBeLessThan(tops[1]);
+    expect(tops[1]).toBeLessThan(tops[2]);
+    expect(await s.locator(".profile-ads").evaluate((e) => getComputedStyle(e).borderTopWidth)).toBe("1px");
+    // the emphasis is heavier than the text around it, never a link or an image
+    const em = await s.locator(".profile-ads-em").evaluate((e) => ({ w: Number(getComputedStyle(e).fontWeight), p: Number(getComputedStyle(e.parentElement!).fontWeight), tag: e.tagName }));
+    expect(em.w).toBeGreaterThan(em.p);
+    expect(em.tag).toBe("STRONG");
+    // the sixth capability's rail card is not duplicated here: the profile adds the human side only
+    expect(await s.innerText()).not.toContain("orientada a ventas");
   });
 
   test("one reveal on entry: blocks clipped until the section reaches 75% of the viewport, then shown whole; none under reduced motion", async ({ page }) => {
@@ -256,6 +286,8 @@ test.describe("profile (Spec §12, Content Master 13)", () => {
       return;
     }
     await expect(s).toHaveAttribute("data-reveal", "pending");
+    const ads = page.locator("#perfil .profile-ads");
+    await expect(ads).toHaveAttribute("data-reveal", "pending");
     const clipped = await s.locator(".profile-core").evaluate((e) => getComputedStyle(e).clipPath);
     expect(clipped).toMatch(/inset\(0(px)? 0(px)? 100%( 0(px)?)?\)/);
     await page.evaluate(() => {
@@ -266,6 +298,16 @@ test.describe("profile (Spec §12, Content Master 13)", () => {
     await expect.poll(() => s.locator(".profile-core").evaluate((e) => getComputedStyle(e).clipPath), { timeout: 3000 }).toMatch(/none|inset\(0(px|%)?( 0(px|%)?)*\)/);
     // the text was never removed from the tree
     await expect(s.locator(".profile-core")).toHaveText(CORE);
+    // Meta Ads waits for the visitor: still clipped while it is far below, then revealed once on its own
+    await expect(ads).toHaveAttribute("data-reveal", "pending");
+    expect(await ads.locator(".profile-ads-title").evaluate((e) => getComputedStyle(e).clipPath)).toMatch(/inset\(0(px)? 0(px)? 100%( 0(px)?)?\)/);
+    await page.evaluate(() => {
+      const r = document.querySelector("#perfil .profile-ads")!.getBoundingClientRect();
+      window.scrollTo({ top: r.top + window.scrollY - window.innerHeight * 0.6, behavior: "instant" });
+    });
+    await expect(ads).toHaveAttribute("data-reveal", "shown");
+    await expect.poll(() => ads.locator(".profile-ads-title").evaluate((e) => getComputedStyle(e).clipPath), { timeout: 3000 }).toMatch(/none|inset\(0(px|%)?( 0(px|%)?)*\)/);
+    await expect(ads.locator(".profile-ads-body p")).toHaveText(ADS);
   });
 });
 

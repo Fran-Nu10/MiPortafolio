@@ -130,17 +130,47 @@ describe("EvidenceSlot guard (Spec §12)", () => {
   });
 });
 
-describe("profile (Content Master 13, corrected)", () => {
-  it("the core and the extension are verbatim; the label is the nav word; no stack or contacts until confirmed", () => {
+describe("profile (Content Master 13, rewritten in Content Master 21 · 2026-10-21)", () => {
+  const ALL = [PROFILE.core, ...PROFILE.body, PROFILE.ads.title, ...PROFILE.ads.paragraphs];
+
+  it("the declaration, the explanation and Meta Ads are verbatim; the label is the nav word", () => {
     expect(PROFILE.label).toBe(SITE.nav.profile);
     expect(PROFILE.core).toBe(
-      "Diseño y construyo productos digitales: la idea, la interfaz, el código y lo que pasa después de publicar. Soy socio de TravelSuite360 y llevo toda su área de software: un sistema que hoy operan tres agencias de viaje. Los otros tres productos de acá arriba los hice de punta a punta. Trabajo desde Uruguay con equipos en cualquier lugar.",
+      "Diseño y desarrollo productos digitales donde la estrategia, la experiencia de usuario y la ingeniería trabajan con un mismo propósito: crear valor real para cada negocio.",
     );
-    expect(PROFILE.extension).toBe(
-      "Construir es una parte. Que llegue a la gente es otra: cuando corresponde, también trabajo la adquisición de clientes con publicidad en Meta Ads.",
-    );
-    expect(PROFILE.core.split(/\s+/).length).toBeGreaterThanOrEqual(40);
-    expect(PROFILE.core.split(/\s+/).length).toBeLessThanOrEqual(70);
-    for (const s of [PROFILE.core, PROFILE.extension]) expect(s).not.toMatch(/fundador|freelance|disponible|años de experiencia|remoto\b/i);
+    expect(PROFILE.body).toEqual([
+      "Mi trabajo va más allá de construir una interfaz. Me involucro en cómo se presenta una marca, cómo interactúan sus clientes, cómo funcionan sus procesos y cómo convertir una idea en un producto digital sólido, escalable y preparado para crecer.",
+      "Desde Uruguay, trabajo en proyectos de comercio electrónico, plataformas y sistemas de gestión, combinando criterio de producto, diseño y desarrollo con una visión comercial.",
+    ]);
+    expect(PROFILE.ads.title).toBe("Un gran producto también necesita llegar a las personas correctas.");
+    expect(PROFILE.ads.paragraphs).toEqual([
+      "Me gusta pensar en todo el recorrido: desde la primera vez que alguien descubre un negocio hasta el momento en que decide consultar, reservar o comprar.",
+      "Por eso, además de diseñar y desarrollar productos digitales, también trabajo con publicidad en Meta Ads. Campañas en Instagram y Facebook que ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad.",
+      "Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla.",
+    ]);
+    expect(PROFILE.ads.emphasis).toBe("Meta Ads");
+    expect(PROFILE.ads.paragraphs.some((p) => p.includes(PROFILE.ads.emphasis))).toBe(true);
+  });
+
+  it("the declaration opens the profile and stays a sentence, not a paragraph (hierarchy needs a short lead)", () => {
+    expect(PROFILE.core.split(/\s+/).length).toBeLessThanOrEqual(30);
+    expect(PROFILE.core.endsWith("para cada negocio.")).toBe(true);
+  });
+
+  it("the profile no longer carries the old TravelSuite360 and «de punta a punta» claims", () => {
+    for (const s of ALL) expect(s, s).not.toMatch(/TravelSuite|tres agencias|agencias de viaje|punta a punta|socio de|equipos en cualquier lugar/i);
+  });
+
+  it("authority comes from precision: no prestige adjectives, no founder, no results, no certifications", () => {
+    for (const s of ALL) {
+      expect(s, s).not.toMatch(/fundador|founder|freelance|disponible|años de experiencia|remoto\b/i);
+      expect(s, s).not.toMatch(/exitos|l[ií]der|el mejor|\bmejor(es)? del\b|n[úu]mero (uno|1)|premiad|certificad|garantiz|asegur/i);
+    }
+  });
+
+  it("Meta Ads claims no results, no ad spend, no clients and no figures", () => {
+    for (const s of [PROFILE.ads.title, ...PROFILE.ads.paragraphs]) {
+      expect(s, s).not.toMatch(/\d|%|ROAS|retorno|inversi[oó]n|presupuesto|ventas|resultados|clientes de|certific/i);
+    }
   });
 });

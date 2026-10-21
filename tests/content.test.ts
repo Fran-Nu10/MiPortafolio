@@ -15,7 +15,7 @@ import { SITE } from "@/data/site";
 import { PROVISIONAL_LAUNCH } from "@/data/launch";
 import type { Gated } from "@/data/types";
 import { hasAsset, launchBlockers, resolveAsset } from "@/lib/assets";
-import { CHEF_PAYMENTS_PROOF, confirmed, proofCaption, routeErrorText, stackLine } from "@/lib/content";
+import { CHEF_PAYMENTS_PROOF, confirmed, proofCaption, rangeLabel, routeErrorText, stackLine } from "@/lib/content";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -125,9 +125,8 @@ describe("rule 2 · TravelSuite360 role", () => {
     for (const s of SITE_STRINGS) expect(s.text, s.path).not.toMatch(/fundador|founder/i);
   });
 
-  it("meta and profile name the partnership", () => {
+  it("the meta description names the partnership (the profile no longer does: Content Master 21)", () => {
     expect(SITE.meta.description).toContain("Socio de TravelSuite360, a cargo del software.");
-    expect(PROFILE.core).toContain("Soy socio de TravelSuite360 y llevo toda su área de software");
   });
 });
 
@@ -235,17 +234,56 @@ describe("rule 6 · asset contracts", () => {
 
 // ── copy fidelity (A2) ───────────────────────────────────────────────────────
 
+describe("the selection is open-ended (Content Master 21)", () => {
+  /** a fixed count of projects, or a fifth that is «still blank»: the collection is not closed */
+  const CLOSED = /cuatro (productos|proyectos|mundos)|los cuatro|el quint[oa]|la quint[oa]|quint[oa] (producto|proyecto)|en blanco|0?1\s?[–-]\s?0?4\b|\b1\s?[–-]\s?4\b/i;
+  const RENDERED = [
+    ...renderable(SITE, "SITE"),
+    ...renderable(CAPABILITIES, "CAPABILITIES"),
+    ...renderable(PROFILE, "PROFILE"),
+    ...PROJECTS.flatMap((p) => renderable({ reelLine: p.reelLine, relationLine: p.relationLine, microCase: p.microCase, proofLine: p.proofLine, meta: p.meta }, `PROJECT.${p.id}`)),
+  ];
+
+  it("no rendered text counts the projects or closes the collection", () => {
+    for (const s of RENDERED) expect(s.text, s.path).not.toMatch(CLOSED);
+  });
+
+  it("the reel's labels and hints follow the real number of projects", () => {
+    const n = PROJECTS.length;
+    expect(rangeLabel(SITE.reel.label, n)).toBe(`Trabajo · 01–${String(n).padStart(2, "0")}`);
+    expect(rangeLabel(SITE.reel.label, 6)).toBe("Trabajo · 01–06");
+    expect(SITE.reel.restHint(n)).toBe(`arrastrá · ← → · 1–${n}`);
+    expect(SITE.reel.restHint(7)).toBe("arrastrá · ← → · 1–7");
+  });
+
+  it("the heading and the capabilities kicker carry no number", () => {
+    expect(SITE.reel.heading).toBe("Trabajo seleccionado.");
+    expect(SITE.capabilities.kicker).toBe("Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.");
+  });
+});
+
 describe("copy fidelity · Content Master rev 26", () => {
-  it("hero, firma and positioning", () => {
+  it("hero, firma and positioning (Content Master 21, option A, 2026-10-21)", () => {
     expect(SITE.hero.name).toEqual(["FRANCO", "NÚÑEZ"]);
-    expect(SITE.hero.firma).toBe("Producto × Diseño × Ingeniería");
-    expect(SITE.hero.support).toBe("Diseña y construye productos digitales, de la idea al sistema en producción.");
+    expect(SITE.hero.firma).toBe("Producto × Diseño × Ingeniería × Crecimiento");
+    expect(SITE.nav.firma).toBe(SITE.hero.firma);
+    expect(SITE.hero.support).toBe("Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.");
+    // the page title and the JSON-LD job title keep the three disciplines (the SEO identity)
+    expect(SITE.meta.title).toBe("Franco Núñez — Producto × Diseño × Ingeniería");
+  });
+
+  it("the meta lines follow the hero line instead of the old one", () => {
+    expect(SITE.meta.description).toBe(`${SITE.hero.support} Socio de TravelSuite360, a cargo del software. Uruguay.`);
+    expect(SITE.meta.ogDescription).toBe(SITE.hero.support);
+    expect(SITE.meta.description.length).toBeLessThanOrEqual(160);
   });
 
   it("reel, CTA, success, seam", () => {
-    expect(SITE.reel.heading).toBe("Cuatro productos.");
+    expect(SITE.reel.heading).toBe("Trabajo seleccionado.");
     expect(SITE.cta.title).toBe("Ahora, el tuyo.");
-    expect(SITE.cta.support).toBe("Cuatro productos, de la idea a producción. El quinto todavía está en blanco.");
+    expect(SITE.cta.support).toBe(
+      "Ya viste lo que puedo construir. Ahora contame qué tenés en mente. Podemos empezar con una idea, un negocio que quiere crecer o un producto que necesita dar el siguiente paso.",
+    );
     expect(SITE.cta.success).toBe("Brief recibido.");
     expect(SITE.capabilities.seam).toBe("Todo lo anterior pasó por las mismas manos.");
     expect(SITE.cta.fields).toMatchObject({ name: "Nombre", email: "Email", brief: "¿Qué estamos construyendo?" });
@@ -299,6 +337,12 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       ...PROJECTS.flatMap((p) => [p.name, proofCaption(p), p.role]),
       SITE.capabilities.seam,
       ...CAPABILITIES.map((c) => c.statement),
+      // the profile (Content Master 21): the declaration, the explanation and Meta Ads
+      PROFILE.core,
+      ...PROFILE.body,
+      PROFILE.ads.title,
+      ...PROFILE.ads.paragraphs,
+      SITE.cta.support,
       // the declaration (Content Master 20): every act's words, title and line, and the conclusion
       ...SITE.declaration.acts.flatMap((a) => [a.title, ...a.words]),
       SITE.declaration.acts[0].line,

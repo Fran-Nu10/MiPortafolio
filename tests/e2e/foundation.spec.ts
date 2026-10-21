@@ -62,9 +62,9 @@ test.describe("without JavaScript", () => {
     await expect(page.locator("html")).not.toHaveClass(/\bjs\b/);
     await expect(page.getByRole("heading", { level: 1, name: "Franco Núñez" })).toBeAttached();
     for (const text of [
-      "Producto × Diseño × Ingeniería",
-      "Diseña y construye productos digitales, de la idea al sistema en producción.",
-      "Cuatro productos.",
+      "Producto × Diseño × Ingeniería × Crecimiento",
+      "Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.",
+      "Trabajo seleccionado.",
       "Producto real, en uso en tres agencias.",
       "Demo real, navegable.",
       "Sitio real, en línea.",
