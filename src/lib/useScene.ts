@@ -265,7 +265,13 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
         if (isDev) console.error(`[useScene:${o.id ?? root.id}] build failed`, err);
         return runReverts;
       }
-      if (!tl) return runReverts;
+      if (!tl) {
+        // a scene with no timeline (a static layout: tiny viewports, reduced motion) may still have changed
+        // the document's layout while building (a world drops its stage): positions measured before it
+        // would stay stale — the profile's reveals fired ~470 px early at 320×568 (Content Master 21 QA)
+        queueRefresh();
+        return runReverts;
+      }
       tl.pause();
 
       const duration = tl.duration();
