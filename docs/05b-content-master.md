@@ -758,3 +758,32 @@ Pendiente: sincronizar esta sección con el Claude Doc de origen.
 4. **Meta Ads se profundiza en el Perfil** (primera persona, igual que el resto del Perfil) sin repetir el enunciado de la capacidad 06 («Publicidad en Meta Ads, orientada a ventas.»).
 
 **Pendientes y tensiones.** (a) La conclusión de la declaración (§20) y la declaración del Perfil empiezan igual («Diseño y desarrollo productos digitales…») y quedan seguidas. (b) El pedido pide mantener «fondo claro y texto oscuro» en Work, pero esa sección ya era papel sobre negro; no se rediseñó. (c) Sincronizar §20 y §21 con el Claude Doc de origen.
+
+## 22 — Capacidades y contacto (addendum local, 2026-10-21 · intervención integral)
+
+> **Addendum de este export, pendiente de sincronizar con el Claude Doc.** Pedido de Franco «REVELADO 2.2 — MASTER PROMPT · Intervención integral de UX, dirección de arte, ritmo narrativo y conversión» (2026-10-21). Implementación: `docs/23-ux-rhythm-conversion.md`. Reemplaza los nombres y enunciados de §11 y el apoyo del CTA de §15/§21; esas secciones quedan como historia.
+
+**Capacidades** (nivel 1 · capacidad, nivel 2 · valor comercial). Los nombres son los del brief. Cada enunciado conserva su frase aprobada de §11 y agrega, después de los dos puntos, el beneficio para el cliente: **propuesta a confirmar por Franco**, sin hechos nuevos ni resultados.
+
+| # | Nombre | Enunciado |
+|---|---|---|
+| 01 | Producto | «Definir qué se construye, para quién y en qué orden: cada decisión al servicio del negocio.» |
+| 02 | Ingeniería web | «Front, back y datos en producción, no en demo: una base sólida para que el negocio opere y crezca.» |
+| 03 | Comercio digital | «Del catálogo al cobro sin fricción: que elegir y comprar sea simple.» |
+| 04 | IA y automatización | «Extraer datos de mensajes reales y convertirlos en trabajo hecho: menos tareas repetitivas para el equipo.» |
+| 05 | Experiencias interactivas | «Movimiento con propósito: cuando el scroll cuenta algo, el producto se recuerda.» |
+| 06 | **Meta Ads y crecimiento** (antes «Adquisición de clientes») | «Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.» (texto del brief) |
+
+Reglas que siguen valiendo para la 06: **sin métricas, sin resultados, sin evidencia fabricada**. Se mantiene la variante tipográfica con la etiqueta «Meta Ads»; un diagrama de «alcance» que se probó durante la intervención se retiró por esta regla. Voz: «Creo campañas» es primera persona dentro de una tarjeta (el resto de §11 es impersonal). Es una excepción del brief y queda registrada.
+
+**Contacto (cierre).**
+
+| Elemento | Texto |
+|---|---|
+| Eyebrow | «Tu próximo proyecto empieza acá» (se muestra en mayúsculas) |
+| Titular | «Ahora, el tuyo.» (sin cambios) |
+| Texto | «Una idea nueva, un negocio que quiere crecer o un producto que necesita dar el siguiente paso. Contame qué tenés en mente.» (reemplaza el apoyo del §21, «Ya viste lo que puedo construir…») |
+| Botón | «Enviar proyecto» (antes «Enviar»; «Enviando…» sin cambios) |
+| Complemento | «Hablemos de lo que podemos construir.» |
+
+Campos, validaciones, mensajes de error y de éxito («Brief recibido.»): sin cambios.
