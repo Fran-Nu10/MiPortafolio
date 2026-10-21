@@ -63,6 +63,7 @@ docs/
   20-revelado-2.2-closure.md            cierre: readiness, checklist de despliegue, rollback, inventario, autorizaciones
   21-production-launch.md               lanzamiento provisional en Vercel: registro, verificación, pendientes, reemplazo
   22-commercial-declaration.md          declaración comercial MOSTRAR → CONVENCER → CONVERTIR (entre Capacidades y Perfil)
+  24-positioning-copy-pass.md           posicionamiento y autoridad: hero, Perfil + Meta Ads, Work abierto, contacto
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 ```
 

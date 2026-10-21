@@ -712,3 +712,49 @@ Las figuras no llevan copy. No hay "Franco en su escritorio", no hay "proceso", 
 3. **«soluciones» se reemplazó por «oportunidades»** en el campo del acto I: §02 («nunca hablar de "soluciones"») se cumple sin excepción.
 
 Pendiente: sincronizar esta sección con el Claude Doc de origen.
+
+## 21 — Posicionamiento y autoridad (addendum local, 2026-10-21)
+
+> **Addendum de este export, no del Claude Doc de origen (pendiente de sincronizar).** Aprobado por Franco en el pedido «REVELADO 2.2 — MASTER PROMPT: optimización de copy, autoridad profesional y posicionamiento comercial» (2026-10-21). Implementación y verificación: `docs/24-positioning-copy-pass.md`. **Reemplaza** el texto de §04 (línea de apoyo y categoría del hero), §05 (título «Cuatro productos.»), §13 (bio) y §15 (apoyo del CTA); esas secciones quedan como historia. No cambia ningún hecho, rol ni atribución.
+
+**Posicionamiento.** Franco no es «alguien que hace páginas web»: comprende el negocio, diseña la experiencia, desarrolla la tecnología y acompaña el crecimiento digital. La autoridad sale de la precisión del mensaje y del trabajo mostrado, no de adjetivos de prestigio («exitoso», «líder», «el mejor» no se usan).
+
+**Hero · opción A.**
+
+- Categoría: **PRODUCTO × DISEÑO × INGENIERÍA × CRECIMIENTO** (hero y firma del header; el `<title>` y el JSON-LD conservan «Producto × Diseño × Ingeniería»).
+- Línea principal: **«Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.»** (la meta description y `og:description` la reutilizan).
+
+**Work.** Título del reel: **«Trabajo seleccionado.»** Sin cantidad fija: ya no hay «Cuatro productos», «los cuatro proyectos», «el quinto». Los contadores funcionales del carrusel (01–NN, «1–N», «0n / NN», «0n de NN») siguen la cantidad real de proyectos. El kicker de Capacidades dice «todos los productos».
+
+**Perfil** (tres párrafos; el primero, la declaración de autoridad):
+
+1. «Diseño y desarrollo productos digitales donde la estrategia, la experiencia de usuario y la ingeniería trabajan con un mismo propósito: crear valor real para cada negocio.»
+2. «Mi trabajo va más allá de construir una interfaz. Me involucro en cómo se presenta una marca, cómo interactúan sus clientes, cómo funcionan sus procesos y cómo convertir una idea en un producto digital sólido, escalable y preparado para crecer.»
+3. «Desde Uruguay, trabajo en proyectos de comercio electrónico, plataformas y sistemas de gestión, combinando criterio de producto, diseño y desarrollo con una visión comercial.»
+
+**Perfil · Meta Ads** (espacio propio dentro del Perfil, con «Meta Ads» en énfasis discreto):
+
+- Titular: «Un gran producto también necesita llegar a las personas correctas.»
+- «Me gusta pensar en todo el recorrido: desde la primera vez que alguien descubre un negocio hasta el momento en que decide consultar, reservar o comprar.»
+- «Por eso, además de diseñar y desarrollar productos digitales, también trabajo con publicidad en Meta Ads. Campañas en Instagram y Facebook que ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad.»
+- «Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla.»
+
+**Contacto.** «Ahora, el tuyo.» se mantiene. Apoyo: **«Ya viste lo que puedo construir. Ahora contame qué tenés en mente. Podemos empezar con una idea, un negocio que quiere crecer o un producto que necesita dar el siguiente paso.»** Campos, validaciones, Resend y lógica del formulario: sin cambios.
+
+**Claims (§18 actualizado).**
+
+| Claim | Tipo | Nota |
+| --- | --- | --- |
+| «Campañas en Instagram y Facebook» | FACT | Declarado por Franco: los emplazamientos de la publicidad en Meta Ads. |
+| «ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad» | POSITIONING | Qué busca el servicio, no un resultado. **Sin** cifras, inversión, retornos, clientes ni certificaciones: NOT CONFIRMED, no se escriben (un test lo verifica). |
+| «sólido, escalable y preparado para crecer» | POSITIONING | Cualidades que busca el trabajo; no se afirman volúmenes ni resultados. |
+| «proyectos de comercio electrónico, plataformas y sistemas de gestión» | FACT | Chef Arturo (comercio), Rayo Smash / Prospector y Santi Nuca (plataformas, sitio), TravelSuite360 (sistema de gestión). |
+
+**Decisiones de Franco (2026-10-21) y excepciones registradas.**
+
+1. **Excepción explícita a §02 («nunca "transformar ideas"»):** el hero dice «Transforma ideas y negocios…» (opción A aprobada).
+2. **TravelSuite360 sale del Perfil.** Se retiran «Soy socio de TravelSuite360», «tres agencias de viaje» y «los otros tres productos… de punta a punta». El mundo, el reel, las capacidades y la prueba («Producto real, en uso en tres agencias.») no cambian. **«Cofundador de TravelSuite360, plataforma de gestión utilizada por agencias de viajes.» NO se agregó**: contradice el rol congelado de la ronda 1 («Socio · Producto e ingeniería», nunca fundador); queda pendiente de confirmación explícita de Franco (ver `docs/24` §7).
+3. **El Perfil supera la banda de 40–70 palabras de §13** a pedido; la primera frase cumple el papel del núcleo.
+4. **Meta Ads se profundiza en el Perfil** (primera persona, igual que el resto del Perfil) sin repetir el enunciado de la capacidad 06 («Publicidad en Meta Ads, orientada a ventas.»).
+
+**Pendientes y tensiones.** (a) La conclusión de la declaración (§20) y la declaración del Perfil empiezan igual («Diseño y desarrollo productos digitales…») y quedan seguidas. (b) El pedido pide mantener «fondo claro y texto oscuro» en Work, pero esa sección ya era papel sobre negro; no se rediseñó. (c) Sincronizar §20 y §21 con el Claude Doc de origen.
