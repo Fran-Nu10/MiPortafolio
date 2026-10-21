@@ -200,8 +200,10 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
         <FinalCta
           renderedAt={RENDERED_AT}
           view={{
+            eyebrow: SITE.cta.eyebrow,
             title: SITE.cta.title,
             support: SITE.cta.support,
+            aside: SITE.cta.aside,
             footer: SITE.footer.line(new Date(RENDERED_AT).getFullYear()),
             form: {
               fields: SITE.cta.fields,

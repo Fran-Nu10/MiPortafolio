@@ -3194,54 +3194,109 @@ a.capability-attr {
 }
 
 /* ── S15 · CTA + form · S16 · End ───────────────────────────────────────── */
+/* the page's closing argument (docs/23 §5): headline and text on one side, the brief on the other */
 .cta {
-  padding: 14svh var(--gutter) calc(14svh + env(safe-area-inset-bottom));
-  max-width: calc(1094px + 2 * var(--gutter));
+  padding: 16svh var(--gutter) calc(10svh + env(safe-area-inset-bottom));
+  max-width: calc(1280px + 2 * var(--gutter));
   margin-inline: auto;
+}
+.cta-grid {
+  display: grid;
+  gap: 48px;
+}
+@media (min-width: 1024px) {
+  .cta-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(48px, 6vw, 96px);
+    align-items: start;
+  }
+}
+.cta-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-paper-2);
+}
+/* the red light of the recording: the same signal the journey has carried since the opening */
+.cta-eyebrow::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-signal);
 }
 .cta-title {
   /* signal red: the only red headline on the site */
+  margin-top: 28px;
   color: var(--color-signal);
-  font-size: var(--type-display);
-  line-height: 1;
+  font-size: clamp(56px, 9.2vw, 136px);
+  line-height: 0.92;
   font-weight: 900;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 .cta-support {
-  margin-top: 16px;
+  margin-top: 32px;
   font-size: var(--type-lead);
   line-height: 1.4;
-  max-width: 52ch;
+  max-width: 32ch;
   text-wrap: pretty;
 }
+.cta-aside {
+  max-width: 32ch;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule-strong);
+  color: var(--color-muted);
+}
 .minimal-footer {
-  margin-top: 48px;
+  margin-top: clamp(56px, 10svh, 112px);
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
 }
 .brief-form {
   display: grid;
-  gap: 24px;
-  margin-top: 32px;
-  max-width: 720px;
+  gap: 28px;
+  padding: clamp(20px, 3vw, 40px);
+  background: var(--color-panel);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
 }
 .field {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+}
+.field-label {
+  color: var(--color-paper-2);
+  transition: color 160ms var(--ease-settle);
+}
+.field:focus-within .field-label {
+  color: var(--color-paper);
 }
 .field-input {
   width: 100%;
-  min-height: 48px;
-  padding: 12px 0;
+  min-height: 56px;
+  padding: 16px 18px;
   font: inherit;
   /* ≥ 16px: no iOS zoom on focus */
-  font-size: max(16px, var(--type-body));
+  font-size: max(17px, var(--type-body));
+  line-height: 1.4;
   color: var(--color-paper);
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--rule-strong);
-  border-radius: 0;
+  background: var(--color-black);
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  transition:
+    border-color 160ms var(--ease-settle),
+    box-shadow 160ms var(--ease-settle);
+}
+.field-input:hover {
+  border-color: var(--color-muted);
 }
 .field-input:focus-visible {
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--color-paper);
+  box-shadow: 0 0 0 1px var(--color-paper);
 }
 .field-input::placeholder {
   color: var(--color-muted);
@@ -3255,14 +3310,38 @@ a.capability-attr {
 .field-textarea {
   resize: vertical;
   field-sizing: content;
-  min-height: calc(4lh + 24px);
+  min-height: calc(5lh + 36px);
 }
 .field-input[aria-invalid="true"] {
-  border-bottom-color: var(--color-signal);
+  border-color: var(--color-signal);
+  box-shadow: 0 0 0 1px var(--color-signal);
 }
+/* focus beats the error state: the form moves focus to the first error, and that is when the
+   visitor most needs to see where they are (the red mark and message stay under the field) */
+.field-input:focus-visible,
+.field-input[aria-invalid="true"]:focus-visible {
+  outline: 2px solid var(--color-paper);
+  outline-offset: 3px;
+  border-color: var(--color-paper);
+  box-shadow: none;
+}
+/* errors read in paper (red at 11 px on the form's panel is 4.25:1, under AA); the red is the mark
+   before the text and the field's own border — the signal still says where the problem is */
 .field-error,
 .brief-route-error {
-  color: var(--color-signal);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--color-paper);
+}
+.field-error::before,
+.brief-route-error::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  background: var(--color-signal);
+  transform: translateY(-1px);
 }
 .brief-route-error:empty {
   display: none;
@@ -3273,16 +3352,45 @@ a.capability-attr {
   gap: 24px;
 }
 .brief-submit {
-  min-height: 48px;
-  padding: 0 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 0 40px;
   font: inherit;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
   color: var(--color-black);
   background: var(--color-paper);
   border: 0;
   border-radius: 999px;
   cursor: pointer;
   touch-action: manipulation;
+  transition:
+    background-color 200ms var(--ease-settle),
+    color 200ms var(--ease-settle);
+}
+.brief-submit:hover:not(:disabled) {
+  background: var(--color-signal);
+}
+.brief-arrow {
+  display: inline-block;
+  transition: transform 200ms var(--ease-settle);
+}
+.brief-submit:hover:not(:disabled) .brief-arrow {
+  transform: translateX(6px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brief-arrow,
+  .brief-submit,
+  .field-input,
+  .field-label {
+    transition: none;
+  }
+  .brief-submit:hover:not(:disabled) .brief-arrow {
+    transform: none;
+  }
 }
 .brief-submit:disabled {
   opacity: 0.6;
@@ -3303,6 +3411,9 @@ a.capability-attr {
   width: 1px;
   height: 1px;
   overflow: hidden;
+}
+.cta-grid > .end {
+  grid-column: 1 / -1;
 }
 .end {
   display: grid;

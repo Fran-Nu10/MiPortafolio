@@ -220,6 +220,47 @@ test.describe("the End (Spec §02 S16)", () => {
   });
 });
 
+test.describe("the closing (docs/23 §5)", () => {
+  test("eyebrow, headline, text, aside and «Enviar proyecto»; side by side from lg, stacked below; a large button", async ({ page }) => {
+    await openForm(page);
+    const cta = page.locator("#contacto");
+    await expect(cta.locator(".cta-eyebrow")).toHaveText("Tu próximo proyecto empieza acá");
+    await expect(cta.locator("h2")).toHaveText("Ahora, el tuyo.");
+    await expect(cta.locator(".cta-support")).toHaveText("Una idea nueva, un negocio que quiere crecer o un producto que necesita dar el siguiente paso. Contame qué tenés en mente.");
+    await expect(cta.locator(".cta-aside")).toHaveText("Hablemos de lo que podemos construir.");
+    const button = cta.getByRole("button", { name: "Enviar proyecto", exact: true });
+    await expect(button).toBeVisible();
+    const b = (await button.boundingBox())!;
+    expect(b.height).toBeGreaterThanOrEqual(56);
+    const intro = (await cta.locator(".cta-intro").boundingBox())!;
+    const form = (await cta.locator(".brief-form").boundingBox())!;
+    if (page.viewportSize()!.width >= 1024) {
+      expect(form.x).toBeGreaterThan(intro.x + intro.width - 1);
+      expect(Math.abs(form.y - intro.y)).toBeLessThan(page.viewportSize()!.height * 0.25);
+    } else expect(form.y).toBeGreaterThan(intro.y + intro.height - 1);
+    // the headline is the largest type of the closing
+    const title = await cta.locator("h2").evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    expect(title).toBeGreaterThanOrEqual(56);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+  });
+
+  test("the first error takes the focus with a visible ring, over the red error state", async ({ page }) => {
+    await openForm(page);
+    await page.getByRole("button", { name: "Enviar proyecto" }).click();
+    await expect(page.locator("#brief-name")).toBeFocused();
+    await expect(page.locator("#brief-name")).toHaveAttribute("aria-invalid", "true");
+    const ring = await page.locator("#brief-name").evaluate((e) => {
+      const cs = getComputedStyle(e);
+      return { style: cs.outlineStyle, width: parseFloat(cs.outlineWidth) };
+    });
+    expect(ring.style).toBe("solid");
+    expect(ring.width).toBeGreaterThanOrEqual(2);
+    // the message reads in paper with a red mark: AA on the form panel at 11 px
+    const color = await page.locator("#brief-name-error").evaluate((e) => getComputedStyle(e).color);
+    expect(color).toBe("rgb(237, 232, 222)");
+  });
+});
+
 test.describe("accessibility", () => {
   test("labels, aria-invalid / describedby, alert region, status focus; axe on the form with errors", async ({ page }) => {
     await openForm(page);

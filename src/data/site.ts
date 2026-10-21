@@ -106,8 +106,12 @@ export const SITE = {
   },
 
   cta: {
+    /** the closing of the journey, redesigned on 2026-10-21 (docs/23 §5): eyebrow, headline, text, aside */
+    eyebrow: "Tu próximo proyecto empieza acá",
     title: "Ahora, el tuyo.",
-    support: "Ya viste lo que puedo construir. Ahora contame qué tenés en mente. Podemos empezar con una idea, un negocio que quiere crecer o un producto que necesita dar el siguiente paso.",
+    support: "Una idea nueva, un negocio que quiere crecer o un producto que necesita dar el siguiente paso. Contame qué tenés en mente.",
+    /** said next to the button: the invitation, not another headline */
+    aside: "Hablemos de lo que podemos construir.",
     fields: {
       name: "Nombre",
       email: "Email",
@@ -115,7 +119,7 @@ export const SITE = {
       /** optional: only where it fits on one line (omitted on sm) */
       briefPlaceholder: "Contame lo que tengas, aunque sea una idea.",
     },
-    button: { idle: "Enviar", pending: "Enviando…" },
+    button: { idle: "Enviar proyecto", pending: "Enviando…" },
     errors: {
       missing: "Falta esto.",
       invalid: "Revisá el email.",

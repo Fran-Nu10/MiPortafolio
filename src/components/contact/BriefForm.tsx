@@ -204,6 +204,11 @@ export function BriefForm({ copy, renderedAt }: { copy: BriefFormCopy; renderedA
       <div className="brief-actions">
         <button type="submit" disabled={pending} aria-disabled={pending || undefined} className="brief-submit">
           {pending ? copy.button.pending : copy.button.idle}
+          {pending ? null : (
+            <span className="brief-arrow" aria-hidden="true">
+              →
+            </span>
+          )}
         </button>
         {typing ? (
           <span className="micro muted brief-completion" aria-hidden="true">

@@ -283,13 +283,13 @@ describe("copy fidelity · Content Master rev 26", () => {
   it("reel, CTA, success, seam", () => {
     expect(SITE.reel.heading).toBe("Trabajo seleccionado.");
     expect(SITE.cta.title).toBe("Ahora, el tuyo.");
-    expect(SITE.cta.support).toBe(
-      "Ya viste lo que puedo construir. Ahora contame qué tenés en mente. Podemos empezar con una idea, un negocio que quiere crecer o un producto que necesita dar el siguiente paso.",
-    );
+    expect(SITE.cta.eyebrow).toBe("Tu próximo proyecto empieza acá");
+    expect(SITE.cta.support).toBe("Una idea nueva, un negocio que quiere crecer o un producto que necesita dar el siguiente paso. Contame qué tenés en mente.");
+    expect(SITE.cta.aside).toBe("Hablemos de lo que podemos construir.");
     expect(SITE.cta.success).toBe("Brief recibido.");
     expect(SITE.capabilities.seam).toBe("Todo lo anterior pasó por las mismas manos.");
     expect(SITE.cta.fields).toMatchObject({ name: "Nombre", email: "Email", brief: "¿Qué estamos construyendo?" });
-    expect(SITE.cta.button).toEqual({ idle: "Enviar", pending: "Enviando…" });
+    expect(SITE.cta.button).toEqual({ idle: "Enviar proyecto", pending: "Enviando…" });
   });
 
   it("journey order and project roles", () => {
@@ -345,6 +345,8 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       PROFILE.ads.title,
       ...PROFILE.ads.paragraphs,
       SITE.cta.support,
+      SITE.cta.eyebrow,
+      SITE.cta.aside,
       // the declaration (Content Master 20): every act's words, title and line, and the conclusion
       ...SITE.declaration.acts.flatMap((a) => [a.title, ...a.words]),
       SITE.declaration.acts[0].line,
