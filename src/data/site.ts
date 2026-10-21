@@ -55,6 +55,46 @@ export const SITE = {
     cursor: { drag: "Arrastrá", enter: "Ver" },
   },
 
+  /**
+   * THE SHIFT (Content Master 23, brief of 2026-10-21; docs/25): how complexity becomes product,
+   * between the reel and the capabilities. «THE SHIFT» is the section's working name only: Content
+   * Master 03 allows no English interface label, so the page shows its Spanish subtitle. The acts'
+   * lines are the brief's; the interface is conceptual — invented for this section, named
+   * «Concepto», with no project, client or metric behind it — and its caption says so.
+   */
+  shift: {
+    heading: "De la complejidad al producto.",
+    acts: [
+      { n: "01", title: "El desorden", line: "Una idea no alcanza." },
+      { n: "02", title: "La dirección", line: "Necesita dirección." },
+      { n: "03", title: "La ejecución", line: "Y ejecución." },
+      { n: "04", title: "El resultado", line: "De la idea al producto." },
+    ],
+    concept: "Interfaz conceptual, diseñada para esta sección.",
+    /** act IV: the system, annotated (the grid's columns are the ones each variant draws) */
+    notes: {
+      grid: (columns: number) => `Retícula de ${columns} columnas`,
+      type: "Tipografía: Schibsted Grotesk",
+      state: "Estado: publicado",
+    },
+    /** the conceptual interface's own words (shown inside it; read as one image description) */
+    ui: {
+      brand: "Concepto",
+      nav: ["Inicio", "Producto", "Contacto"],
+      cta: "Empezar",
+      eyebrow: "01 — Producto",
+      headline: ["Todo encuentra", "su lugar."],
+      body: "Una estructura clara, para que cada parte cumpla su función.",
+      button: "Explorar →",
+      draft: "Borrador",
+      live: "Publicado",
+      toggle: "Publicar",
+      cards: ["Estructura", "Interfaz", "Función"],
+      label:
+        "Interfaz conceptual de un producto digital: navegación, el titular «Todo encuentra su lugar.», tres módulos —Estructura, Interfaz y Función— y un control «Publicar» que pasa el estado de borrador a publicado.",
+    },
+  },
+
   world: {
     next: "Siguiente →",
     back: "← Trabajo",

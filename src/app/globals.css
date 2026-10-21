@@ -1070,6 +1070,716 @@ html.js .reel[data-anim] .reel-controls {
   }
 }
 
+/* ── S2b · THE SHIFT (docs/25, Content Master 23): de la complejidad al producto. Without JS, under
+   reduced motion and on tiny viewports: the four lines and the finished interface, static. With
+   motion: one sticky stage and a design space per variant (wide 1440×900 · tablet 820×1180 · phone
+   390×844, the conditions of lib/shift shiftVariant). The interface is laid out where it is finished
+   in every mode (its fragments' places come from lib/shift as --{w,t,p}{x,y,w,h,fs}); the disorder
+   is the scene's inverse transform. Its type is in container units of the interface. ───────────── */
+.shift {
+  padding: 14svh var(--gutter);
+  background: var(--color-black);
+}
+.shift-space {
+  display: grid;
+  gap: 40px;
+  max-width: 1094px;
+  margin-inline: auto;
+}
+.shift-title {
+  margin: 0;
+  color: var(--color-muted);
+}
+.shift-acts {
+  display: grid;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shift-act {
+  display: grid;
+  gap: 8px;
+}
+.shift-act-n {
+  color: var(--color-muted);
+}
+.shift-line {
+  margin: 0;
+  font-size: var(--type-statement);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.shift-figure {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  container-type: inline-size;
+}
+.shift-ui {
+  --ui-ar: 0.7;
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ui-ar);
+}
+.shift-concept {
+  margin: 0;
+  color: var(--color-muted);
+}
+.sh-note,
+.sh-grid {
+  display: none;
+}
+
+/* ── the interface: every fragment at its finished place (phone layout by default) ── */
+.sh-el {
+  --x: var(--px);
+  --y: var(--py);
+  --w: var(--pw);
+  --h: var(--ph);
+  --fs: var(--pfs, 3.6);
+  --d: var(--pd, block);
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
+  display: var(--d);
+  width: calc(var(--w) * 100%);
+  height: calc(var(--h) * 100%);
+  font-size: calc(var(--fs) * 1cqw);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+@media (min-width: 768px) and (max-aspect-ratio: 9/10) {
+  .shift-ui {
+    --ui-ar: 0.95;
+  }
+  .sh-el {
+    --x: var(--tx);
+    --y: var(--ty);
+    --w: var(--tw);
+    --h: var(--th);
+    --fs: var(--tfs, 2.1);
+    --d: var(--td, block);
+  }
+}
+@media (min-width: 768px) and (min-aspect-ratio: 901/1000) {
+  .shift-ui {
+    --ui-ar: 1.5;
+  }
+  .sh-el {
+    --x: var(--wx);
+    --y: var(--wy);
+    --w: var(--ww);
+    --h: var(--wh);
+    --fs: var(--wfs, 1.45);
+    --d: var(--wd, block);
+  }
+}
+.sh-raw,
+.sh-done {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+}
+/* the finished interface: paper, ink, one red (the raw layer is the scene's: hidden without it) */
+.sh-raw {
+  visibility: hidden;
+}
+.sh-done {
+  color: var(--color-ink);
+}
+.sh-frame .sh-done {
+  background: var(--color-paper);
+}
+.sh-bar .sh-done,
+.sh-rule .sh-done {
+  background: rgb(20 20 20 / 0.14);
+}
+.sh-mark .sh-done {
+  background: var(--color-signal);
+}
+.sh-word {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.sh-nav1 .sh-done::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.35em;
+  height: 2px;
+  background: var(--color-signal);
+}
+.sh-nav1 .sh-done,
+.sh-nav2 .sh-done,
+.sh-nav3 .sh-done {
+  color: rgb(20 20 20 / 0.78);
+}
+.sh-menu-lines,
+.sh-menu-lines::after {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+}
+.sh-menu-lines {
+  position: relative;
+  top: -0.25em;
+}
+.sh-menu-lines::after {
+  content: "";
+  position: relative;
+  top: 0.5em;
+}
+.sh-cta .sh-done,
+.sh-cta .sh-raw {
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+}
+.sh-eyebrow,
+.sh-card-n,
+.sh-poster-n {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+.sh-eyebrow .sh-done {
+  /* ≥ 4.5:1 on the paper surface */
+  color: rgb(20 20 20 / 0.68);
+}
+.sh-h1a,
+.sh-h1b {
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.sh-body {
+  white-space: normal;
+  line-height: 1.35;
+}
+.sh-body .sh-raw,
+.sh-body .sh-done {
+  align-items: flex-start;
+}
+.sh-body .sh-done {
+  color: rgb(20 20 20 / 0.7);
+}
+.sh-button .sh-done {
+  justify-content: center;
+  color: var(--color-paper);
+  background: var(--color-ink);
+}
+.sh-button .sh-raw {
+  justify-content: center;
+  border: 1px solid currentColor;
+}
+.sh-chip .sh-done,
+.sh-chip .sh-raw {
+  border-radius: 999px;
+}
+.sh-chip .sh-done {
+  /* the module paper: legible on the surface and over the image (phones place it there) */
+  background: #e1dbce;
+}
+.sh-chip .sh-raw {
+  border: 1px solid currentColor;
+}
+.sh-chip-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding-inline: 0.85em;
+}
+.sh-chip-label::before {
+  content: "";
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: var(--color-muted);
+}
+.sh-chip-label[data-live]::before {
+  background: var(--color-signal);
+}
+/* without the scene the gesture is over: the state reads «Publicado» */
+.sh-chip [data-part="draft"] {
+  opacity: 0;
+}
+.sh-visual .sh-done {
+  overflow: clip;
+  background: var(--color-ink);
+}
+.sh-poster {
+  position: absolute;
+  inset: 0;
+}
+.sh-sun {
+  position: absolute;
+  right: 12%;
+  top: 22%;
+  width: 34%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-signal);
+}
+.sh-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 64%;
+  height: 1px;
+  background: rgb(237 232 222 / 0.5);
+}
+.sh-poster-n {
+  position: absolute;
+  left: 6%;
+  bottom: 8%;
+  font-size: 0.8em;
+  color: rgb(237 232 222 / 0.7);
+}
+.sh-cross {
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  background:
+    linear-gradient(to top right, transparent calc(50% - 0.6px), currentColor 50%, transparent calc(50% + 0.6px)),
+    linear-gradient(to bottom right, transparent calc(50% - 0.6px), currentColor 50%, transparent calc(50% + 0.6px));
+}
+.sh-card1 .sh-done,
+.sh-card2 .sh-done,
+.sh-card3 .sh-done {
+  background: #e1dbce;
+}
+:is(.sh-card1, .sh-card2, .sh-card3) :is(.sh-raw, .sh-done) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
+  align-items: end;
+  gap: 0.35em 0.6em;
+  padding: 0.8em;
+}
+:is(.sh-card1, .sh-card2, .sh-card3) .sh-raw {
+  border: 1px solid currentColor;
+}
+.sh-thumb {
+  grid-column: 1 / -1;
+  align-self: start;
+  width: 2.6em;
+  aspect-ratio: 1;
+  border: 1px solid currentColor;
+}
+.sh-done .sh-thumb {
+  border: 0;
+  background: var(--color-ink);
+}
+.sh-done .sh-thumb[data-shape="1"] {
+  border-radius: 50%;
+  background: var(--color-signal);
+}
+.sh-done .sh-thumb[data-shape="2"] {
+  background: linear-gradient(to top, var(--color-ink) 50%, transparent 50%);
+  box-shadow: inset 0 0 0 1px var(--color-ink);
+}
+.sh-card-n {
+  font-size: 0.72em;
+  /* ≥ 4.5:1 on the module paper */
+  opacity: 0.72;
+}
+.sh-card-t {
+  font-weight: 600;
+}
+/* the module that answers the gesture */
+.sh-answer {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1.5px var(--color-ink);
+  pointer-events: none;
+}
+.sh-answer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: var(--color-signal);
+}
+.sh-toggle .sh-raw,
+.sh-toggle .sh-done {
+  justify-content: space-between;
+  gap: 0.8em;
+}
+.sh-track {
+  position: relative;
+  flex: none;
+  width: 2.7em;
+  height: 1.45em;
+  border-radius: 999px;
+  overflow: clip;
+}
+.sh-raw .sh-track {
+  border: 1px solid currentColor;
+}
+.sh-done .sh-track {
+  background: rgb(20 20 20 / 0.18);
+}
+.sh-track-on {
+  position: absolute;
+  inset: 0;
+  background: var(--color-signal);
+}
+.sh-knob {
+  position: absolute;
+  left: 0.18em;
+  top: 0.18em;
+  width: 1.09em;
+  height: 1.09em;
+  border-radius: 50%;
+}
+.sh-raw .sh-knob {
+  border: 1px solid currentColor;
+}
+.sh-done .sh-knob {
+  background: var(--color-paper);
+  box-shadow: 0 0 0 1px rgb(20 20 20 / 0.12);
+}
+/* without the scene the switch is on */
+.sh-done .sh-knob {
+  transform: translateX(1.24em);
+}
+.sh-meter {
+  position: absolute;
+  inset: 0;
+}
+.sh-raw .sh-meter {
+  border-top: 1px dashed currentColor;
+}
+.sh-done .sh-meter {
+  background: rgb(20 20 20 / 0.12);
+}
+.sh-meter-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-signal);
+}
+
+/* ── with motion ────────────────────────────────────────────────────────────── */
+@media (min-width: 360px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+  html.js .shift:has(.shift-stage[data-anim]) {
+    padding: 0;
+  }
+  /* the pin's length from the first paint: the stage plus SHIFT_UNITS (2.6) gestures of the tier
+     (lib/tiers pinLengthVh: 60vh sm · 70vh md · 80vh lg/xl); the scene sets the same height */
+  html.js .shift-pin:has(> .shift-stage[data-anim]) {
+    height: calc(100svh + 156vh);
+  }
+  @media (min-width: 768px) {
+    html.js .shift-pin:has(> .shift-stage[data-anim]) {
+      height: calc(100svh + 182vh);
+    }
+  }
+  @media (min-width: 1024px) {
+    html.js .shift-pin:has(> .shift-stage[data-anim]) {
+      height: calc(100svh + 208vh);
+    }
+  }
+  html.js .shift-stage[data-anim] {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    background: var(--color-black);
+  }
+  html.js .shift-stage[data-anim] .shift-space {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: block;
+    width: min(100%, 46.2svh);
+    max-width: none;
+    aspect-ratio: 390 / 844;
+    margin: 0;
+    transform: translate(-50%, -50%);
+    container-type: size;
+  }
+  html.js .shift-stage[data-anim] .shift-title {
+    position: absolute;
+    left: 6%;
+    top: 8.6%;
+    font-size: max(11px, 2.8cqw);
+  }
+  html.js .shift-stage[data-anim] .shift-acts {
+    position: absolute;
+    left: 6%;
+    top: 12.4%;
+    display: block;
+    width: 88%;
+  }
+  html.js .shift-stage[data-anim] .shift-act {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    gap: 1.6cqw;
+  }
+  html.js .shift-stage[data-anim] .shift-act:not([data-a="01"]) {
+    opacity: 0;
+  }
+  html.js .shift-stage[data-anim] .shift-act-n {
+    font-size: max(11px, 2.8cqw);
+  }
+  html.js .shift-stage[data-anim] .shift-line {
+    font-size: 9.6cqw;
+    line-height: 0.98;
+  }
+  html.js .shift-stage[data-anim] .shift-figure {
+    position: absolute;
+    left: 6%;
+    top: 30%;
+    width: 88%;
+    gap: 2.6cqw;
+    perspective: 2400px;
+    perspective-origin: 50% 50%;
+  }
+  html.js .shift-stage[data-anim] .shift-ui {
+    transform-style: preserve-3d;
+  }
+  html.js .shift-stage[data-anim] .shift-concept {
+    opacity: 0;
+  }
+  html.js .shift-stage[data-anim] .sh-el {
+    will-change: transform;
+  }
+
+  /* raw (acts I–II): outlines and muted type on black; the finished layer waits */
+  html.js .shift-stage[data-anim] .sh-raw {
+    visibility: visible;
+    color: rgb(237 232 222 / 0.62);
+  }
+  html.js .shift-stage[data-anim] .sh-done {
+    opacity: 0;
+  }
+  html.js .shift-stage[data-anim] .sh-frame .sh-raw {
+    border: 1px solid rgb(237 232 222 / 0.32);
+  }
+  html.js .shift-stage[data-anim] :is(.sh-bar, .sh-rule) .sh-raw {
+    background: rgb(237 232 222 / 0.5);
+  }
+  html.js .shift-stage[data-anim] .sh-mark .sh-raw {
+    border: 1.5px solid var(--color-signal);
+  }
+  html.js .shift-stage[data-anim] :is(.sh-h1a, .sh-h1b, .sh-word) .sh-raw {
+    color: var(--color-paper-2);
+  }
+  /* the raw type stays AA on black at every pose (it is read as part of the image, but it is type) */
+  html.js .shift-stage[data-anim] .sh-raw .sh-card-n {
+    opacity: 1;
+  }
+  html.js .shift-stage[data-anim] .sh-chip [data-part="draft"] {
+    opacity: 1;
+  }
+  html.js .shift-stage[data-anim] .sh-done .sh-knob {
+    transform: none;
+  }
+
+  /* the grid the fragments find (act II), as many columns as the variant draws */
+  html.js .shift-stage[data-anim] .sh-grid {
+    position: absolute;
+    inset: 0 6%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4%;
+    pointer-events: none;
+  }
+  html.js .shift-stage[data-anim] .sh-col {
+    opacity: 0;
+    background: rgb(230 59 46 / 0.12);
+    box-shadow:
+      inset 1px 0 0 rgb(230 59 46 / 0.4),
+      inset -1px 0 0 rgb(230 59 46 / 0.4);
+  }
+  html.js .shift-stage[data-anim] .sh-col:nth-child(n + 5) {
+    display: none;
+  }
+
+  /* act IV: the annotations */
+  html.js .shift-stage[data-anim] .sh-note {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: max(11px, 2.6cqw);
+    letter-spacing: 0.06em;
+    color: var(--color-paper-2);
+    white-space: nowrap;
+    opacity: 0;
+  }
+  html.js .shift-stage[data-anim] .sh-note-line {
+    flex: none;
+    width: 5cqw;
+    height: 1px;
+    background: var(--color-signal);
+  }
+  html.js .shift-stage[data-anim] .sh-note-v:not([data-v="phone"]) {
+    display: none;
+  }
+  /* phones: the annotations above the interface (it steps back from the act lines), the caption under it */
+  html.js .shift-stage[data-anim] .sh-note[data-n="grid"] {
+    left: 6%;
+    top: 28.6%;
+  }
+  html.js .shift-stage[data-anim] .sh-note[data-n="state"] {
+    left: 54%;
+    top: 28.6%;
+  }
+  html.js .shift-stage[data-anim] .sh-note[data-n="type"] {
+    display: none;
+  }
+
+  /* portrait tablets */
+  @media (min-width: 768px) and (max-aspect-ratio: 9/10) {
+    html.js .shift-stage[data-anim] .shift-space {
+      width: min(100%, 69.5svh);
+      aspect-ratio: 820 / 1180;
+    }
+    html.js .shift-stage[data-anim] .shift-title {
+      left: 8%;
+      top: 6.2%;
+      font-size: max(11px, 1.6cqw);
+    }
+    html.js .shift-stage[data-anim] .shift-acts {
+      left: 8%;
+      top: 9.4%;
+      width: 84%;
+    }
+    html.js .shift-stage[data-anim] .shift-act-n {
+      font-size: max(11px, 1.6cqw);
+    }
+    html.js .shift-stage[data-anim] .shift-line {
+      font-size: 6.6cqw;
+    }
+    html.js .shift-stage[data-anim] .shift-figure {
+      left: 8%;
+      top: 25%;
+      width: 84%;
+      gap: 1.6cqw;
+    }
+    html.js .shift-stage[data-anim] .sh-grid {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 2.4%;
+      inset: 0 5%;
+    }
+    html.js .shift-stage[data-anim] .sh-col:nth-child(n + 5) {
+      display: block;
+    }
+    html.js .shift-stage[data-anim] .sh-col:nth-child(n + 9) {
+      display: none;
+    }
+    html.js .shift-stage[data-anim] .sh-note {
+      font-size: max(11px, 1.5cqw);
+      gap: 1cqw;
+    }
+    html.js .shift-stage[data-anim] .sh-note-line {
+      width: 3cqw;
+    }
+    html.js .shift-stage[data-anim] .sh-note-v[data-v="phone"] {
+      display: none;
+    }
+    html.js .shift-stage[data-anim] .sh-note-v[data-v="tablet"] {
+      display: inline;
+    }
+    html.js .shift-stage[data-anim] .sh-note[data-n="grid"] {
+      left: 8%;
+      top: 91.6%;
+    }
+    html.js .shift-stage[data-anim] .sh-note[data-n="type"] {
+      left: 38%;
+      top: 91.6%;
+      display: flex;
+    }
+    html.js .shift-stage[data-anim] .sh-note[data-n="state"] {
+      left: 72%;
+      top: 91.6%;
+    }
+  }
+
+  /* landscape screens */
+  @media (min-width: 768px) and (min-aspect-ratio: 901/1000) {
+    html.js .shift-stage[data-anim] .shift-space {
+      width: min(100%, 160svh);
+      aspect-ratio: 1440 / 900;
+    }
+    html.js .shift-stage[data-anim] .shift-title {
+      left: 6%;
+      top: 11%;
+      font-size: max(11px, 0.85cqw);
+    }
+    html.js .shift-stage[data-anim] .shift-acts {
+      left: 6%;
+      top: 31%;
+      width: 29%;
+    }
+    html.js .shift-stage[data-anim] .shift-act {
+      gap: 1.2cqw;
+    }
+    html.js .shift-stage[data-anim] .shift-act-n {
+      font-size: max(11px, 0.85cqw);
+    }
+    html.js .shift-stage[data-anim] .shift-line {
+      font-size: 4.6cqw;
+    }
+    html.js .shift-stage[data-anim] .shift-figure {
+      left: 38%;
+      top: 15%;
+      width: 57%;
+      gap: 1cqw;
+    }
+    html.js .shift-stage[data-anim] .sh-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1.6%;
+      inset: 0 4%;
+    }
+    html.js .shift-stage[data-anim] .sh-col:nth-child(n + 5) {
+      display: block;
+    }
+    html.js .shift-stage[data-anim] .sh-note {
+      font-size: max(11px, 0.85cqw);
+      gap: 0.6cqw;
+    }
+    html.js .shift-stage[data-anim] .sh-note-line {
+      width: 2cqw;
+    }
+    html.js .shift-stage[data-anim] .sh-note-v[data-v="phone"] {
+      display: none;
+    }
+    html.js .shift-stage[data-anim] .sh-note-v[data-v="wide"] {
+      display: inline;
+    }
+    html.js .shift-stage[data-anim] .sh-note[data-n="grid"] {
+      left: 38%;
+      top: 10.4%;
+    }
+    html.js .shift-stage[data-anim] .sh-note[data-n="type"] {
+      left: 66%;
+      top: 10.4%;
+      display: flex;
+    }
+    html.js .shift-stage[data-anim] .sh-note[data-n="state"] {
+      left: auto;
+      right: 9%;
+      top: 74.4%;
+    }
+  }
+}
+
 /* ── worlds — without JS: the static SCREEN poster and the world copy, readable ─── */
 .world {
   position: relative;
