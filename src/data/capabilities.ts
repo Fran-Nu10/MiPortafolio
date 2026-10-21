@@ -3,12 +3,16 @@ import type { Capability } from "./types";
 /**
  * Six capabilities (Content Master 00-D and 11; Spec §12). Five core, one extended.
  * 06 has no live element and no metrics until a real, authorized campaign exists.
+ * Names follow the brief of 2026-10-21 (docs/23 §4: «Nivel 1 capacidad · Nivel 2 valor comercial»).
+ * Each statement keeps its approved clause (Content Master 11) verbatim and adds, after the colon,
+ * what the client gets — no new fact, no result, no figure. 06 is the brief's own text. Content
+ * Master 22 records them as proposals to confirm.
  */
 export const CAPABILITIES: Capability[] = [
   {
     index: 1,
     name: "Producto",
-    statement: "Definir qué se construye, para quién y en qué orden.",
+    statement: "Definir qué se construye, para quién y en qué orden: cada decisión al servicio del negocio.",
     group: "core",
     attribution: { label: "TravelSuite360 · 01", href: "/trabajo/travelsuite360" },
     evidence: { variant: "element", element: "ts-flow" },
@@ -16,7 +20,7 @@ export const CAPABILITIES: Capability[] = [
   {
     index: 2,
     name: "Ingeniería web",
-    statement: "Front, back y datos en producción, no en demo.",
+    statement: "Front, back y datos en producción, no en demo: una base sólida para que el negocio opere y crezca.",
     group: "core",
     attribution: { label: "Santi Nuca · Rayo Smash · Chef Arturo" },
     evidence: { variant: "element", element: "posters" },
@@ -24,15 +28,15 @@ export const CAPABILITIES: Capability[] = [
   {
     index: 3,
     name: "Comercio digital",
-    statement: "Del catálogo al cobro sin fricción.",
+    statement: "Del catálogo al cobro sin fricción: que elegir y comprar sea simple.",
     group: "core",
     attribution: { label: "Chef Arturo · 04", href: "/trabajo/chef-arturo" },
     evidence: { variant: "element", element: "chef-commerce" },
   },
   {
     index: 4,
-    name: "IA + automatización",
-    statement: "Extraer datos de mensajes reales y convertirlos en trabajo hecho.",
+    name: "IA y automatización",
+    statement: "Extraer datos de mensajes reales y convertirlos en trabajo hecho: menos tareas repetitivas para el equipo.",
     group: "core",
     attribution: { label: "TravelSuite360 · Prospector" },
     evidence: { variant: "element", element: "ts-extraction" },
@@ -40,15 +44,16 @@ export const CAPABILITIES: Capability[] = [
   {
     index: 5,
     name: "Experiencias interactivas",
-    statement: "Movimiento con propósito: cuando el scroll cuenta algo.",
+    statement: "Movimiento con propósito: cuando el scroll cuenta algo, el producto se recuerda.",
     group: "core",
     attribution: { label: "Rayo Smash · 02", href: "/trabajo/rayo-smash" },
     evidence: { variant: "element", element: "rayo-layers" },
   },
   {
     index: 6,
-    name: "Adquisición de clientes",
-    statement: "Publicidad en Meta Ads, orientada a ventas.",
+    name: "Meta Ads y crecimiento",
+    statement:
+      "Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.",
     group: "extended",
     attribution: { label: "Meta Ads" },
     evidence: { variant: "typographic", tag: "Meta Ads" },

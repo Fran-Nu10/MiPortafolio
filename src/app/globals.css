@@ -2212,27 +2212,38 @@ html.js .at-work-stage[data-anim] {
 }
 .capabilities-list {
   display: grid;
-  gap: 32px;
+  gap: 40px 32px;
   margin-top: 32px;
   list-style: none;
   padding: 0;
+  counter-reset: cap;
 }
 @media (min-width: 768px) {
   .capabilities-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* the card: capability → what it is for → its evidence (a region of its own) → its reference (docs/23 §4) */
 .capability {
   position: relative;
   display: grid;
   gap: 8px;
   align-content: start;
-  padding-top: 16px;
+  padding-top: 20px;
   border-top: 1px solid var(--rule-strong);
+  counter-increment: cap;
 }
 .capability article {
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  align-content: start;
+}
+.capability article::before {
+  content: counter(cap, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: var(--tracking-micro);
+  color: var(--color-muted);
 }
 .capability[data-group="extended"] {
   /* set apart by space and the sub-kicker only — same type, size and colour */
@@ -2241,29 +2252,56 @@ html.js .at-work-stage[data-anim] {
 @media (min-width: 768px) {
   .capability[data-group="extended"] {
     grid-column: 1 / -1;
-    max-width: calc(50% - 16px);
+    max-width: min(100%, 720px);
   }
 }
 .capability-sub {
   margin-bottom: 8px;
 }
 .capability-name {
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1.2;
+  font-size: clamp(28px, 2.7vw, 40px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 .capability-statement {
-  max-width: 34ch;
+  max-width: 38ch;
+  font-size: var(--type-body);
+  line-height: 1.45;
+  color: var(--color-paper-2);
 }
 .capability[data-evidence="typographic"] .capability-statement {
   font-size: var(--type-lead);
   line-height: 1.35;
+  color: var(--color-paper);
+}
+/* the evidence lives inside its own frame: it never reaches the title or the text */
+.capability-evidence {
+  aspect-ratio: 16 / 10;
+  padding: 16px;
+  overflow: clip;
+  border: 1px solid var(--rule-strong);
+  background: var(--color-panel);
 }
 .capability-evidence:empty {
   display: none;
 }
 .capability-attr {
   justify-self: start;
+  width: 100%;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+/* 06 · Meta Ads is part of the offer, not a footnote: the one capability with a red rule and room */
+.capability[data-group="extended"] {
+  border-top: 2px solid var(--color-signal);
+}
+.capability[data-group="extended"] .capability-name {
+  font-size: clamp(30px, 3.1vw, 46px);
+}
+.capability[data-group="extended"] .capability-statement {
+  max-width: 34ch;
 }
 a.capability-attr {
   /* a link is a target: ≥ 44px tall without moving the text (Spec §15) */
@@ -2313,7 +2351,8 @@ a.capability-attr {
     width: max-content;
     max-width: none;
     margin: 0;
-    padding: 0 0 0 var(--gutter);
+    /* the kicker sits at the top: the cards centre in what is left */
+    padding: 72px 0 0 var(--gutter);
     will-change: transform;
   }
   html.js .capabilities-stage[data-anim] .capability {
@@ -2323,6 +2362,8 @@ a.capability-attr {
     max-width: none;
   }
   html.js .capabilities-stage[data-anim] .capability[data-group="extended"] {
+    flex-basis: min(600px, 42vw);
+    width: min(600px, 42vw);
     margin-left: 64px;
   }
   html.js .capabilities-stage[data-anim] .capability-sub {
@@ -2333,10 +2374,26 @@ a.capability-attr {
   }
 }
 
+/* short viewports: a flatter frame and a smaller title keep the card clear of the kicker */
+@media (max-height: 720px) {
+  .capability-evidence {
+    aspect-ratio: 2 / 1;
+    padding: 12px;
+  }
+  .capability-name {
+    font-size: clamp(24px, 2.3vw, 32px);
+  }
+  .capability[data-group="extended"] .capability-name {
+    font-size: clamp(28px, 3vw, 44px);
+  }
+}
+
+
 /* ── evidence elements (live, aria-hidden; a loop runs only while its card is in view) ── */
 .ev {
   position: relative;
-  height: 180px;
+  height: 100%;
+  min-height: 120px;
   overflow: clip;
 }
 .ev [data-ev-step] {

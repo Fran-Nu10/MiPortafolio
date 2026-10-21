@@ -173,17 +173,19 @@ describe("rule 5 · capabilities", () => {
       "Producto",
       "Ingeniería web",
       "Comercio digital",
-      "IA + automatización",
+      "IA y automatización",
       "Experiencias interactivas",
-      "Adquisición de clientes",
+      "Meta Ads y crecimiento",
     ]);
     expect(CAPABILITIES.filter((c) => c.group === "core")).toHaveLength(5);
     expect(CAPABILITIES[5].group).toBe("extended");
   });
 
-  it("06 is «Publicidad en Meta Ads, orientada a ventas.» with no numbers", () => {
+  it("06 is «Meta Ads y crecimiento» (brief of 2026-10-21) with no numbers and no promised results", () => {
     const c6 = CAPABILITIES[5];
-    expect(c6.statement).toBe("Publicidad en Meta Ads, orientada a ventas.");
+    expect(c6.statement).toBe(
+      "Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.",
+    );
     expect(c6.evidence.variant).toBe("typographic");
     expect(`${c6.name} ${c6.statement} ${c6.attribution.label}`).not.toMatch(/\d/);
   });

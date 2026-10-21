@@ -71,7 +71,7 @@ test.describe("without JavaScript", () => {
       "Tienda real, en línea.",
       "Fotografía · Santi Nuca",
       "Todo lo anterior pasó por las mismas manos.",
-      "Publicidad en Meta Ads, orientada a ventas.",
+      "Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.",
       "Ahora, el tuyo.",
     ]) {
       await expect(page.getByText(text, { exact: true }).filter({ visible: true }).first(), text).toBeVisible();

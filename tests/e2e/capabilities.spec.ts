@@ -173,8 +173,8 @@ test.describe("evidence", () => {
     await open(page);
     const six = page.locator('#capacidades [data-capability="6"]');
     await expect(six).toHaveAttribute("data-evidence", "typographic");
-    await expect(six.locator("h3")).toHaveText("Adquisición de clientes");
-    await expect(six.locator(".capability-statement")).toHaveText("Publicidad en Meta Ads, orientada a ventas.");
+    await expect(six.locator("h3")).toHaveText("Meta Ads y crecimiento");
+    await expect(six.locator(".capability-statement")).toHaveText("Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.");
     await expect(six.locator(".capability-attr")).toHaveText("Meta Ads");
     expect(await six.locator("img, video, [data-placeholder]").count()).toBe(0);
     expect(await six.innerText()).not.toMatch(/\d/);
@@ -276,7 +276,7 @@ test.describe("profile (Spec §12, Content Master 13)", () => {
     expect(em.w).toBeGreaterThan(em.p);
     expect(em.tag).toBe("STRONG");
     // the sixth capability's rail card is not duplicated here: the profile adds the human side only
-    expect(await s.innerText()).not.toContain("orientada a ventas");
+    expect(await s.innerText()).not.toContain("Un buen producto merece ser descubierto");
   });
 
   test("one reveal on entry: blocks clipped until the section reaches 75% of the viewport, then shown whole; none under reduced motion", async ({ page }) => {
@@ -323,7 +323,7 @@ test.describe("accessibility", () => {
     const links = await page.locator("#capacidades .capability-attr[href]").evaluateAll((l) => l.map((a) => (a as HTMLAnchorElement).getAttribute("href")));
     expect(links).toEqual(["/trabajo/travelsuite360", "/trabajo/chef-arturo", "/trabajo/rayo-smash"]);
     expect(await page.locator("#capacidades h2").innerText()).toBe("Capacidades");
-    expect(await page.locator("#capacidades h3").allInnerTexts()).toEqual(["Producto", "Ingeniería web", "Comercio digital", "IA + automatización", "Experiencias interactivas", "Adquisición de clientes"]);
+    expect(await page.locator("#capacidades h3").allInnerTexts()).toEqual(["Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Meta Ads y crecimiento"]);
   });
 
   test("an attribution link enters its world in place (pushState, no reload)", async ({ page }) => {
@@ -352,7 +352,7 @@ test.describe("without JavaScript", () => {
     await page.goto("/");
     // textContent: the mono labels are uppercased by CSS
     const text = (await page.locator("#capacidades").textContent()) ?? "";
-    const order = ["Todo lo anterior pasó por las mismas manos.", "Cinco cosas que se repiten", "Producto", "Ingeniería web", "Comercio digital", "IA + automatización", "Experiencias interactivas", "Después de publicar", "Adquisición de clientes", "Meta Ads"];
+    const order = ["Todo lo anterior pasó por las mismas manos.", "Cinco cosas que se repiten", "Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Después de publicar", "Meta Ads y crecimiento", "Meta Ads"];
     let at = -1;
     for (const o of order) {
       const i = text.indexOf(o, at + 1);
