@@ -200,9 +200,52 @@ function restoreView() {
 function anchored(root: HTMLElement, fn: () => void) {
   // a scene below the viewport's center grows below the visitor: nothing to hold
   if (root.getBoundingClientRect().top > window.innerHeight / 2) return fn();
+  const own = !reading;
   holdView();
   fn();
   restoreView();
+  // a hold this build took is released once it is restored, unless a refresh is still coming (it
+  // releases it then). A presized lazy build queues none: its hold used to outlive it, and the next
+  // lazy build restored that stale view — a jump from Perfil up to THE SHIFT was pulled back to
+  // Perfil (docs/25 §8)
+  if (own && !refreshQueued && !pending.length && !draining) reading = null;
+}
+
+/**
+ * A width change rebuilds every scene (one timer each) while ScrollTrigger runs its own refresh, which
+ * measures with the document scrolled to 0. Each scene used to read `scrollY` when its own timer fired
+ * — sometimes in the middle of that, sometimes after another scene had shrunk the document — and put
+ * the visitor back there: since THE SHIFT a resize could land at the very top (docs/25 §8). The section
+ * at the viewport's center is noted once, on the first resize event (before any rebuild or media-query
+ * flip), and the visitor is put back on it once every rebuild and refresh has settled.
+ */
+let resizeAnchor: { el: HTMLElement; top: number } | null = null;
+let resizeSettle = 0;
+let resizeListening = false;
+function restoreResize() {
+  const a = resizeAnchor;
+  if (!a?.el.isConnected) return;
+  const delta = a.el.getBoundingClientRect().top - a.top;
+  if (Math.abs(delta) >= 1) window.scrollBy({ top: delta, behavior: "instant" });
+}
+function noteResize() {
+  window.clearTimeout(resizeSettle);
+  if (!resizeListening) {
+    resizeListening = true;
+    // every refresh while the resize settles puts the visitor back at once (no frame at the top)
+    ScrollTrigger.addEventListener("refresh", restoreResize);
+  }
+  if (resizeAnchor || window.scrollY <= 0) return;
+  const el = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)?.closest<HTMLElement>("[data-section]");
+  if (el) resizeAnchor = { el, top: el.getBoundingClientRect().top };
+}
+function settleResize() {
+  restoreResize();
+  window.clearTimeout(resizeSettle);
+  resizeSettle = window.setTimeout(() => {
+    restoreResize();
+    resizeAnchor = null;
+  }, 450);
 }
 
 /**
@@ -456,15 +499,16 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
     let timer = 0;
     const onResize = () => {
       if (Math.abs(window.innerWidth - width) < 2) return;
+      noteResize();
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
         width = window.innerWidth;
         // still queued: it will build once, at the new width
-        if (cancelDeferred) return;
-        const y = window.scrollY;
-        mm?.revert();
-        setup();
-        window.scrollTo(0, y);
+        if (!cancelDeferred) {
+          mm?.revert();
+          setup();
+        }
+        settleResize();
       }, 220);
     };
     window.addEventListener("resize", onResize);
