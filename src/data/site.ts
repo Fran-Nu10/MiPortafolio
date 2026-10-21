@@ -1,7 +1,9 @@
 /**
  * Global copy (Spec §21 `Site`). Every string is verbatim from the Content Master rev 26:
  * 03 navigation · 04 hero · 05 reel · 11/14 capabilities seam · 15 CTA · 16 microcopy · 17 meta.
- * `declaration` is Content Master 20 (approved by Franco on 2026-10-13).
+ * `declaration` is Content Master 20 (approved by Franco on 2026-10-13). The firma «× Crecimiento», the
+ * hero line, the reel heading, the capabilities kicker, the CTA support and the meta lines were
+ * updated by the positioning pass of 2026-10-21 (Content Master 21).
  */
 export const SITE = {
   name: "Franco Núñez",
@@ -9,7 +11,7 @@ export const SITE = {
 
   nav: {
     brand: "Franco Núñez",
-    firma: "Producto × Diseño × Ingeniería",
+    firma: "Producto × Diseño × Ingeniería × Crecimiento",
     work: "Trabajo",
     profile: "Perfil",
     /** without a period in the nav, with a period in the section */
@@ -21,8 +23,9 @@ export const SITE = {
 
   hero: {
     name: ["FRANCO", "NÚÑEZ"] as const,
-    firma: "Producto × Diseño × Ingeniería",
-    support: "Diseña y construye productos digitales, de la idea al sistema en producción.",
+    firma: "Producto × Diseño × Ingeniería × Crecimiento",
+    /** option A, approved 2026-10-21 (Content Master 21): an explicit exception to §02 «transformar ideas» */
+    support: "Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.",
     /** red: the hero is the first reveal */
     index: "01",
     /** the opening shows only the light band and "00" */
@@ -30,14 +33,17 @@ export const SITE = {
   },
 
   reel: {
-    label: "Trabajo · 01–04",
-    heading: "Cuatro productos.",
+    /** the range «01–NN» is added from the real number of projects (lib/content `rangeLabel`) */
+    label: "Trabajo",
+    /** no number: the selection keeps growing (Content Master 21) */
+    heading: "Trabajo seleccionado.",
     enter: "Ver caso",
     open: "Abrir ↗",
     /** first visit, disappears after the first interaction */
     hint: "Arrastrá o usá ← →",
     /** resting navigation help */
-    restHint: "arrastrá · ← → · 1–4",
+    /** the last key is the real number of projects */
+    restHint: (total: number) => `arrastrá · ← → · 1–${total}`,
     prev: "Proyecto anterior",
     next: "Proyecto siguiente",
     /** accessible names of the reel's structure (Spec §06 DOM) */
@@ -63,7 +69,7 @@ export const SITE = {
     /** sr-only section heading: the rail words are the visual title */
     heading: "Capacidades",
     seam: "Todo lo anterior pasó por las mismas manos.",
-    kicker: "Cinco cosas que se repiten en los cuatro productos. Y una sexta, después de publicar.",
+    kicker: "Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.",
     subKicker: "Después de publicar",
   },
 
@@ -101,7 +107,7 @@ export const SITE = {
 
   cta: {
     title: "Ahora, el tuyo.",
-    support: "Cuatro productos, de la idea a producción. El quinto todavía está en blanco.",
+    support: "Ya viste lo que puedo construir. Ahora contame qué tenés en mente. Podemos empezar con una idea, un negocio que quiere crecer o un producto que necesita dar el siguiente paso.",
     fields: {
       name: "Nombre",
       email: "Email",
@@ -128,9 +134,9 @@ export const SITE = {
   meta: {
     title: "Franco Núñez — Producto × Diseño × Ingeniería",
     description:
-      "Diseña y construye productos digitales, de la idea al sistema en producción. Socio de TravelSuite360, a cargo del software. Uruguay.",
+      "Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades. Socio de TravelSuite360, a cargo del software. Uruguay.",
     ogTitle: "Franco Núñez",
-    ogDescription: "Cuatro productos digitales, de la idea a producción. El quinto todavía está en blanco.",
+    ogDescription: "Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.",
     ogImage: "og.home",
     /** JSON-LD Person (home only). url and sameAs are [CONFIRMAR] → omitted. */
     person: { name: "Franco Núñez", jobTitle: "Producto × Diseño × Ingeniería", addressCountry: "UY" },

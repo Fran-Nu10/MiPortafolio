@@ -8,7 +8,7 @@ import { CHEF_PHOTOS } from "@/data/chef-photos";
 import { SITE } from "@/data/site";
 import type { Project, ProjectSlug } from "@/data/types";
 import { resolveAsset } from "@/lib/assets";
-import { confirmed, indexLabel, liveLabel, miniLabel, proofCaption, routeErrorText, stackLine } from "@/lib/content";
+import { confirmed, indexLabel, liveLabel, miniLabel, proofCaption, rangeLabel, routeErrorText, stackLine } from "@/lib/content";
 import type { SectionId } from "@/lib/journey-store";
 import { pathForSection } from "@/lib/route-sync";
 import { TS_KEY_WORDS, splitField, splitList } from "@/lib/ts-world";
@@ -58,6 +58,8 @@ const FEATURES = {
  */
 export function Journey({ initial }: { initial: ProjectSlug | null }) {
   const total = PROJECTS.length;
+  // "Trabajo · 01–NN": the range follows the real number of projects
+  const reelName = rangeLabel(SITE.reel.label, total);
 
   const reelItems: ReelItemView[] = PROJECTS.map((p) => ({
     id: p.id,
@@ -136,7 +138,7 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
           cta: SITE.nav.cta,
           projects: PROJECTS.map((p) => ({ id: p.id, index: p.index, name: p.name })),
           overlay: {
-            title: SITE.reel.label,
+            title: reelName,
             close: SITE.nav.close,
             items: PROJECTS.map((p) => ({ id: p.id, label: miniLabel(p.index, p.name), href: pathForSection(p.id), poster: resolveAsset(p.reel.poster) })),
           },
@@ -153,10 +155,10 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
         ) : null}
         <OpeningHero hero={SITE.hero} portrait={resolveAsset("franco.hero")} grain={resolveAsset("site.grain")} skipOpening={initial !== null} />
         <ProjectReel
-          label={SITE.reel.label}
+          label={reelName}
           heading={SITE.reel.heading}
           items={reelItems}
-          copy={{ hint: SITE.reel.hint, restHint: SITE.reel.restHint, prev: SITE.reel.prev, next: SITE.reel.next, a11y: SITE.reel.a11y, cursor: SITE.reel.cursor }}
+          copy={{ hint: SITE.reel.hint, restHint: SITE.reel.restHint(total), prev: SITE.reel.prev, next: SITE.reel.next, a11y: SITE.reel.a11y, cursor: SITE.reel.cursor }}
         />
         {/* no Suspense boundaries here (tried in Phase 12 for progressive hydration): React outlines
             large boundaries into hidden nodes revealed by a script, which empties the no-JS document */}
@@ -188,7 +190,8 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
           view={{
             label: PROFILE.label,
             core: PROFILE.core,
-            extension: PROFILE.extension,
+            body: PROFILE.body,
+            ads: PROFILE.ads,
             stack: confirmed(PROFILE.stack),
             contacts,
           }}

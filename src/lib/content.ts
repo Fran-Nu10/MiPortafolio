@@ -18,6 +18,11 @@ export function indexLabel(index: number, total: number): string {
   return `${pad2(index)} / ${pad2(total)}`;
 }
 
+/** "Trabajo · 01–NN": the range follows the real number of projects (the selection grows) */
+export function rangeLabel(name: string, total: number): string {
+  return `${name} · 01–${pad2(total)}`;
+}
+
 /** reel neighbour: "02 · Rayo Smash" (Content Master 05) */
 export function miniLabel(index: number, name: string): string {
   return `${pad2(index)} · ${name}`;

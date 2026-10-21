@@ -9,7 +9,7 @@ export interface FinalCtaView {
 }
 
 /**
- * S15 · "Ahora, el tuyo." (Spec §14). The fifth, blank project. Never pinned: inputs,
+ * S15 · "Ahora, el tuyo." (Spec §14). The invitation after the selected work. Never pinned: inputs,
  * keyboard and focus scrolling behave natively. The minimal footer sits above the form.
  */
 export function FinalCta({ view, renderedAt }: { view: FinalCtaView; renderedAt: number }) {
