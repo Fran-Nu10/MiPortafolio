@@ -217,7 +217,7 @@ export function ProjectReel({ label, heading, items, copy }: { label: string; he
       const v = e.type === "pointercancel" ? 0 : velocity([...d.samples, { x: e.clientX, t: e.timeStamp }]);
       goTo(e.type === "pointercancel" ? i : releaseIndex(i, count, d.dx, v, geo.current.widths[i] ?? 1));
     };
-    // click / tap: a neighbour comes to the center; the active frame enters its world
+    // click / tap: a neighbour comes to the center; the active card (frame and meta) enters its world
     const onClick = (e: MouseEvent) => {
       if (suppressClick) {
         suppressClick = false;
@@ -235,8 +235,8 @@ export function ProjectReel({ label, heading, items, copy }: { label: string; he
         return;
       }
       if (target.closest("a")) return;
-      if (target.closest('[data-part="frame"]')) {
-        // the active frame enters its world: pushState + the jump to its SCREEN state
+      if (target.closest(".reel-piece")) {
+        // the active card enters its world: pushState + the jump to its SCREEN state
         const section = sectionForHref(li.querySelector<HTMLAnchorElement>("[data-enter]")?.getAttribute("href") ?? "");
         if (section) navigate(section, { from: li });
       }

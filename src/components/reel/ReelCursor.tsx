@@ -20,7 +20,8 @@ const enabledNow = () => window.matchMedia(FINE).matches && !prefersReducedMotio
 
 /**
  * The reel cursor (Spec §06, Revelado 2.2 §8): a 22px ring and one word — over the reel the
- * drag word, over the active frame "Ver", over a neighbour an arrow toward it. Fine pointers
+ * drag word, over the active card (frame and metadata: the whole card enters its project) "Ver",
+ * over a neighbour an arrow toward it. Fine pointers
  * only, never on touch, never under reduced motion; an enhancement, never the only cue.
  * One fixed element moved by transform (gsap.quickTo), no React state per frame.
  */
@@ -45,7 +46,7 @@ export function ReelCursor({ viewportRef, labels }: { viewportRef: RefObject<HTM
       const active = viewport.querySelector<HTMLElement>(".reel-item[data-active]");
       const i = Number(li.dataset.index);
       const a = Number(active?.dataset.index ?? 0);
-      if (i === a) return target?.closest('[data-part="frame"]') ? labels.enter : labels.drag;
+      if (i === a) return target?.closest(".reel-piece") ? labels.enter : labels.drag;
       return i > a ? "→" : "←";
     };
     const onMove = (e: PointerEvent) => {

@@ -158,6 +158,21 @@ test.describe("pointer and wheel", () => {
     await expect(page).toHaveURL(/\/trabajo\/rayo-smash$/);
   });
 
+  test("the whole active card is the door: a click on its metadata enters the project too (docs/23 §6)", async ({ page }) => {
+    await toReel(page);
+    // the active card: TravelSuite360. Its name, not its frame
+    const name = page.locator('#trabajo .reel-item[data-active] .reel-name');
+    await expect(name).toHaveText("TravelSuite360");
+    const box = (await name.boundingBox())!;
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(page).toHaveURL(/\/trabajo\/travelsuite360$/);
+    // one door per card: the card itself holds no nested interactive control besides its links
+    await page.goto("/", { waitUntil: "networkidle" });
+    const piece = page.locator("#trabajo .reel-item").first().locator(".reel-piece");
+    expect(await piece.locator("button, [role=button], [tabindex='0']:not(a)").count()).toBe(0);
+    expect(await piece.locator("a a").count()).toBe(0);
+  });
+
   test("the cursor names the action: Ver on the active frame, an arrow on a neighbour", async ({ page, hasTouch }, testInfo) => {
     test.skip(hasTouch || testInfo.project.use.reducedMotion === "reduce", "fine pointers with motion only (Spec §06, §16)");
     await toReel(page);
@@ -165,6 +180,10 @@ test.describe("pointer and wheel", () => {
     await expect(cursor).toHaveCount(1);
     const frame = (await page.locator('#trabajo .reel-item[data-active] [data-part="frame"]').boundingBox())!;
     await page.mouse.move(frame.x + frame.width / 2, frame.y + frame.height / 2, { steps: 4 });
+    await expect(cursor.locator(".reel-cursor-word")).toHaveText("Ver");
+    // over the card's metadata too: the whole card is the door
+    const meta = (await page.locator('#trabajo .reel-item[data-active] .reel-name').boundingBox())!;
+    await page.mouse.move(meta.x + meta.width / 2, meta.y + meta.height / 2, { steps: 4 });
     await expect(cursor.locator(".reel-cursor-word")).toHaveText("Ver");
     const vw = page.viewportSize()!.width;
     await page.mouse.move(Math.min(vw - 20, frame.x + frame.width + 60), frame.y + frame.height / 2, { steps: 4 });

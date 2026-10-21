@@ -11,6 +11,7 @@ import { resolveAsset } from "@/lib/assets";
 import { confirmed, indexLabel, liveLabel, miniLabel, proofCaption, rangeLabel, routeErrorText, stackLine } from "@/lib/content";
 import type { SectionId } from "@/lib/journey-store";
 import { pathForSection } from "@/lib/route-sync";
+import { showreelOf } from "@/lib/showreel";
 import { TS_KEY_WORDS, splitField, splitList } from "@/lib/ts-world";
 import { splitPurchaseLine } from "@/lib/chef-world";
 import { resolveEvidence } from "@/lib/capabilities-rail";
@@ -61,20 +62,23 @@ export function Journey({ initial }: { initial: ProjectSlug | null }) {
   // "Trabajo · 01–NN": the range follows the real number of projects
   const reelName = rangeLabel(SITE.reel.label, total);
 
-  const reelItems: ReelItemView[] = PROJECTS.map((p) => ({
-    id: p.id,
-    indexLabel: indexLabel(p.index, total),
-    miniLabel: miniLabel(p.index, p.name),
-    liveLabel: liveLabel(p.index, total, p.name),
-    name: p.name,
-    reelLine: p.reelLine,
-    relationLine: p.relationLine,
-    aspect: p.reel.aspect,
-    loop: resolveAsset(p.reel.loop),
-    reelLabel: p.a11y.reelLabel,
-    enter: { href: pathForSection(p.id), label: SITE.reel.enter },
-    open: openLink(p),
-  }));
+  const reelItems: ReelItemView[] = PROJECTS.map((p) => {
+    const show = showreelOf(p);
+    return {
+      id: p.id,
+      indexLabel: indexLabel(p.index, total),
+      miniLabel: miniLabel(p.index, p.name),
+      liveLabel: liveLabel(p.index, total, p.name),
+      name: p.name,
+      reelLine: p.reelLine,
+      relationLine: p.relationLine,
+      aspect: p.reel.aspect,
+      loop: resolveAsset(p.reel.loop),
+      reelLabel: p.a11y.reelLabel,
+      enter: { href: show.route, label: SITE.reel.enter },
+      open: openLink(p),
+    };
+  });
 
   const worldFor = (p: Project): WorldView => ({
     id: p.id,

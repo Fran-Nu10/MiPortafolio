@@ -676,9 +676,10 @@ html.js main[data-initial]:not([data-started]) .hero-stage {
   margin-top: 16px;
 }
 .reel-name {
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1.2;
+  font-size: clamp(22px, 1.6vw, 28px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 .reel-relation {
   color: var(--color-muted);
@@ -803,6 +804,35 @@ html.js .reel[data-anim] .reel-frame {
 }
 html.js .reel[data-anim] .reel-item:not([data-active]) .reel-frame {
   opacity: 0.55;
+}
+/* the whole active card is the door to its project (docs/23 §6): the video is the protagonist, the
+   frame is a hairline, and the keyboard's single stop (the «Ver caso» link) lights the whole card */
+html.js .reel[data-anim] .reel-item[data-active] .reel-piece {
+  cursor: pointer;
+}
+html.js .reel[data-anim] .reel-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: box-shadow 200ms var(--ease-settle);
+}
+html.js .reel[data-anim] .reel-item[data-active] .reel-piece:hover .reel-frame::after {
+  box-shadow: inset 0 0 0 1px var(--color-paper);
+}
+/* a slow push-in on the active card's picture (poster or video alike): 2 %, inside the frame's clip */
+html.js .reel[data-anim] .reel-frame > .loop-video {
+  transition: transform 900ms var(--ease-settle);
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html.js .reel[data-anim] .reel-item[data-active] .reel-piece:hover .reel-frame > .loop-video {
+    transform: scale(1.02);
+  }
+}
+html.js .reel[data-anim] .reel-item[data-active] .reel-piece:has([data-enter]:focus-visible) .reel-frame {
+  outline: 2px solid var(--color-paper);
+  outline-offset: 4px;
 }
 /* neighbours turn grey once the settle is complete — never interpolated during a drag */
 html.js .reel[data-anim] .reel-item .media-img {
