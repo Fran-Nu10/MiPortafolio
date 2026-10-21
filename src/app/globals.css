@@ -182,6 +182,20 @@ html:not(.js) .js-only {
   }
 }
 
+/* ── between the home and a case (docs/25): two documents since THE SHIFT. Where the browser can,
+   the page change is one short cross-fade — the reel's frame and the case's first picture share the
+   same rectangle, so the eye stays on it. Never under reduced motion (a cut, as everywhere else). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 240ms;
+    animation-timing-function: var(--ease-settle);
+  }
+}
+
 /* ── media boxes: space reserved by aspect before any byte loads ─────────── */
 .media-box {
   position: relative;
@@ -3995,6 +4009,15 @@ a.capability-attr {
   padding-top: 20px;
   border-top: 1px solid var(--rule);
 }
+/* a case's end (docs/25): the footer inside the page's gutters, under the proof */
+.case-foot {
+  max-width: 1094px;
+  margin-inline: auto;
+  padding: 0 var(--gutter) 32px;
+}
+.case-foot .minimal-footer {
+  margin-top: 0;
+}
 .brief-form {
   display: grid;
   gap: 28px;
@@ -4187,13 +4210,7 @@ a.capability-attr {
   font-size: var(--type-display);
   line-height: 1;
 }
-/* ── no-JS deep link, 404 ─────────────────────────────────────────────────── */
-.deep-link {
-  position: absolute;
-  top: calc(var(--header-h) + 8px);
-  left: var(--gutter);
-  z-index: 10;
-}
+/* ── 404 ──────────────────────────────────────────────────────────────────── */
 .not-found {
   display: grid;
   gap: 16px;

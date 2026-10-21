@@ -21,6 +21,8 @@ export interface ProofView {
   stack?: string;
   open?: { href: string; label: string; aria: string };
   next: { href: string; label: string };
+  /** «← Trabajo»: back to the reel of the home journey (a case is its own document, docs/25) */
+  back?: { href: string; label: string };
   tone: "paper-on-black" | "ink-on-paper";
   /** the window keeps the reel geometry of its project */
   aspect: { desktop: [number, number]; mobile: [number, number] };
@@ -158,6 +160,11 @@ export function ProjectProof({ proof }: { proof: ProofView }) {
           {proof.open ? (
             <a href={proof.open.href} target="_blank" rel="noopener noreferrer" aria-label={proof.open.aria} className="link">
               {proof.open.label}
+            </a>
+          ) : null}
+          {proof.back ? (
+            <a href={proof.back.href} className="link">
+              {proof.back.label}
             </a>
           ) : null}
           <a href={proof.next.href} className="link">

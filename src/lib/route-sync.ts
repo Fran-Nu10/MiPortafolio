@@ -2,10 +2,10 @@ import type { ProjectSlug } from "@/data/types";
 import type { SectionId } from "./journey-store";
 
 /**
- * Section ↔ URL mapping (Spec §20). Every route renders the same journey; the route only
- * decides where the visitor starts and which metadata the server sends.
+ * Section ↔ URL mapping (Spec §20, docs/25). Two documents since THE SHIFT: the home journey (`/`)
+ * and each project's case (`/trabajo/{slug}`, its world and proof). The mapping is the same for both.
  *
- * - a world is the active section → `/trabajo/{slug}`
+ * - a world is the active section → `/trabajo/{slug}` (its own document)
  * - capacidades / propuesta / perfil / contacto → `/#{id}`
  * - anything else (opening, reel) → `/`
  *
@@ -37,6 +37,9 @@ export function sectionForLocation(pathname: string, hash = ""): SectionId | nul
   if (m) return (PROJECT_SECTIONS as readonly string[]).includes(m[1]) ? (m[1] as ProjectSlug) : null;
   return pathname === "/" ? "inicio" : null;
 }
+
+/** the reel in the home journey: where a case's «← Trabajo» returns (docs/25) */
+export const REEL_HREF = "/#trabajo";
 
 /** the URL as the router sees it, for comparison with `pathForSection` */
 export function currentUrl(loc: Pick<Location, "pathname" | "hash">): string {

@@ -225,9 +225,10 @@ test.describe("C00–C07 at the reference viewport", () => {
     await expect.poll(async () => (await part(page, "object")).opacity).toBe(1);
   });
 
-  test("continuity: Santi's paper proof dims into Chef's SCREEN; the cream arrives with the pull-back; the proof leads to Capacidades", async ({ page }, info) => {
+  test("continuity inside the case: Chef's SCREEN, the cream arrives with the pull-back; the proof leads to Capacidades", async ({ page }, info) => {
     test.skip(info.project.name !== "xl-1440", "the reference viewport, once");
-    await page.goto("/trabajo/santi-nuca", { waitUntil: "networkidle" });
+    // its own document since THE SHIFT (docs/25)
+    await page.goto("/trabajo/chef-arturo", { waitUntil: "networkidle" });
     await expect(page.locator("main")).toHaveAttribute("data-started", "");
     const proofAt = async (id: string, f: number) => {
       await page.evaluate(
@@ -240,15 +241,19 @@ test.describe("C00–C07 at the reference viewport", () => {
       );
       await page.waitForTimeout(800);
     };
-    await proofAt("santi-nuca", 0.95);
-    expect(await page.locator('[data-proof="santi-nuca"] [data-part="window"]').evaluate((w) => Number(getComputedStyle(w).opacity))).toBeLessThan(0.75);
-    await proofAt("santi-nuca", 1.0);
     await expect.poll(() => state(page)).toBe("SCREEN");
     expect((await part(page, "field")).opacity).toBe(0);
     await to(page, 3);
     await expect.poll(() => state(page)).toBe("C03");
     await expect.poll(async () => (await part(page, "field")).opacity).toBe(1);
-    await proofAt("chef-arturo", 1.0);
+    // the document ends on the proof: its window in view, then the way back to the home journey
+    await proofAt("chef-arturo", 0.95);
+    await expect(page.locator('[data-proof="chef-arturo"] [data-part="window"]')).toBeInViewport();
+    // the last case returns to the home journey at Capacidades
+    const next = page.locator('[data-proof="chef-arturo"]').getByRole("link", { name: /Siguiente/ });
+    await expect(next).toHaveText("Siguiente → Capacidades");
+    await next.click();
+    await expect(page).toHaveURL(/\/#capacidades$/);
     await expect(page.locator("#capacidades")).toBeVisible();
   });
 });

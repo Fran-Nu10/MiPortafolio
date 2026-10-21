@@ -235,10 +235,10 @@ test.describe("N00–N05 at the reference viewport", () => {
     expect((await part(page, "object")).opacity).toBe(1);
   });
 
-  test("continuity: Rayo's proof dims into Santi's black SCREEN; the rupture makes it paper; Santi's proof dims toward Chef", async ({ page }, info) => {
+  test("continuity inside the case: a black SCREEN, the rupture makes it paper; the proof dims and leads to Chef's case", async ({ page }, info) => {
     test.skip(info.project.name !== "xl-1440", "the reference viewport, once");
-    await page.goto("/trabajo/rayo-smash", { waitUntil: "networkidle" });
-    await expect(page.locator("main")).toHaveAttribute("data-started", "");
+    // its own document since THE SHIFT (docs/25): it opens on its SCREEN, no seam before or after it
+    await open(page);
     const proofAt = async (id: string, f: number) => {
       await page.evaluate(
         ([id, f]) => {
@@ -250,22 +250,17 @@ test.describe("N00–N05 at the reference viewport", () => {
       );
       await page.waitForTimeout(800);
     };
-    await proofAt("rayo-smash", 0.9);
-    const win = await page.locator('[data-proof="rayo-smash"] [data-part="window"]').evaluate((w) => Number(getComputedStyle(w).opacity));
-    expect(win).toBeLessThan(0.75);
-    expect(await page.evaluate(() => document.querySelectorAll('[data-proof] [data-part="seam"]').length)).toBe(1); // only TS's proof has a seam
-    await proofAt("rayo-smash", 1.0);
     await expect.poll(() => state(page)).toBe("SCREEN");
     expect((await part(page, "env")).opacity).toBe(0);
+    expect(await page.locator('[data-part="seam"]').count()).toBe(0);
     await to(page, 2);
     await expect.poll(() => state(page)).toBe("WORLD");
     await expect.poll(async () => (await part(page, "env")).opacity).toBe(1);
-    // out: Santi's proof dims to .55 and Chef's SCREEN follows, no seam
+    // out: the document ends on the proof (its window in full, no next world under it), which
+    // hands over to the next case
     await proofAt("santi-nuca", 0.95);
-    const out = await page.locator('[data-proof="santi-nuca"] [data-part="window"]').evaluate((w) => Number(getComputedStyle(w).opacity));
-    expect(out).toBeLessThan(0.75);
-    await proofAt("santi-nuca", 1.0);
-    await expect.poll(() => page.locator("#chef-arturo").getAttribute("data-state")).toBe("SCREEN");
+    await expect(page.locator('[data-proof="santi-nuca"] [data-part="window"]')).toBeInViewport();
+    await expect(page.locator('[data-proof="santi-nuca"]').getByRole("link", { name: /Siguiente/ })).toHaveAttribute("href", "/trabajo/chef-arturo");
   });
 });
 

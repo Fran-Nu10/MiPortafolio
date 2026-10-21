@@ -9,6 +9,10 @@ import sharp from "sharp";
  * picture at the same rectangle (screenshot diff ≤ 1% of pixels) · Back from a world returns to
  * the reel at the piece that was active · deep links, history and reload. Plus the shared
  * SCREEN → ISOLATE → WORLD grammar, the 01–04 overlay, reduced motion and no-JS.
+ *
+ * Since THE SHIFT (docs/25) a world is its project's case, a document of its own at
+ * `/trabajo/{slug}`: entering is a page navigation that opens the case at the reel's rectangle, and
+ * Back is the browser's return to the home journey, at the place and the piece the visitor left.
  */
 
 const SLUGS = ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"] as const;
@@ -23,15 +27,14 @@ const tiny = (page: Page) => {
 
 const reduced = (page: Page) => page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-/** a world's start: its pinned stage at the top (tiny viewports: its name under the header) */
+/** a case's start: its world at the top of the document (pinned stage, or the static world on tiny viewports) */
 const atWorld = (page: Page, slug: Slug) =>
   expect
     .poll(() =>
       page.evaluate((slug) => {
         const tiny = innerWidth < 360 || innerHeight < 560;
         const el = document.querySelector(tiny ? `#${slug}` : `#${slug} [data-part="stage"]`)!;
-        const want = tiny ? parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0 : 0;
-        return Math.abs(el.getBoundingClientRect().top - want) < 2;
+        return Math.abs(el.getBoundingClientRect().top) < 2;
       }, slug),
     )
     .toBe(true);
@@ -151,32 +154,25 @@ test.describe("the shared rectangle", () => {
 });
 
 test.describe("entering and leaving", () => {
-  test("the jump keeps the rectangle where the visitor sees it, even off the reel's rest", async ({ page }) => {
+  test("Ver caso opens the case at the reel's rectangle: the picture stays where the visitor saw it", async ({ page }) => {
     test.skip(tiny(page), "tiny viewports read the worlds as static layout");
-    test.skip(test.info().project.use.reducedMotion === "reduce", "reduced motion cuts to WORLD");
     await toReel(page);
     await pick(page, 1);
-    await page.evaluate(() => window.scrollBy({ top: -90, behavior: "instant" }));
-    await page.waitForTimeout(100);
-    // read both rectangles in the same task: the jump is synchronous, the smooth scroll follows
-    const { reel, world } = await page.evaluate(() => {
-      const box = (el: Element) => {
-        const r = el.getBoundingClientRect();
-        return [r.x, r.y, r.width, r.height];
-      };
-      const reel = box(document.querySelector('#trabajo .reel-item[data-active] [data-part="frame"]')!);
-      document.querySelector<HTMLAnchorElement>("#trabajo .reel-item[data-active] [data-enter]")!.click();
-      return { reel, world: box(document.querySelector('#rayo-smash [data-part="screen"]')!) };
-    });
-    expect(reel[1]).toBeGreaterThan(60);
-    world.forEach((v, i) => expect(Math.abs(v - reel[i]), `rect[${i}]`).toBeLessThan(1.5));
+    const reel = await page.locator('#trabajo .reel-item[data-active] [data-part="frame"]').boundingBox();
+    await page.locator("#trabajo .reel-item[data-active] [data-enter]").click();
+    await expect(page).toHaveURL(/\/trabajo\/rayo-smash$/);
+    await expect(page.locator("main")).toHaveAttribute("data-started", "");
+    await expect.poll(() => state(page, "rayo-smash")).toBe("SCREEN");
+    const world = await page.locator('#rayo-smash [data-part="screen"]').boundingBox();
+    for (const k of ["x", "y", "width", "height"] as const) expect(Math.abs(world![k] - reel![k]), k).toBeLessThan(1.5);
   });
 
-  test("Ver caso → one history entry, the world; Back → the reel at the same piece, no reload", async ({ page, isMobile }) => {
+  test("Ver caso → one history entry, the case; Back → the reel at the same piece and place", async ({ page }) => {
     const problems = watchConsole(page);
     await toReel(page);
     await pick(page, 2);
-    await page.evaluate(() => ((window as unknown as { __marker: number }).__marker = 1));
+    // the remembered position is written once scrolling settles (journey-nav)
+    await page.waitForTimeout(500);
     const reelY = await page.evaluate(() => window.scrollY);
     const stageTop = () => page.evaluate(() => document.querySelector('#trabajo [data-part="stage"]')!.getBoundingClientRect().top);
     const reelTop = await stageTop();
@@ -186,27 +182,20 @@ test.describe("entering and leaving", () => {
     await expect(page).toHaveURL(/\/trabajo\/santi-nuca$/);
     await expect(page).toHaveTitle("Santi Nuca — Franco Núñez");
     expect(await page.evaluate(() => history.length)).toBe(length + 1);
-    if (!tiny(page)) {
-      // one gesture's smooth scroll to ISOLATE (reduced motion: a cut to WORLD)
-      await expect.poll(() => state(page, "santi-nuca")).toBe((await reduced(page)) ? "WORLD" : "ISOLATE");
-      // the second gesture: into the world (Santi's own states follow s:WORLD since Phase 7)
-      if (isMobile) await scrollToFraction(page, "santi-nuca", 2 / 5.4);
-      else for (let n = 0; n < 6; n++) await page.mouse.wheel(0, 120);
-      await expect.poll(async () => ["SCREEN", "ISOLATE"].includes((await state(page, "santi-nuca")) ?? "")).toBe(false);
-    }
+    await atWorld(page, "santi-nuca");
+    if (!tiny(page)) expect(await state(page, "santi-nuca")).toBe("SCREEN");
 
     await page.goBack();
     await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator("main")).toHaveAttribute("data-started", "");
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(reelY);
-    expect(await activeIndex(page)).toBe(2);
-    expect(await page.evaluate(() => (window as unknown as { __marker?: number }).__marker)).toBe(1);
-    // pinned: the stage at the top (tiny viewports: the list exactly where it was)
+    await expect.poll(() => activeIndex(page)).toBe(2);
+    // the stage where it was (tiny viewports: the list exactly where it was)
     expect(Math.abs((await stageTop()) - reelTop)).toBeLessThan(2);
 
     await page.goForward();
     await expect(page).toHaveURL(/\/trabajo\/santi-nuca$/);
     await atWorld(page, "santi-nuca");
-    expect(await page.evaluate(() => (window as unknown as { __marker?: number }).__marker)).toBe(1);
     expect(problems).toEqual([]);
   });
 
@@ -244,14 +233,16 @@ test.describe("entering and leaving", () => {
     await expect(page).toHaveURL(/\/trabajo\/rayo-smash$/);
   });
 
-  test("scrolling through the worlds never adds history entries", async ({ page }) => {
-    await page.goto("/", { waitUntil: "networkidle" });
-    const length = await page.evaluate(() => history.length);
+  test("scrolling a case never adds history entries and keeps its address", async ({ page }) => {
     for (const slug of SLUGS) {
-      await page.evaluate((s) => document.getElementById(s)!.scrollIntoView({ behavior: "instant" }), slug);
-      await expect.poll(() => page.evaluate(() => location.pathname)).toBe(`/trabajo/${slug}`);
+      await page.goto(`/trabajo/${slug}`, { waitUntil: "networkidle" });
+      await expect(page.locator("main")).toHaveAttribute("data-started", "");
+      const length = await page.evaluate(() => history.length);
+      await page.evaluate((s) => document.querySelector(`[data-proof="${s}"]`)!.scrollIntoView({ behavior: "instant" }), slug);
+      await page.waitForTimeout(400);
+      expect(await page.evaluate(() => location.pathname)).toBe(`/trabajo/${slug}`);
+      expect(await page.evaluate(() => history.length)).toBe(length);
     }
-    expect(await page.evaluate(() => history.length)).toBe(length);
   });
 });
 
@@ -336,18 +327,24 @@ test.describe("the 01–04 overlay", () => {
 test.describe("reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("entering a world is a cut to WORLD; nothing tweens", async ({ page }) => {
+  test("entering a case is a cut; its world steps to WORLD without tweening; Back → the same piece", async ({ page }) => {
     test.skip(tiny(page), "tiny viewports read the worlds as static layout");
     await toReel(page);
     await pick(page, 1);
     await page.locator("#trabajo .reel-item[data-active] [data-enter]").click();
     await expect(page).toHaveURL(/\/trabajo\/rayo-smash$/);
-    await expect.poll(() => state(page, "rayo-smash")).toBe("WORLD");
-    const env = await page.evaluate(() => Number(getComputedStyle(document.querySelector('#rayo-smash [data-part="env"]')!).opacity));
-    expect(env).toBe(1);
+    await expect(page.locator("main")).toHaveAttribute("data-started", "");
+    // past the middle of Rayo's pin: WORLD or later, a state reached by a cut
+    await scrollToFraction(page, "rayo-smash", 0.5);
+    await expect.poll(async () => ["SCREEN", "ISOLATE"].includes((await state(page, "rayo-smash")) ?? "")).toBe(false);
+    const env = () => page.evaluate(() => Number(getComputedStyle(document.querySelector('#rayo-smash [data-part="env"]')!).opacity));
+    const a = await env();
+    await page.waitForTimeout(150);
+    expect(await env()).toBe(a);
+    expect(a).toBe(1);
     await page.goBack();
     await expect(page).toHaveURL(/\/$/);
-    expect(await activeIndex(page)).toBe(1);
+    await expect.poll(() => activeIndex(page)).toBe(1);
   });
 });
 
@@ -361,8 +358,10 @@ test.describe("without JavaScript", () => {
     await expect(world.locator(".world-credit")).toHaveText("Fotografía · Santi Nuca");
     await expect(world.locator(".world-credit")).toBeVisible();
     await expect(world.locator('[data-part="object"]')).toBeHidden();
-    await expect(page.locator("#trabajo .reel-item [data-enter]").first()).toHaveAttribute("href", "/trabajo/travelsuite360");
-    await expect(page.getByRole("banner").getByRole("link", { name: "Trabajo" })).toHaveAttribute("href", "#trabajo");
+    // from a case, «Trabajo» is the reel of the home journey
+    await expect(page.getByRole("banner").getByRole("link", { name: "Trabajo" })).toHaveAttribute("href", "/#trabajo");
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.goto("/");
+    await expect(page.locator("#trabajo .reel-item [data-enter]").first()).toHaveAttribute("href", "/trabajo/travelsuite360");
   });
 });

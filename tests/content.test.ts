@@ -329,14 +329,21 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
     expect(html).not.toMatch(/CONFIRMAR/);
   });
 
-  it.each(ROUTES)("%s is readable without JS: all key copy is in the document", (route) => {
-    const html = readFileSync(join(APP, route), "utf8");
+  // since THE SHIFT (docs/25) the home and each case are two documents: each carries its own copy
+  it("index.html is readable without JS: all of the home journey's key copy is in the document", () => {
+    const html = readFileSync(join(APP, "index.html"), "utf8");
     const must = [
       "Franco Núñez",
       SITE.hero.firma,
       SITE.hero.support,
       SITE.reel.heading,
-      ...PROJECTS.flatMap((p) => [p.name, proofCaption(p), p.role]),
+      // the reel opens every case: its name, its line and its door
+      ...PROJECTS.flatMap((p) => [p.name, p.reelLine, `/trabajo/${p.id}`]),
+      SITE.reel.enter,
+      // THE SHIFT (Content Master 23): the title, the four acts and what the interface is
+      SITE.shift.heading,
+      ...SITE.shift.acts.flatMap((a) => [a.title, a.line]),
+      SITE.shift.concept,
       SITE.capabilities.seam,
       ...CAPABILITIES.map((c) => c.statement),
       // the profile (Content Master 21): the declaration, the explanation and Meta Ads
@@ -353,12 +360,31 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       SITE.declaration.acts[1].line,
       "Que no solo te vean.",
       SITE.declaration.close,
-      PROFILE.core,
       SITE.cta.title,
       SITE.cta.fields.brief,
-      "Fotografía · Santi Nuca",
     ];
-    for (const m of must) expect(html, `${route} misses «${m}»`).toContain(escapeHtml(m));
+    for (const m of must) expect(html, `index.html misses «${m}»`).toContain(escapeHtml(m));
+  });
+
+  it.each(PROJECTS.map((p) => [p.id, p] as const))("trabajo/%s.html is readable without JS: the whole case is in the document", (id, p) => {
+    const html = readFileSync(join(APP, `trabajo/${id}.html`), "utf8");
+    const must = [
+      "Franco Núñez",
+      p.name,
+      proofCaption(p),
+      p.microCase,
+      p.role,
+      ...(p.relationLine ? [p.relationLine] : []),
+      ...(p.credit ? [`${p.credit.label} · ${p.credit.holder}`] : []),
+      ...Object.values(p.worldCopy),
+      // its way back to the reel and on to the next case
+      SITE.world.back,
+      SITE.world.next,
+    ];
+    for (const m of must) expect(html, `trabajo/${id}.html misses «${m}»`).toContain(escapeHtml(m));
+    // a case is one case: no other project's world, no home section
+    for (const other of PROJECTS.filter((o) => o.id !== id)) expect(html).not.toContain(`id="${other.id}"`);
+    for (const section of ["inicio", "shift", "capacidades", "propuesta", "perfil", "contacto"]) expect(html).not.toContain(`id="${section}"`);
   });
 });
 

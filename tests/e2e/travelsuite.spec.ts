@@ -6,7 +6,9 @@ import { jump } from "./scroll";
 /**
  * Phase 5 acceptance (Spec §26): every TS state matches §08 at 1440×900 (one screenshot per
  * label, attached) · no Math.random at runtime (unit) · 3D only on lg/xl · the reduced-motion
- * sequence is complete. Plus phones, reversal, the sr-only summary, no-JS, the TS12 seam.
+ * sequence is complete. Plus phones, reversal, the sr-only summary, no-JS. The TS12 red seam led
+ * into Rayo's world in the same document; since THE SHIFT (docs/25) the case ends on its proof and
+ * its links, so the seam is not drawn.
  * (Frame rate is measured separately, in a real browser: docs/11 §5.)
  */
 
@@ -152,25 +154,16 @@ test.describe("TS00–TS12 at the reference viewport", () => {
     await expect.poll(async () => Number(await page.locator('#travelsuite360 [data-part="drift"]').first().evaluate((d) => getComputedStyle(d).opacity))).toBeCloseTo(0.5, 2);
     await shot(page, "TS10 NAME");
 
-    // TS11 · the proof in flow, TS12 · the red seam toward Rayo
+    // TS11 · the proof in flow; the case ends there: its links, no red seam over them (docs/25)
     const proof = page.locator('[data-proof="travelsuite360"]');
     await proof.scrollIntoViewIfNeeded();
     await expect(proof.getByText("Producto real, en uso en tres agencias.")).toBeVisible();
     await expect(proof.getByText("Socio · Producto e ingeniería")).toBeVisible();
     await shot(page, "TS11 PROOF");
-    const seamAt = async (f: number) => {
-      await page.evaluate((f) => {
-        const s = document.querySelector<HTMLElement>('[data-proof="travelsuite360"]')!;
-        const top = s.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: Math.round(top - innerHeight + f * (s.offsetHeight + innerHeight)), behavior: "instant" });
-      }, f);
-      await page.waitForTimeout(900);
-      return page.evaluate(() => getComputedStyle(document.querySelector('[data-part="seam"]')!).visibility);
-    };
-    expect(await seamAt(0.5)).toBe("hidden");
-    expect(await seamAt(0.9)).toBe("visible");
-    await shot(page, "TS12 EXIT");
-    expect(await seamAt(1.02)).toBe("hidden");
+    await expect(page.locator('[data-part="seam"]')).toHaveCount(0);
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+    await expect(proof.getByRole("link", { name: "← Trabajo" })).toBeInViewport();
+    await shot(page, "TS11 END OF THE CASE");
     expect(problems).toEqual([]);
   });
 
@@ -276,10 +269,8 @@ test.describe("reduced motion", () => {
     expect((await part(page, "report")).opacity).toBe(1);
     await expect.poll(async () => (await part(page, "name-title")).clip).toMatch(/inset\(0/);
     expect(await page.evaluate(() => getComputedStyle(document.querySelector('#travelsuite360 [data-part="persp"]')!).perspective)).toBe("none");
-    // no seam under reduced motion
-    await page.locator('[data-proof="travelsuite360"]').evaluate((s) => window.scrollTo({ top: s.getBoundingClientRect().top + window.scrollY + (s as HTMLElement).offsetHeight * 0.8, behavior: "instant" }));
-    await page.waitForTimeout(400);
-    expect(await page.evaluate(() => getComputedStyle(document.querySelector('[data-part="seam"]')!).visibility)).toBe("hidden");
+    // the case ends on its proof: no seam (docs/25)
+    await expect(page.locator('[data-part="seam"]')).toHaveCount(0);
   });
 });
 

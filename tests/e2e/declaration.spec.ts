@@ -72,11 +72,11 @@ const look = (page: Page, sel: string) =>
   }, sel);
 
 test.describe("place in the journey", () => {
-  test("between the capabilities and the profile; the four worlds keep their order", async ({ page }) => {
+  test("between the capabilities and the profile", async ({ page }) => {
     await open(page);
-    // a world and its proof share their section id: the order of the distinct sections
+    // the home journey since THE SHIFT (docs/25): the worlds are their projects' cases
     const ids = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll<HTMLElement>("[data-section]")).map((e) => e.dataset.section))]);
-    expect(ids).toEqual(["inicio", "trabajo", "travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo", "capacidades", "propuesta", "perfil", "contacto"]);
+    expect(ids).toEqual(["inicio", "trabajo", "shift", "capacidades", "propuesta", "perfil", "contacto"]);
     await expect(page.locator("#propuesta h2")).toHaveText("MOSTRAR. CONVENCER. CONVERTIR.");
     await expect(page.locator("#propuesta h3")).toHaveText(TITLES);
   });

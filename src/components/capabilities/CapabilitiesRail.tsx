@@ -5,7 +5,7 @@ import type { EvidenceSlotVariant } from "@/data/types";
 import { EASE, gsap, prefersReducedMotion, usePrefersReducedMotion } from "@/lib/motion";
 import type { ResolvedAsset } from "@/lib/resolved";
 import { getScene, useScene } from "@/lib/useScene";
-import { RAIL_ENTER_AT, SEAM_IN, cardScroll, railUnits, seamPx, separationWindow } from "@/lib/capabilities-rail";
+import { RAIL_ENTER_AT, cardScroll, railUnits, seamPx, separationWindow } from "@/lib/capabilities-rail";
 import { Cutout } from "@/components/media/Cutout";
 import { EvidenceElement, type EvidenceData } from "./EvidenceElement";
 import { EvidenceSlot } from "./EvidenceSlot";
@@ -82,7 +82,13 @@ export function CapabilitiesRail({ view }: { view: CapabilitiesView }) {
       // the timeline runs in scroll pixels: one viewport of seam, then the overflow, 1:1
       const tl = gsap.timeline({ defaults: { ease: EASE.none } });
       tl.addLabel("s:SEAM", 0);
-      tl.fromTo(seam, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: SEAM_IN * vh, ease: EASE.settle }, 0);
+      // the bust arrives while the section rises into view (its own scrub, inside this build's
+      // context, reverted with it): the pin starts on it, never on an empty black frame (docs/25 §5)
+      gsap.fromTo(
+        seam,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, ease: EASE.settle, immediateRender: true, scrollTrigger: { trigger: root, start: "top 85%", end: "top 20%", scrub: 0.8 } },
+      );
       const seamLen = seamPx(vh);
       const enterAt = RAIL_ENTER_AT * seamLen;
       const enterDur = seamLen - enterAt;

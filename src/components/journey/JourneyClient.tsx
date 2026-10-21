@@ -4,7 +4,8 @@ import { useLayoutEffect } from "react";
 import type { ProjectSlug } from "@/data/types";
 import { registerGsap, ScrollTrigger } from "@/lib/motion";
 import { getJourney, setJourney, subscribeJourney, type SectionId } from "@/lib/journey-store";
-import { installHistory, navigate, releaseTitle, reloadPosition, sectionForHref, sectionScroll, syncUrl, trackScrollPosition } from "@/lib/journey-nav";
+import { installHistory, isHere, navigate, releaseTitle, reloadPosition, sectionForHref, sectionScroll, syncUrl, trackScrollPosition } from "@/lib/journey-nav";
+import { sectionForLocation } from "@/lib/route-sync";
 import { anchorView, queueRefresh, scenesReady } from "@/lib/useScene";
 
 /**
@@ -13,7 +14,8 @@ import { anchorView, queueRefresh, scenesReady } from "@/lib/useScene";
  * - in-journey links (reel "Ver caso", "Siguiente →", header, capabilities) → pushState + jump,
  *   handled in the bubble phase so the reel (a drag is not a click) and the overlay can veto
  * - Back / Forward → the remembered position
- * - start: a deep link lands on its world's SCREEN state; a reload returns where the visitor was
+ * - start: a deep link lands on its world's SCREEN state; a reload (or Back from another document)
+ *   returns where the visitor was; an anchor lands on its section
  */
 export function JourneyClient({
   initial,
@@ -27,6 +29,8 @@ export function JourneyClient({
   useLayoutEffect(() => {
     registerGsap();
     const main = document.getElementById("contenido");
+    // a case has no opening to reveal the header (docs/25): it shows from the start
+    if (!document.getElementById("inicio")) setJourney({ heroRevealed: true });
 
     const triggers = Array.from(document.querySelectorAll<HTMLElement>("[data-section]")).map((el) =>
       ScrollTrigger.create({
@@ -52,16 +56,21 @@ export function JourneyClient({
       const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
       if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
       const section = sectionForHref(a.getAttribute("href") ?? "");
-      if (!section) return;
+      // a section of another document (a case from the home, the home from a case): the browser's
+      if (!section || !isHere(section)) return;
       e.preventDefault();
       // a keyboard activation (detail 0) moves focus to where the visitor lands
       navigate(section, { focus: e.detail === 0, from: a });
     };
     document.addEventListener("click", onClick);
 
-    // the first position: deep link → the world's SCREEN; reload → the remembered place
+    // the first position: deep link → the world's SCREEN; reload or Back → the remembered place; an
+    // anchor of this document (a case's «← Trabajo» → `/#trabajo`, docs/25) → that section, measured
+    // once every pin has its length (the browser's own jump happens before the scenes have built)
     let cancelled = false;
     const remembered = reloadPosition();
+    const hashed = sectionForLocation(location.pathname, location.hash);
+    const anchor = !initial && remembered === null && hashed && hashed !== "inicio" && isHere(hashed) ? hashed : null;
     const start = () => {
       if (cancelled) return;
       ScrollTrigger.refresh();
@@ -72,18 +81,19 @@ export function JourneyClient({
     };
     const land = () => {
       if (cancelled) return;
-      const y = remembered ?? (initial ? sectionScroll(initial) : null);
+      const target = initial ?? anchor;
+      const y = remembered ?? (target ? sectionScroll(target) : null);
       if (y !== null) window.scrollTo({ top: y, behavior: "instant" });
       // the landing is authoritative: hold the landed section (not the one picked mid-build)
       anchorView();
       history.scrollRestoration = "auto";
       // the hero was kept out of sight until now (no opening flash on deep links)
       main?.setAttribute("data-started", "");
-      if (initial && remembered === null) setJourney({ section: initial });
+      if (target && remembered === null) setJourney({ section: target });
       syncing = true;
       syncUrl(getJourney().section, titles, homeTitle);
     };
-    if (initial || remembered !== null) {
+    if (initial || anchor || remembered !== null) {
       history.scrollRestoration = "manual";
       // every scene must be built (pins sized) before the landing position is measured
       (document.fonts?.ready ?? Promise.resolve()).then(scenesReady).then(() => requestAnimationFrame(start));

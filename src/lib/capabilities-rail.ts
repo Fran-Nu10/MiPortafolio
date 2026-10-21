@@ -40,11 +40,12 @@ export function railLayout(vw: number, gutter: number, count = 6, extendedAt = 5
  * The pin, in scroll pixels: SEAM_LEN of a viewport for the bust seam (the bust appears at the
  * start, holds, then slides out left as the rail enters over the seam's second half), then the
  * rail's own overflow, 1:1 with the scroll. The seam was a full viewport until docs/23 §3.2: with
- * only the bust and one line on screen it read as a dead stretch, so it is now 0.6 of one.
+ * only the bust and one line on screen it read as a dead stretch, so it is now 0.6 of one. The bust
+ * arrives with the section, while it rises into the viewport (docs/25 §5: it faded in after the pin
+ * started, so the first frame of the pin was an empty black screen): it holds from the pin's start.
  */
 export const SEAM_LEN = 0.6;
 export const seamPx = (vh: number) => SEAM_LEN * vh;
-export const SEAM_IN = 0.12;
 export const RAIL_ENTER_AT = 0.5;
 export function railPinPx(vh: number, overflow: number): number {
   return seamPx(vh) + overflow;

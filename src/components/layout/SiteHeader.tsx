@@ -17,7 +17,8 @@ export interface HeaderView {
 /**
  * S0 · Shell (Spec §02, Content Master 03): marca, firma, Trabajo, the "0n / 04" state while a
  * world is in view, Perfil and "Ahora, el tuyo". Hidden during End. "Trabajo" opens the 01–04
- * overlay; the links are in-journey navigation (pushState + jump, see JourneyClient).
+ * overlay; the links are in-journey navigation (pushState + jump, see JourneyClient) when their section
+ * is in this document, a page navigation when it is not (a case and the home, docs/25).
  */
 export function SiteHeader({ view }: { view: HeaderView }) {
   const section = useJourney((s) => s.section);
@@ -39,10 +40,13 @@ export function SiteHeader({ view }: { view: HeaderView }) {
         <span className="site-index micro muted">
           {current ? indexLabel(current.index, view.projects.length) : null}
         </span>
-        <a href="#perfil" className="link">
+        {/* the home's sections: in place on `/`, a page navigation from a case (docs/25) */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a href="/#perfil" className="link">
           {view.profile}
         </a>
-        <a href="#contacto" className="link site-cta">
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a href="/#contacto" className="link site-cta">
           {view.cta}
         </a>
       </nav>

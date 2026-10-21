@@ -37,7 +37,9 @@ export function ReelOverlay({ trigger, title, close, items }: { trigger: string;
 
   return (
     <>
-      <a ref={triggerRef} href="#trabajo" aria-haspopup="dialog" className="link" onClick={open}>
+      {/* without JS (or opened in a new tab): the reel of the home journey, from a case too (docs/25) */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a ref={triggerRef} href="/#trabajo" aria-haspopup="dialog" className="link" onClick={open}>
         {trigger}
       </a>
       <dialog ref={dialogRef} aria-labelledby="overlay-h" className="overlay" onClose={() => triggerRef.current?.focus()}>

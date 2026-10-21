@@ -97,12 +97,11 @@ export const SITE = {
 
   world: {
     next: "Siguiente →",
+    /** a case's way back to the reel of the home journey (docs/25) */
     back: "← Trabajo",
     stackLabel: "Stack",
     /** the capabilities rail is the target after Chef Arturo */
     capabilitiesName: "Capacidades",
-    /** no-JS deep link on /trabajo/{slug}: "Ir a {name}" (Spec §20) */
-    goTo: "Ir a",
   },
 
   capabilities: {

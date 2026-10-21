@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { watchConsole } from "./console";
 import { settled, scenesBuilt } from "./scroll";
-import { RAIL_ENTER_AT, SEAM_IN, SEAM_LEN } from "../../src/lib/capabilities-rail";
+import { RAIL_ENTER_AT, SEAM_LEN } from "../../src/lib/capabilities-rail";
 
 /**
  * Phase 9 acceptance (Spec §26): the rail pinned on lg/xl and stacked on md/sm · focus on an
@@ -74,18 +74,20 @@ test.describe("the rail (Spec §12)", () => {
     expect(p.len / vh).toBeGreaterThan(2);
     expect(p.len / vh).toBeLessThan(3.5);
 
-    // pin start: the seam is arriving, the kicker and the rail are not in yet
-    await to(page, 0);
-    await expect(page.locator("#capacidades [data-part=stage]")).toHaveAttribute("data-state", "SEAM");
-    expect(await railX(page)).toBeGreaterThan(page.viewportSize()!.width * 0.9);
-    // the seam holds between its arrival (SEAM_IN of a viewport) and the rail's entry (RAIL_ENTER_AT of the seam)
-    await to(page, (((SEAM_IN + RAIL_ENTER_AT * SEAM_LEN) / 2) * vh) / p.len);
     const seamOf = () =>
       page.evaluate(() => {
         const el = document.querySelector<HTMLElement>("#capacidades [data-part=seam]")!;
         const r = el.getBoundingClientRect();
         return { opacity: Number(getComputedStyle(el).opacity), left: r.left, bottom: r.bottom };
       });
+    // pin start: the seam is already in (it arrived with the section — never a black frame, docs/25
+    // §5); the kicker and the rail are not in yet
+    await to(page, 0);
+    await expect(page.locator("#capacidades [data-part=stage]")).toHaveAttribute("data-state", "SEAM");
+    expect(await railX(page)).toBeGreaterThan(page.viewportSize()!.width * 0.9);
+    await expect.poll(async () => (await seamOf()).opacity).toBe(1);
+    // the seam holds until the rail's entry (RAIL_ENTER_AT of the seam)
+    await to(page, ((RAIL_ENTER_AT * SEAM_LEN) / 2) * vh / p.len);
     // scrub 0.8: the playhead settles after the scroll
     await expect.poll(async () => (await seamOf()).opacity).toBe(1);
     const seam = await seamOf();
@@ -326,7 +328,7 @@ test.describe("accessibility", () => {
     expect(await page.locator("#capacidades h3").allInnerTexts()).toEqual(["Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Meta Ads y crecimiento"]);
   });
 
-  test("an attribution link enters its world in place (pushState, no reload)", async ({ page }) => {
+  test("an attribution link opens its project's case (its own document since docs/25), at its world", async ({ page }) => {
     await open(page);
     // on the rail the card travels with the scroll: bring it in through the rail's own focus rule
     // (it centers the card), let the document rest, then click — a click while the rail still
@@ -338,11 +340,12 @@ test.describe("accessibility", () => {
     // activated from the keyboard: a pointer click on a card the rail is still carrying can land on
     // its neighbour (Playwright re-scrolls the target before clicking, which moves the rail)
     await link.press("Enter");
-    await expect.poll(() => page.evaluate(() => location.pathname)).toBe("/trabajo/chef-arturo");
+    // a page navigation now: the URL, not an evaluate across the unload
+    await expect(page).toHaveURL(/\/trabajo\/chef-arturo$/);
     await expect(page.locator("main")).toHaveAttribute("data-started", "");
-    const v = page.viewportSize()!;
-    // tiny viewports (320×568) show the world as a static section: no states to leave
-    if (v.width >= 360 && v.height >= 560) await expect.poll(() => page.locator("#chef-arturo").getAttribute("data-state"), { timeout: 5000 }).not.toBe("SCREEN");
+    await expect(page).toHaveTitle("Chef Arturo — Franco Núñez");
+    // the case starts with its world at the top of the document
+    await expect.poll(() => page.evaluate(() => Math.abs(Math.round(document.getElementById("chef-arturo")!.getBoundingClientRect().top)))).toBeLessThanOrEqual(2);
   });
 });
 

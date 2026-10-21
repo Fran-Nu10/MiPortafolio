@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PROJECTS, getProject } from "@/data/projects";
-import { Journey } from "@/components/journey/Journey";
+import { CaseStudy } from "@/components/journey/CaseStudy";
 
 /**
- * `/trabajo/{slug}` (Spec §20): the same journey as `/`, starting at the world, with the
- * project's own metadata (Content Master 17). Unknown slugs are a 404.
+ * `/trabajo/{slug}` (Spec §20, docs/25): the project's case — its world and its proof — with the
+ * project's own metadata (Content Master 17). The URLs are the ones the reel always opened; since
+ * THE SHIFT they are their own documents instead of a place in the home journey. Unknown slugs: 404.
  */
 export const dynamicParams = false;
 
@@ -29,5 +30,5 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const p = getProject(slug);
   if (!p) notFound();
-  return <Journey initial={p.id} />;
+  return <CaseStudy project={p} />;
 }

@@ -254,22 +254,13 @@ test.describe("R00–R07 at the reference viewport", () => {
     await expect.poll(async () => (await part(page, "env")).opacity).toBe(0);
   });
 
-  test("the seam from TravelSuite360: red to the edges, then Rayo's real interface, then red again", async ({ page }, info) => {
+  test("the case opens on Rayo's real interface, then the red arrives as Rayo's own field", async ({ page }, info) => {
     test.skip(info.project.name !== "xl-1440", "the reference viewport, once");
-    await page.goto("/trabajo/travelsuite360", { waitUntil: "networkidle" });
+    // its own document since THE SHIFT (docs/25): no TravelSuite360 seam before it
+    await page.goto("/trabajo/rayo-smash", { waitUntil: "networkidle" });
     await expect(page.locator("main")).toHaveAttribute("data-started", "");
-    const seamAt = async (f: number) => {
-      await page.evaluate((f) => {
-        const s = document.querySelector<HTMLElement>('[data-proof="travelsuite360"]')!;
-        const top = s.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: Math.round(top - innerHeight + f * (s.offsetHeight + innerHeight)), behavior: "instant" });
-      }, f);
-      await page.waitForTimeout(700);
-      return page.evaluate(() => getComputedStyle(document.querySelector('[data-part="seam"]')!).visibility);
-    };
-    expect(await seamAt(0.9)).toBe("visible");
-    // Rayo's stage rises over the red: its SCREEN is the hero on black (the reel's own ground)
-    expect(await seamAt(1.0)).toBe("hidden");
+    await expect(page.locator('[data-part="seam"]')).toHaveCount(0);
+    // its SCREEN is the hero on black (the reel's own ground)
     await expect.poll(() => state(page)).toBe("SCREEN");
     expect((await part(page, "env")).opacity).toBe(0);
     // one gesture in, the red is back as Rayo's own field

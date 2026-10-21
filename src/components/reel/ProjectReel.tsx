@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { EASE, gsap, registerGsap, ScrollTrigger, usePrefersReducedMotion } from "@/lib/motion";
-import { navigate, sectionForHref } from "@/lib/journey-nav";
+import { isHere, navigate, rememberedReel, replaceOwnState, sectionForHref } from "@/lib/journey-nav";
 import { isSaveData } from "@/lib/media";
 import {
   AXIS_LOCK,
@@ -89,6 +89,8 @@ export function ProjectReel({ label, heading, items, copy }: { label: string; he
       const changed = i !== activeRef.current;
       activeRef.current = i;
       setActive(i);
+      // the history entry remembers the piece (a case is another document: Back comes back to it)
+      replaceOwnState({ reel: i });
       setSettled(false);
       setInteracted(true);
       const instant = rmRef.current;
@@ -122,6 +124,13 @@ export function ProjectReel({ label, heading, items, copy }: { label: string; he
     try {
       ctx = gsap.context(() => {
         measure();
+        // back from a case (or a reload): the piece the visitor left active, in place, no settle
+        const back = rememberedReel(count);
+        if (back !== null && back !== activeRef.current) {
+          activeRef.current = back;
+          setActive(back);
+          Array.from(track.querySelectorAll<HTMLElement>('[data-part="frame"]')).forEach((f, j) => gsap.set(f, { opacity: j === back ? 1 : 0.55 }));
+        }
         gsap.set(track, { x: offsetFor(activeRef.current) });
         // the heading masks up once, when the reel top reaches 80% of the viewport
         const h = root.querySelector<HTMLElement>('[data-part="heading"]');
@@ -236,9 +245,12 @@ export function ProjectReel({ label, heading, items, copy }: { label: string; he
       }
       if (target.closest("a")) return;
       if (target.closest(".reel-piece")) {
-        // the active card enters its world: pushState + the jump to its SCREEN state
-        const section = sectionForHref(li.querySelector<HTMLAnchorElement>("[data-enter]")?.getAttribute("href") ?? "");
-        if (section) navigate(section, { from: li });
+        // the active card opens its project: the case is its own document (docs/25), so this is a page
+        // navigation; a section of this document (none today) would still be entered in place
+        const href = li.querySelector<HTMLAnchorElement>("[data-enter]")?.getAttribute("href") ?? "";
+        const section = sectionForHref(href);
+        if (section && isHere(section)) navigate(section, { from: li });
+        else if (href) window.location.assign(href);
       }
     };
     const onDragStart = (e: DragEvent) => e.preventDefault();

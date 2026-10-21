@@ -65,19 +65,31 @@ test.describe("without JavaScript", () => {
       "Producto × Diseño × Ingeniería × Crecimiento",
       "Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.",
       "Trabajo seleccionado.",
-      "Producto real, en uso en tres agencias.",
-      "Demo real, navegable.",
-      "Sitio real, en línea.",
-      "Tienda real, en línea.",
-      "Fotografía · Santi Nuca",
+      // THE SHIFT (docs/25)
+      "De la complejidad al producto.",
+      "Una idea no alcanza.",
+      "De la idea al producto.",
       "Todo lo anterior pasó por las mismas manos.",
       "Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.",
       "Ahora, el tuyo.",
     ]) {
       await expect(page.getByText(text, { exact: true }).filter({ visible: true }).first(), text).toBeVisible();
     }
-    for (const name of ["TravelSuite360", "Rayo Smash", "Santi Nuca", "Chef Arturo"]) {
+    // the four projects: each a card of the reel, each a real link to its case
+    for (const slug of ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"]) await expect(page.locator(`#trabajo a[href="/trabajo/${slug}"]`).first()).toBeVisible();
+  });
+
+  test("every case is readable: its world, its proof, its credit", async ({ page }) => {
+    for (const [slug, name, proof] of [
+      ["travelsuite360", "TravelSuite360", "Producto real, en uso en tres agencias."],
+      ["rayo-smash", "Rayo Smash", "Demo real, navegable."],
+      ["santi-nuca", "Santi Nuca", "Sitio real, en línea."],
+      ["chef-arturo", "Chef Arturo", "Tienda real, en línea."],
+    ] as const) {
+      await page.goto(`/trabajo/${slug}`);
       await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+      await expect(page.getByText(proof, { exact: true }).filter({ visible: true }).first(), proof).toBeVisible();
+      if (slug === "santi-nuca") await expect(page.getByText("Fotografía · Santi Nuca", { exact: true }).filter({ visible: true }).first()).toBeVisible();
     }
   });
 
@@ -97,9 +109,12 @@ test.describe("without JavaScript", () => {
     await expect(page.getByLabel("Nombre")).toHaveValue("Ana");
   });
 
-  test("a project route without JS offers the in-page jump", async ({ page }) => {
+  test("a project route without JS starts with its case: no jump needed", async ({ page }) => {
     await page.goto("/trabajo/chef-arturo");
-    await expect(page.getByRole("link", { name: "Ir a Chef Arturo" })).toBeVisible();
+    // the case is its own document (docs/25): its world is the first thing under the header
+    const first = await page.evaluate(() => document.querySelector("main")!.firstElementChild!.id);
+    expect(first).toBe("chef-arturo");
+    await expect(page.getByRole("link", { name: /^Ir a / })).toHaveCount(0);
   });
 });
 
@@ -107,17 +122,15 @@ test.describe("routes", () => {
   test("project routes carry their metadata and start at the world", async ({ page }) => {
     await page.goto("/trabajo/rayo-smash");
     await expect(page).toHaveTitle("Rayo Smash — Franco Núñez");
-    // the pinned stage at the top; tiny viewports (static world): its name under the header
+    // the case is its own document: its world at the top
     await expect
       .poll(async () =>
         page.evaluate(() => {
-          const tiny = innerWidth < 360 || innerHeight < 560;
-          const want = tiny ? parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0 : 0;
-          return Math.abs(document.getElementById("rayo-smash")!.getBoundingClientRect().top - want);
+          // the case starts with its world at the top of its document (tiny viewports too)
+          return Math.abs(document.getElementById("rayo-smash")!.getBoundingClientRect().top);
         }),
       )
       .toBeLessThan(4);
-    await expect(page.getByRole("link", { name: "Ir a Rayo Smash" })).toBeHidden();
   });
 
   test("unknown slug → 404 «No existe.»", async ({ page }) => {
@@ -130,11 +143,14 @@ test.describe("routes", () => {
   test("scrolling replaces the URL without adding history entries", async ({ page }) => {
     await page.goto("/", { waitUntil: "networkidle" });
     const before = await page.evaluate(() => history.length);
-    await page.evaluate(() => document.getElementById("santi-nuca")!.scrollIntoView({ behavior: "instant" }));
-    await expect.poll(() => page.evaluate(() => location.pathname)).toBe("/trabajo/santi-nuca");
-    await expect(page).toHaveTitle("Santi Nuca — Franco Núñez");
+    await page.evaluate(() => document.getElementById("perfil")!.scrollIntoView({ behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe("#perfil");
+    // THE SHIFT and the reel are the home itself: no anchor of their own in the address
+    await page.evaluate(() => document.getElementById("shift")!.scrollIntoView({ behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => `${location.pathname}${location.hash}`)).toBe("/");
     await page.evaluate(() => window.scrollTo(0, 0));
     await expect.poll(() => page.evaluate(() => location.pathname)).toBe("/");
+    await expect(page).toHaveTitle(/Franco Núñez/);
     expect(await page.evaluate(() => history.length)).toBe(before);
   });
 });
@@ -142,17 +158,26 @@ test.describe("routes", () => {
 test.describe("a failed bundle (Spec §24 / §27 \"block GSAP chunk only\", Phase 13)", () => {
   test("if an app chunk fails to load, the page falls back to the static, readable document", async ({ page }, info) => {
     test.skip(info.project.name !== "xl-1440" && info.project.name !== "sm-390", "twice");
-    const html = await (await page.request.get("/")).text();
-    const chunks = [...html.matchAll(/src="(\/_next\/static\/chunks\/[^"]+\.js)"/g)].map((m) => m[1]);
-    let gsap: string | undefined;
-    for (const c of chunks) if ((await (await page.request.get(c)).text()).includes("ScrollTrigger")) gsap = c;
-    expect(gsap, "the chunk carrying GSAP").toBeTruthy();
-    await page.route("**/*", (r) => (r.request().url().endsWith(gsap!) ? r.abort() : r.continue()));
+    // the home and a case are two documents (docs/25): each may carry GSAP in its own chunk
+    const gsapChunks: string[] = [];
+    for (const route of ["/", "/trabajo/travelsuite360"]) {
+      const html = await (await page.request.get(route)).text();
+      const chunks = [...html.matchAll(/src="(\/_next\/static\/chunks\/[^"]+\.js)"/g)].map((m) => m[1]);
+      for (const c of chunks) if ((await (await page.request.get(c)).text()).includes("ScrollTrigger")) gsapChunks.push(c);
+    }
+    expect(gsapChunks.length, "the chunk carrying GSAP").toBeGreaterThan(0);
+    await page.route("**/*", (r) => (gsapChunks.some((c) => r.request().url().endsWith(c)) ? r.abort() : r.continue()));
     await page.goto("/", { waitUntil: "networkidle" });
     await expect(page.locator("html")).toHaveAttribute("data-js-failed", "");
     expect(await page.locator("html").getAttribute("class")).not.toMatch(/js/);
-    // the worlds read as their static compositions: names and copy visible, no stacked layers
-    for (const name of ["TravelSuite360", "Rayo Smash", "Santi Nuca", "Chef Arturo"]) await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+    // THE SHIFT reads as its static page: the four lines and the finished interface
+    await expect(page.locator("#shift .shift-line").filter({ visible: true })).toHaveCount(4);
+    expect(await page.locator("#shift .sh-frame .sh-done").evaluate((e) => Number(getComputedStyle(e).opacity))).toBe(1);
+    expect(await page.evaluate((w) => document.documentElement.scrollWidth - w, page.viewportSize()!.width)).toBeLessThanOrEqual(0);
+    // a case: the world reads as its static composition, names and copy visible, no stacked layers
+    await page.goto("/trabajo/travelsuite360", { waitUntil: "networkidle" });
+    await expect(page.locator("html")).toHaveAttribute("data-js-failed", "");
+    await expect(page.getByRole("heading", { level: 2, name: "TravelSuite360" })).toBeVisible();
     await expect(page.locator("#travelsuite360").getByText("Necesito viajar a Punta Cana en julio, somos cuatro.", { exact: true }).filter({ visible: true }).first()).toBeVisible();
     expect(await page.evaluate((w) => document.documentElement.scrollWidth - w, page.viewportSize()!.width)).toBeLessThanOrEqual(0);
   });

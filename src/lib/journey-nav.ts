@@ -6,9 +6,12 @@ import { isProjectSection, pathForSection, sectionForLocation } from "./route-sy
 import { sceneScroll } from "./useScene";
 
 /**
- * In-journey navigation (Spec §06 "Entering a world", §20). One document on every URL: explicit
- * navigation pushes history and scrolls; scrolling only replaces. Never `router.push` (it would
- * remount the journey between `/` and `/trabajo/[slug]`).
+ * In-journey navigation (Spec §06 "Entering a world", §20). Inside one document, explicit
+ * navigation pushes history and scrolls; scrolling only replaces. Never `router.push`.
+ *
+ * Since THE SHIFT (docs/25) `/` and `/trabajo/[slug]` are two documents: the home journey
+ * (discovery) and the project's case (evaluation). A link to a section this document does not
+ * contain is an ordinary page navigation (`isHere`); one to a section it contains stays in place.
  *
  * History entries carry only our own state — `{ section, y }` — so Next.js keeps copying its
  * router internals into them and Back/Forward restore the same page tree without a reload.
@@ -18,6 +21,8 @@ export interface JourneyHistoryState {
   section?: SectionId;
   /** scroll position to return to on Back / Forward */
   y?: number;
+  /** the reel's active piece: Back from a case returns to the card the visitor opened (docs/25) */
+  reel?: number;
 }
 
 const NEXT_KEYS = new Set(["__NA", "__PRIVATE_NEXTJS_INTERNALS_TREE", "_N"]);
@@ -104,6 +109,11 @@ export function navigate(section: SectionId, opts: { focus?: boolean; from?: Ele
   if (opts.focus) focusSection(section);
 }
 
+/** the section is part of this document (the home journey or one case): navigation stays in place */
+export function isHere(section: SectionId): boolean {
+  return !!document.querySelector(`[data-section="${section}"]`);
+}
+
 /** a same-origin link into the journey → its section (null: let the browser handle it) */
 export function sectionForHref(href: string): SectionId | null {
   let url: URL;
@@ -166,11 +176,22 @@ export function trackScrollPosition(): () => void {
   };
 }
 
-/** a reload (not a fresh visit) with a remembered position */
+/**
+ * A reload with a remembered position — or a return with Back / Forward from another document
+ * (a case study back to the home journey, docs/25) that the browser did not restore from its cache.
+ */
 export function reloadPosition(): number | null {
   const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
   const y = ownState().y;
-  return nav?.type === "reload" && typeof y === "number" ? y : null;
+  return (nav?.type === "reload" || nav?.type === "back_forward") && typeof y === "number" ? y : null;
+}
+
+/** the reel piece to start on: a reload or a return (Back / Forward) restores the one left active */
+export function rememberedReel(count: number): number | null {
+  const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+  const i = ownState().reel;
+  if (nav?.type !== "reload" && nav?.type !== "back_forward") return null;
+  return typeof i === "number" && i >= 0 && i < count ? i : null;
 }
 
 /** Back / Forward: return to the remembered position (or the section's start) instantly */

@@ -179,12 +179,13 @@ test.describe("reload and deep links", () => {
     }
   });
 
-  test("a deep link starts at the world: the hero stays out of sight, no opening", async ({ page }) => {
+  test("a deep link starts at the world: no hero, no opening, the header shown", async ({ page }) => {
     const problems = watchConsole(page);
     await page.goto("/trabajo/santi-nuca");
     await expect(page.locator("main")).toHaveAttribute("data-started", "");
     await expect.poll(() => page.evaluate(() => Math.abs(document.getElementById("santi-nuca")!.getBoundingClientRect().top))).toBeLessThan(4);
-    await expect.poll(() => phase(page)).toBe("H2");
+    // a case is its own document (docs/25): the opening belongs to the home journey only
+    await expect(page.locator("#inicio")).toHaveCount(0);
     await expect.poll(() => headerOpacity(page)).toBeGreaterThan(0.95);
     expect(problems).toEqual([]);
   });
