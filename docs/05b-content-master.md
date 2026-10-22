@@ -822,3 +822,34 @@ Reglas:
 - no se presenta como trabajo publicado.
 
 **Casos individuales.** `/trabajo/{slug}` conserva el copy de §06–§09 y §17 (metadatos). La prueba suma «← Trabajo» (texto ya existente en el sistema, `SITE.world.back`), que vuelve al reel. «Siguiente →» lleva al caso siguiente; después de Chef Arturo, a Capacidades de la home. Sale del sistema «Ir a {proyecto}», el salto sin JS dentro del documento único: el caso empieza por su mundo y no hace falta.
+
+## 24 — Dirección de arte final: Capacidades, THE SHIFT, Perfil, showreel (addendum local, 2026-10-22)
+
+> **Addendum de este export, pendiente de sincronizar con el Claude Doc.** Pedido de Franco «REVELADO 2.2 — MASTER PROMPT · FINAL ART DIRECTION · EDITORIAL RHYTHM · MOTION · PROFESSIONAL SHOWREEL» (2026-10-22). Implementación: `docs/26-final-art-direction-motion.md`. **No se reescribió copy aprobado**: lo que sigue es cómo se reparte en pantalla y las pocas palabras nuevas, cada una con su fuente.
+
+**THE SHIFT (§23).** Cada frase se parte en un comienzo en papel y un remate en rojo, el reparto que propone el brief. El texto de cada frase no cambia.
+
+| Frase | Papel | Rojo |
+|---|---|---|
+| «Una idea no alcanza.» | Una idea | no alcanza. |
+| «Necesita dirección.» | Necesita | dirección. |
+| «Y ejecución.» | Y | ejecución. |
+| «De la idea al producto.» | De la idea | al producto. |
+
+**Capacidades (§22): el índice editorial.**
+- La frase del busto, «Todo lo anterior pasó por las mismas manos.», es ahora la apertura de la sección, en tamaño de titular. El texto no cambia.
+- El kicker, los seis nombres, los seis enunciados y «Después de publicar» se mantienen tal cual.
+- Las escenas sólo reutilizan copy aprobado de los proyectos:
+  - TravelSuite360, §06: el mensaje, «interpretado», los campos, «Opción 01 · Opción 02», «reserva confirmada».
+  - Chef Arturo, §09: el producto, el precio, «− 1 +», «Agregar al carrito», «Mercado Pago».
+- Las únicas palabras que agrega una escena salen del enunciado de su propia capacidad:
+  - en 02, «Front · Back · Datos», de «Front, back y datos en producción…»;
+  - en 06, «Negocios · Personas · Próximos clientes», de «…acercar negocios a las personas que pueden convertirse en sus próximos clientes».
+  - Lo verifica `wordsFromStatement` en `tests/capabilities.test.ts`.
+- Sin métricas, cifras, ROAS ni resultados.
+
+**Perfil (§21).** El copy no cambia. Se suma el conductor de Meta Ads «Estrategia → Producto → Crecimiento», texto del brief, a confirmar. Va como lista visible encima del titular de Meta Ads.
+
+**Showreel.** Las cuatro tarjetas muestran las películas finales de Franco. La de TravelSuite360 muestra sólo datos demo: «Ana Demo», «Bruno Ejemplo», «Agencia Demo». Ver la revisión de §23 en `docs/26` §F2. No hay copy nuevo.
+
+**Tipografía en rojo, regla.** El rojo de texto se usa sólo en tamaños grandes, donde cumple AA para texto grande: los remates de THE SHIFT, el punto de «CONVERTIR.», «Crecimiento» y «Ahora, el tuyo.». En micro-textos el rojo es una marca (un punto o un cuadrado) junto a texto en papel.
