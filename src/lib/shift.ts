@@ -81,7 +81,7 @@ export function uiHeight(v: ShiftVariant): number {
 
 /** where the act lines live: no fragment ever crosses it (the text is never covered) */
 export const TEXT_ZONE: Record<ShiftVariant, { x: number; y: number; w: number; h: number }> = {
-  wide: { x: 0.05, y: 0.24, w: 0.3, h: 0.46 },
+  wide: { x: 0.05, y: 0.24, w: 0.32, h: 0.46 },
   tablet: { x: 0.08, y: 0.085, w: 0.84, h: 0.145 },
   phone: { x: 0.06, y: 0.1, w: 0.88, h: 0.17 },
 };
@@ -236,8 +236,8 @@ export const SCATTER: Record<ShiftVariant, Partial<Record<ShiftElement, ScatterP
     nav3: { x: 0.93, y: 0.12, r: -15, s: 1.2, o: 0.9 },
     cta: { x: 0.91, y: 0.45, r: -18, s: 1.15, o: 0.9 },
     eyebrow: { x: 0.55, y: 0.58, r: 0, s: 1.2, o: 0.9 },
-    h1a: { x: 0.57, y: 0.3, r: -5, s: 1.3, o: 1 },
-    h1b: { x: 0.72, y: 0.67, r: 8, s: 1.45, o: 1 },
+    h1a: { x: 0.6, y: 0.3, r: -5, s: 0.95, o: 1 },
+    h1b: { x: 0.72, y: 0.67, r: 8, s: 1.05, o: 1 },
     body: { x: 0.62, y: 0.16, r: -3, s: 1.05, o: 0.9 },
     button: { x: 0.8, y: 0.8, r: 12, s: 1.15, o: 1 },
     chip: { x: 0.49, y: 0.4, r: -16, s: 1.25, o: 1 },
@@ -259,8 +259,8 @@ export const SCATTER: Record<ShiftVariant, Partial<Record<ShiftElement, ScatterP
     nav3: { x: 0.86, y: 0.37, r: -14, s: 1.2, o: 0.9 },
     cta: { x: 0.86, y: 0.52, r: -17, s: 1.2, o: 0.9 },
     eyebrow: { x: 0.27, y: 0.42, r: 0, s: 1.3, o: 0.9 },
-    h1a: { x: 0.43, y: 0.335, r: -5, s: 0.9, o: 1 },
-    h1b: { x: 0.6, y: 0.47, r: 7, s: 0.85, o: 1 },
+    h1a: { x: 0.43, y: 0.335, r: -5, s: 0.75, o: 1 },
+    h1b: { x: 0.6, y: 0.47, r: 7, s: 0.72, o: 1 },
     body: { x: 0.64, y: 0.62, r: -4, s: 0.9, o: 0.9 },
     button: { x: 0.3, y: 0.72, r: 11, s: 1.1, o: 1 },
     chip: { x: 0.16, y: 0.655, r: -15, s: 1.2, o: 1 },
@@ -277,8 +277,8 @@ export const SCATTER: Record<ShiftVariant, Partial<Record<ShiftElement, ScatterP
     word: { x: 0.3, y: 0.315, r: 4, s: 1.15, o: 0.9 },
     menu: { x: 0.8, y: 0.31, r: -14, s: 1.4, o: 0.8 },
     eyebrow: { x: 0.3, y: 0.445, r: 0, s: 0.9, o: 0.9 },
-    h1a: { x: 0.45, y: 0.37, r: -6, s: 0.92, o: 1 },
-    h1b: { x: 0.56, y: 0.51, r: 7, s: 0.88, o: 1 },
+    h1a: { x: 0.45, y: 0.37, r: -6, s: 0.78, o: 1 },
+    h1b: { x: 0.56, y: 0.51, r: 7, s: 0.74, o: 1 },
     body: { x: 0.6, y: 0.62, r: -4, s: 0.85, o: 0.9 },
     button: { x: 0.28, y: 0.71, r: 10, s: 1, o: 1 },
     chip: { x: 0.74, y: 0.455, r: -14, s: 1.1, o: 1 },

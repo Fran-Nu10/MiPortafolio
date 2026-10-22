@@ -64,11 +64,12 @@ export const SITE = {
    */
   shift: {
     heading: "De la complejidad al producto.",
+    /** `accent`: the line's last words, set in red (docs/26 §B): the protagonists read at once */
     acts: [
-      { n: "01", title: "El desorden", line: "Una idea no alcanza." },
-      { n: "02", title: "La dirección", line: "Necesita dirección." },
-      { n: "03", title: "La ejecución", line: "Y ejecución." },
-      { n: "04", title: "El resultado", line: "De la idea al producto." },
+      { n: "01", title: "El desorden", line: "Una idea no alcanza.", accent: "no alcanza." },
+      { n: "02", title: "La dirección", line: "Necesita dirección.", accent: "dirección." },
+      { n: "03", title: "La ejecución", line: "Y ejecución.", accent: "ejecución." },
+      { n: "04", title: "El resultado", line: "De la idea al producto.", accent: "al producto." },
     ],
     concept: "Interfaz conceptual, diseñada para esta sección.",
     /** act IV: the system, annotated (the grid's columns are the ones each variant draws) */

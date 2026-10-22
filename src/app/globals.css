@@ -1183,10 +1183,26 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
 .shift-line {
   margin: 0;
   font-size: var(--type-statement);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.02;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   text-wrap: balance;
+}
+/* each half of a line rises out of its own mask (docs/26 §B); the accent is the act's protagonist */
+.shift-mask {
+  display: inline-block;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+  overflow: clip;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+.shift-lead,
+.shift-accent {
+  display: inline-block;
+}
+.shift-accent {
+  color: var(--color-signal);
 }
 .shift-figure {
   display: grid;
@@ -1611,7 +1627,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
     font-size: max(11px, 2.8cqw);
   }
   html.js .shift-stage[data-anim] .shift-line {
-    font-size: 9.6cqw;
+    font-size: 10.6cqw;
     line-height: 0.98;
   }
   html.js .shift-stage[data-anim] .shift-figure {
@@ -1650,8 +1666,9 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   html.js .shift-stage[data-anim] .sh-mark .sh-raw {
     border: 1.5px solid var(--color-signal);
   }
+  /* the fragments' type steps back from the act lines: muted (still AA on black), never paper */
   html.js .shift-stage[data-anim] :is(.sh-h1a, .sh-h1b, .sh-word) .sh-raw {
-    color: var(--color-paper-2);
+    color: var(--color-muted);
   }
   /* the raw type stays AA on black at every pose (it is read as part of the image, but it is type) */
   html.js .shift-stage[data-anim] .sh-raw .sh-card-n {
@@ -1740,7 +1757,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
       font-size: max(11px, 1.6cqw);
     }
     html.js .shift-stage[data-anim] .shift-line {
-      font-size: 6.6cqw;
+      font-size: 7.4cqw;
     }
     html.js .shift-stage[data-anim] .shift-figure {
       left: 8%;
@@ -1801,7 +1818,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
     html.js .shift-stage[data-anim] .shift-acts {
       left: 6%;
       top: 31%;
-      width: 29%;
+      width: 31%;
     }
     html.js .shift-stage[data-anim] .shift-act {
       gap: 1.2cqw;
@@ -1810,7 +1827,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
       font-size: max(11px, 0.85cqw);
     }
     html.js .shift-stage[data-anim] .shift-line {
-      font-size: 4.6cqw;
+      font-size: 4.8cqw;
     }
     html.js .shift-stage[data-anim] .shift-figure {
       left: 38%;

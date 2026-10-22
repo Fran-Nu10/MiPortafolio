@@ -65,6 +65,17 @@ const look = (page: Page, sel: string) =>
     return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, width: r.width, height: r.height, o, transform: getComputedStyle(e).transform };
   }, sel);
 
+/** an act line is shown when both its halves sit in their masks (docs/26 §B), hidden when both are out */
+const lineShown = (page: Page, n: number) =>
+  page.evaluate((n) => {
+    const act = document.querySelectorAll<HTMLElement>("#shift [data-part=act]")[n];
+    const inMask = (sel: string) => {
+      const el = act.querySelector<HTMLElement>(sel)!;
+      return Math.abs(el.getBoundingClientRect().top - el.parentElement!.getBoundingClientRect().top) < 2;
+    };
+    return inMask("[data-part=lead]") && inMask("[data-part=accent]");
+  }, n);
+
 /** every drawn fragment: how far its painted box is from its laid-out box (FLIP at rest = 0) */
 const drift = (page: Page) =>
   page.evaluate(() =>
@@ -111,12 +122,14 @@ test.describe("the transformation (pinned, with motion)", () => {
     for (const s of SHIFT_STATES) {
       await toState(page, s);
       const i = SHIFT_STATES.indexOf(s);
-      for (let n = 0; n < LINES.length; n++) {
-        const o = (await look(page, `#shift [data-part=act]:nth-child(${n + 1})`)).o;
-        if (n === i) expect(o, `${s}: line ${n + 1}`).toBeGreaterThan(0.99);
-        else expect(o, `${s}: line ${n + 1}`).toBeLessThan(0.01);
-      }
+      for (let n = 0; n < LINES.length; n++) expect(await lineShown(page, n), `${s}: line ${n + 1}`).toBe(n === i);
     }
+    // the protagonist reads first: the line is larger than any fragment's type, its accent in red
+    await toState(page, "DESORDEN");
+    const lineSize = await page.locator("#shift [data-part=act] .shift-line").first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    const fragSize = await page.locator("#shift .sh-h1a").evaluate((e) => parseFloat(getComputedStyle(e).fontSize) * new DOMMatrix(getComputedStyle(e).transform).a);
+    expect(lineSize).toBeGreaterThan(fragSize * 1.15);
+    expect(await page.locator("#shift [data-part=accent]").first().evaluate((e) => getComputedStyle(e).color)).toBe("rgb(230, 59, 46)");
 
     // act III and IV: every fragment on its place in the finished interface (FLIP, nothing swapped)
     await toState(page, "EJECUCION");
@@ -162,6 +175,7 @@ test.describe("the transformation (pinned, with motion)", () => {
     const vw = page.viewportSize()!.width;
     const vh = page.viewportSize()!.height;
     const line = await look(page, "#shift [data-part=act]:nth-child(1) .shift-line");
+    expect(await lineShown(page, 0)).toBe(true);
     const boxes = await page.evaluate(() =>
       Array.from(document.querySelectorAll<HTMLElement>("#shift [data-part=el]"))
         .filter((e) => e.offsetWidth > 0)

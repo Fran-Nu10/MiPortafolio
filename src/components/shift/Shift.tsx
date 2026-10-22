@@ -28,7 +28,7 @@ import {
 export interface ShiftView {
   /** the section's title, shown small (its working name, THE SHIFT, never is: Content Master 03) */
   heading: string;
-  acts: { n: string; title: string; line: string }[];
+  acts: { n: string; title: string; line: string; accent: string }[];
   /** the caption that says what the interface is */
   concept: string;
   notes: { grid: Record<ShiftVariant, string>; type: string; state: string };
@@ -174,10 +174,18 @@ export function Shift({ view }: { view: ShiftView }) {
       const tl = gsap.timeline({ defaults: { ease: EASE.none } });
       for (const s of SHIFT_STATES) tl.addLabel(`s:${s}`, SHIFT_AT[s]);
 
-      // the act lines: one at a time, the old one leaves upward, the new one settles in
+      // the act lines (docs/26 §B): one at a time. The old one leaves upward; the new one rises out of
+      // its mask, its first words, then its red accent — the protagonist of each act
+      const lead = acts.map((a) => a.querySelector<HTMLElement>('[data-part="lead"]')!);
+      const accent = acts.map((a) => a.querySelector<HTMLElement>('[data-part="accent"]')!);
+      gsap.set(acts.slice(1), { opacity: 1 });
+      gsap.set([...lead.slice(1), ...accent.slice(1)], { yPercent: 110 });
       const swap = (from: number, state: ShiftState) => {
-        tl.fromTo(acts[from], { opacity: 1, y: 0 }, { opacity: 0, y: -0.02 * H, duration: span(state, 0, 0.28), immediateRender: false }, within(state, 0));
-        tl.fromTo(acts[from + 1], { opacity: 0, y: 0.03 * H }, { opacity: 1, y: 0, duration: span(state, 0.42, 0.9), ease: EASE.settle, immediateRender: true }, within(state, 0.42));
+        tl.fromTo([lead[from], accent[from]], { yPercent: 0 }, { yPercent: -110, duration: span(state, 0, 0.3), ease: EASE.reveal, stagger: span(state, 0, 0.04), immediateRender: false }, within(state, 0));
+        tl.fromTo(acts[from].querySelector(".shift-act-n"), { opacity: 1 }, { opacity: 0, duration: span(state, 0, 0.2), immediateRender: false }, within(state, 0));
+        tl.fromTo(acts[from + 1].querySelector(".shift-act-n"), { opacity: 0 }, { opacity: 1, duration: span(state, 0.36, 0.56), immediateRender: true }, within(state, 0.36));
+        tl.fromTo(lead[from + 1], { yPercent: 110 }, { yPercent: 0, duration: span(state, 0.4, 0.78), ease: EASE.settle, immediateRender: false }, within(state, 0.4));
+        tl.fromTo(accent[from + 1], { yPercent: 110 }, { yPercent: 0, duration: span(state, 0.5, 0.9), ease: EASE.settle, immediateRender: false }, within(state, 0.5));
       };
 
       // ── I → II · the direction: straighten, align, find the grid ──
@@ -275,7 +283,19 @@ export function Shift({ view }: { view: ShiftView }) {
                   <span className="shift-act-n micro">
                     {a.n} — {a.title}
                   </span>
-                  <p className="shift-line">{a.line}</p>
+                  {/* the line reads as one sentence; its two halves move on their own (the accent in red) */}
+                  <p className="shift-line">
+                    <span className="shift-mask">
+                      <span data-part="lead" className="shift-lead">
+                        {a.line.slice(0, a.line.length - a.accent.length).trimEnd()}
+                      </span>
+                    </span>{" "}
+                    <span className="shift-mask">
+                      <span data-part="accent" className="shift-accent">
+                        {a.accent}
+                      </span>
+                    </span>
+                  </p>
                 </li>
               ))}
             </ol>
