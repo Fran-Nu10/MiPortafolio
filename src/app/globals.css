@@ -3867,6 +3867,16 @@ a.cx-ref:hover {
 .dec-word-in {
   display: block;
 }
+/* a title's letters (docs/26 §D): transformed one by one by the scene, never by layout */
+.dec-l {
+  display: inline-block;
+}
+.dec-l[data-mark] {
+  color: var(--color-signal);
+}
+.dec-sweep {
+  display: none;
+}
 .dec-line {
   max-width: 30ch;
   margin: 0;
@@ -4020,6 +4030,19 @@ a.cx-ref:hover {
   }
   html.js .dec-stage[data-anim] .dec-word[data-w="2"] .dec-word-in {
     transform: translateY(105%);
+  }
+  /* the red line along CONVENCER.: a bar on the word's baseline, run by the scene (through its middle
+     it read as a strike-through) */
+  html.js .dec-stage[data-anim] .dec-sweep {
+    position: absolute;
+    left: 0;
+    bottom: 0.06em;
+    display: block;
+    width: 100%;
+    height: 0.06em;
+    background: var(--color-signal);
+    opacity: 0;
+    pointer-events: none;
   }
   /* the red line of an aperture: as wide as its word, on its center line */
   html.js .dec-stage[data-anim] .dec-ap {

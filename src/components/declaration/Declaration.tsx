@@ -35,6 +35,36 @@ function fieldVars(i: number): CSSProperties {
   } as CSSProperties;
 }
 
+/**
+ * A title as letters (docs/26 §D): each one can find its place on its own. The text reads exactly as
+ * the title (no extra node, no label); `mark` makes the closing period the one red point.
+ */
+function Letters({ text, mark = false }: { text: string; mark?: boolean }) {
+  return (
+    <>
+      {Array.from(text).map((ch, i, all) => (
+        <span key={i} data-part="l" className="dec-l" data-mark={mark && i === all.length - 1 && ch === "." ? "" : undefined}>
+          {ch}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** a deterministic scatter for a letter's arrival (no randomness at runtime): em offsets and degrees */
+const ARRIVE = [
+  { y: 0.34, r: -7 },
+  { y: -0.26, r: 5 },
+  { y: 0.22, r: -4 },
+  { y: -0.32, r: 6 },
+  { y: 0.28, r: -5 },
+  { y: -0.2, r: 4 },
+  { y: 0.3, r: -6 },
+  { y: -0.24, r: 5 },
+  { y: 0.18, r: -3 },
+  { y: -0.28, r: 4 },
+];
+
 /** an element's layout box in the design space (offsets ignore transforms) */
 function box(el: HTMLElement, space: HTMLElement) {
   let x = 0;
@@ -161,6 +191,17 @@ export function Declaration({ view }: { view: DeclarationView }) {
       );
       tl.fromTo(ap1, { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, transformOrigin: "0% 50%", duration: span("MOSTRAR", 0, 0.4), ease: EASE.settle, immediateRender: true }, within("MOSTRAR", 0));
       aperture(0, ap1, "MOSTRAR", 0.48, 0.86);
+      // MOSTRAR.: as the aperture opens, each letter finds its place — a short, controlled elastic
+      // settle from its own offset (docs/26 §D); the word is whole and still at the state
+      const fs = (el: HTMLElement) => parseFloat(getComputedStyle(el).fontSize) || 100;
+      const letters = words.map((w) => Array.from(w.querySelectorAll<HTMLElement>('[data-part="l"]')));
+      const em1 = fs(words[0]);
+      tl.fromTo(
+        letters[0],
+        { y: (k: number) => ARRIVE[k % ARRIVE.length].y * em1, rotation: (k: number) => ARRIVE[k % ARRIVE.length].r, transformOrigin: "50% 80%" },
+        { y: 0, rotation: 0, duration: span("MOSTRAR", 0.46, 0.98), ease: "elastic.out(1, 0.55)", stagger: span("MOSTRAR", 0, 0.035), immediateRender: true },
+        within("MOSTRAR", 0.46),
+      );
       lineIn(lines[0], "MOSTRAR", 0.74, 1);
 
       // ── II · organization: MOSTRAR. to the index; six loose words settle into a grid ──
@@ -181,6 +222,19 @@ export function Declaration({ view }: { view: DeclarationView }) {
       tl.fromTo(cells, { opacity: 1 }, { opacity: 0.5, duration: span("CONVENCER", 0, 0.4), immediateRender: false }, within("CONVENCER", 0));
       // y stays 0: the CSS first state (translateY 105%) would otherwise be read as pixels
       tl.fromTo(wordIn2, { y: 0, yPercent: 105 }, { y: 0, yPercent: 0, duration: span("CONVENCER", 0.08, 0.72), ease: EASE.settle, immediateRender: true }, within("CONVENCER", 0.08));
+      // … and a red line runs through it: each letter answers as the line passes — a lift, a breath
+      // of scale, a flush of red — then is still again. The word never hides (docs/26 §D)
+      const sweep = pick('[data-part="sweep"]');
+      const em2 = fs(words[1]);
+      const n2 = letters[1].length;
+      tl.fromTo(sweep, { xPercent: -100, opacity: 1 }, { xPercent: 100, duration: span("CONVENCER", 0.56, 0.9), immediateRender: true }, within("CONVENCER", 0.56));
+      tl.set(sweep, { opacity: 0 }, within("CONVENCER", 0.9));
+      letters[1].forEach((l, k) => {
+        const at = within("CONVENCER", 0.56 + (0.3 * (k + 0.5)) / n2);
+        const half = span("CONVENCER", 0, 0.05);
+        tl.fromTo(l, { y: 0, scale: 1, color: "rgb(237, 232, 222)" }, { y: -0.05 * em2, scale: 1.07, color: "rgb(230, 59, 46)", duration: half, ease: EASE.settle, immediateRender: false }, at);
+        tl.fromTo(l, { y: -0.05 * em2, scale: 1.07, color: "rgb(230, 59, 46)" }, { y: 0, scale: 1, color: "rgb(237, 232, 222)", duration: half * 1.6, ease: "back.out(2.4)", immediateRender: false }, at + half);
+      });
       lineIn(lines[1], "CONVENCER", 0.58, 1);
 
       // ── III · resolution: the grid collapses into one track; four actions light on it ──
@@ -209,6 +263,19 @@ export function Declaration({ view }: { view: DeclarationView }) {
       const apOrigin = axis === "x" ? "100% 50%" : "0% 50%";
       tl.fromTo(ap3, { scaleX: 0, transformOrigin: apOrigin }, { scaleX: 1, transformOrigin: apOrigin, duration: span("CONVERTIR", 0.38, 0.62), ease: EASE.settle, immediateRender: true }, within("CONVERTIR", 0.38));
       aperture(2, ap3, "CONVERTIR", 0.58, 0.92);
+      // CONVERTIR.: decisive — the letters close in from a wider set and lock with a short overshoot;
+      // the period lands last, the red point that ends the movement (docs/26 §D)
+      const em3 = fs(words[2]);
+      const n3 = letters[2].length;
+      const body = letters[2].filter((l) => !l.hasAttribute("data-mark"));
+      const point = letters[2].find((l) => l.hasAttribute("data-mark"));
+      tl.fromTo(
+        body,
+        { x: (k: number) => (k - (n3 - 1) / 2) * 0.09 * em3, scaleY: 1.12, transformOrigin: "50% 100%" },
+        { x: 0, scaleY: 1, duration: span("CONVERTIR", 0.58, 0.94), ease: "back.out(1.7)", stagger: { each: span("CONVERTIR", 0, 0.012), from: "center" }, immediateRender: true },
+        within("CONVERTIR", 0.58),
+      );
+      if (point) tl.fromTo(point, { scale: 0, transformOrigin: "50% 85%" }, { scale: 1, duration: span("CONVERTIR", 0.86, 1), ease: "back.out(3)", immediateRender: true }, within("CONVERTIR", 0.86));
 
       // ── … CONVERTIR. to the index; the final phrase, then the conclusion ──
       toIndex(2, "ELIJAN");
@@ -244,7 +311,7 @@ export function Declaration({ view }: { view: DeclarationView }) {
               <span aria-hidden="true" data-part="ap" data-w="1" className="dec-ap" />
               <h3 data-part="word" data-w="1" className="dec-word">
                 <span data-part="word-in" className="dec-word-in">
-                  {one.title}
+                  <Letters text={one.title} />
                 </span>
               </h3>
               <p data-part="statement" data-l="1" className="dec-line">
@@ -268,8 +335,10 @@ export function Declaration({ view }: { view: DeclarationView }) {
               </ol>
               <h3 data-part="word" data-w="2" className="dec-word">
                 <span data-part="word-in" className="dec-word-in">
-                  {two.title}
+                  <Letters text={two.title} />
                 </span>
+                {/* the red line that runs through CONVENCER. (docs/26 §D) */}
+                <span aria-hidden="true" data-part="sweep" className="dec-sweep" />
               </h3>
               <p data-part="statement" data-l="2" className="dec-line">
                 {two.line}
@@ -292,7 +361,7 @@ export function Declaration({ view }: { view: DeclarationView }) {
               <span aria-hidden="true" data-part="ap" data-w="3" className="dec-ap" />
               <h3 data-part="word" data-w="3" className="dec-word">
                 <span data-part="word-in" className="dec-word-in">
-                  {three.title}
+                  <Letters text={three.title} mark />
                 </span>
               </h3>
               <p className="dec-final">
