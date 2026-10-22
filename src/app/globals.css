@@ -839,6 +839,10 @@ html.js .reel[data-anim] .reel-item[data-active] .reel-piece:hover .reel-frame::
 html.js .reel[data-anim] .reel-frame > .loop-video {
   transition: transform 900ms var(--ease-settle);
 }
+/* the film is decoration: the frame takes the click, even while a codec fallback remounts the <video> */
+.reel-frame .media-video {
+  pointer-events: none;
+}
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html.js .reel[data-anim] .reel-item[data-active] .reel-piece:hover .reel-frame > .loop-video {
     transform: scale(1.02);

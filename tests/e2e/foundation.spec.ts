@@ -233,7 +233,8 @@ test.describe("with JavaScript", () => {
     await page.goto("/");
     const inside = await page.locator("[data-placeholder] img, [data-placeholder] video").count();
     expect(inside).toBe(0);
-    // TravelSuite360: no capture is published before the privacy sign-off
-    expect(await page.locator('img[src*="travelsuite360"]').count()).toBe(0);
+    // TravelSuite360: the unapproved ENSAMBLE captures are never published; only the signed-off film
+    // (its poster is its frame 0, docs/26 §F2) may show
+    expect(await page.locator('img[src*="projects/travelsuite360"], img[srcset*="projects/travelsuite360"]').count()).toBe(0);
   });
 });

@@ -38,6 +38,9 @@ export function Journey() {
 
   const reelItems: ReelItemView[] = PROJECTS.map((p) => {
     const show = showreelOf(p);
+    // with its film the card takes the film's own aspect (docs/26 §F3): the picture is never cropped
+    const loop = resolveAsset(p.reel.loop);
+    const film = loop.status !== "placeholder";
     return {
       id: p.id,
       indexLabel: indexLabel(p.index, total),
@@ -46,8 +49,8 @@ export function Journey() {
       name: p.name,
       reelLine: p.reelLine,
       relationLine: p.relationLine,
-      aspect: p.reel.aspect,
-      loop: resolveAsset(p.reel.loop),
+      aspect: film ? { desktop: loop.aspect.desktop, mobile: loop.aspect.mobile ?? p.reel.aspect.mobile } : p.reel.aspect,
+      loop,
       reelLabel: p.a11y.reelLabel,
       enter: { href: show.route, label: SITE.reel.enter },
       open: openLink(p),

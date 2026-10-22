@@ -283,16 +283,30 @@ test.describe("keyboard and buttons", () => {
 test.describe("media and accessibility", () => {
   test("never more than one video playing", async ({ page }) => {
     await toReel(page);
+    // on arrival: the active film and, at most, its neighbour's metadata — never the four films
+    expect(await page.locator("#trabajo video").count()).toBeLessThanOrEqual(2);
     for (const n of ["02", "03", "04"]) {
       await page.getByRole("navigation", { name: "Proyectos" }).getByRole("button", { name: new RegExp(`^${n} ·`) }).click();
       await settle(page);
       const playing = await page.evaluate(() => Array.from(document.querySelectorAll("video")).filter((v) => !v.paused && !v.ended).length);
       expect(playing).toBeLessThanOrEqual(1);
     }
-    // no reel loop exists yet: the real posters (or the honest placeholder) are the frames
-    expect(await page.locator("#trabajo video").count()).toBe(0);
-    await expect(page.locator('#trabajo .reel-item[data-project="travelsuite360"] [data-placeholder]')).toHaveCount(1);
-    expect(await page.locator('#trabajo img[src*="travelsuite360"]').count()).toBe(0);
+    // the films (docs/26 §F): a card seen recently keeps its paused <video> for 10 s (the Phase 3 lifecycle);
+    // the TravelSuite360 card shows its signed-off film, never an unapproved capture
+    await expect(page.locator('#trabajo .reel-item[data-project="travelsuite360"] [data-placeholder]')).toHaveCount(0);
+    expect(await page.locator('#trabajo img[src*="projects/travelsuite360"]').count()).toBe(0);
+  });
+
+  test("the active film plays: its time advances (AV1 first; H.264 where AV1 fails to decode, as in WebKit)", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.use.reducedMotion === "reduce", "no <video> under reduced motion");
+    await toReel(page);
+    const film = () =>
+      page.evaluate(() => {
+        const v = document.querySelector<HTMLVideoElement>("#trabajo .reel-item[data-active] video");
+        return v ? { t: v.currentTime, src: v.currentSrc } : null;
+      });
+    await expect.poll(async () => (await film())?.t ?? -1, { timeout: 15000 }).toBeGreaterThan(0.5);
+    expect((await film())!.src).toMatch(/\/media\/reel\/travelsuite360-(desktop|mobile)\.(av1|h264)\.mp4$/);
   });
 
   test("axe: no serious or critical violations on the page", async ({ page }) => {

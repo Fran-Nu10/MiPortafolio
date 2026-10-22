@@ -154,11 +154,176 @@ export const ASSETS: AssetContract[] = [
     },
   },
 
-  // ── reel loops (posters only until they exist — allowed in production) ──────
-  { key: "ts.reel.loop", kind: "loop", status: "placeholder", aspect: { desktop: [1094, 616], mobile: REEL_MOBILE }, poster: "ts.reel.poster", alt: "", optional: true, meta: { duration: 4 } },
-  { key: "rayo.reel.loop", kind: "loop", status: "placeholder", aspect: { desktop: [1094, 580], mobile: REEL_MOBILE }, poster: "rayo.reel.poster", alt: "", optional: true, meta: { duration: 4 } },
-  { key: "santi.reel.loop", kind: "loop", status: "placeholder", aspect: { desktop: [1094, 700], mobile: REEL_MOBILE }, poster: "santi.reel.poster", alt: "", optional: true, meta: { duration: 4 } },
-  { key: "chef.reel.loop", kind: "loop", status: "placeholder", aspect: { desktop: [1094, 640], mobile: REEL_MOBILE }, poster: "chef.reel.poster", alt: "", optional: true, meta: { duration: 4 } },
+  // ── reel films (docs/26 §F): the four professional films, web versions made by
+  // scripts/encode-reel.mjs from the masters in REVELADO-PORTFOLIO-FINAL (kept outside the repo).
+  // AV1 first, H.264 fallback; the poster is each film's frame 0. The reel card takes the film's
+  // aspect (16:9 desktop; the mobile cut as delivered); the cases keep their SCREEN posters.
+  {
+    key: "ts.reel.film.poster",
+    kind: "still",
+    status: "final",
+    aspect: { desktop: [1600, 900], mobile: [720, 1280] },
+    files: {
+      desktop: { src: "/media/reel/travelsuite360-desktop-poster.webp", width: 1600, height: 900 },
+      mobile: { src: "/media/reel/travelsuite360-mobile-poster.webp", width: 720, height: 1280 },
+    },
+    alt: "",
+    privacyChecked: true,
+    meta: { source: "Película final de TravelSuite360, cuadro 0. Spec §23: sólo datos demo (Ana Demo, Bruno Ejemplo, Agencia Demo…), revisado cuadro a cuadro a 1 fps, desktop y mobile (docs/26 §F2); integración pedida por Franco, autor de la película, el 2026-10-22." },
+  },
+  {
+    key: "ts.reel.loop",
+    kind: "loop",
+    status: "final",
+    aspect: { desktop: [16, 9], mobile: [720, 1280] },
+    files: {
+      desktop: {
+        sources: [
+          { src: "/media/reel/travelsuite360-desktop.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/travelsuite360-desktop.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 1600,
+        height: 900,
+        duration: 12,
+      },
+      mobile: {
+        sources: [
+          { src: "/media/reel/travelsuite360-mobile.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/travelsuite360-mobile.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 720,
+        height: 1280,
+        duration: 12,
+      },
+    },
+    poster: "ts.reel.film.poster",
+    alt: "",
+    privacyChecked: true,
+    meta: { duration: 12, source: "Película final de TravelSuite360, 12 s, sin audio; datos demo revisados (Spec §23, docs/26 §F2)." },
+  },
+  {
+    key: "rayo.reel.film.poster",
+    kind: "still",
+    status: "final",
+    aspect: { desktop: [1600, 900], mobile: [720, 1280] },
+    files: {
+      desktop: { src: "/media/reel/rayo-smash-desktop-poster.webp", width: 1600, height: 900 },
+      mobile: { src: "/media/reel/rayo-smash-mobile-poster.webp", width: 720, height: 1280 },
+    },
+    alt: "",
+    meta: { source: "Película final de Rayo Smash (REVELADO-PORTFOLIO-FINAL/rayo-smash-{desktop,mobile}.mp4), cuadro 0." },
+  },
+  {
+    key: "rayo.reel.loop",
+    kind: "loop",
+    status: "final",
+    aspect: { desktop: [16, 9], mobile: [720, 1280] },
+    files: {
+      desktop: {
+        sources: [
+          { src: "/media/reel/rayo-smash-desktop.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/rayo-smash-desktop.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 1600,
+        height: 900,
+        duration: 15,
+      },
+      mobile: {
+        sources: [
+          { src: "/media/reel/rayo-smash-mobile.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/rayo-smash-mobile.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 720,
+        height: 1280,
+        duration: 15,
+      },
+    },
+    poster: "rayo.reel.film.poster",
+    alt: "",
+    meta: { duration: 15, source: "Película final de Rayo Smash, 15 s, sin audio." },
+  },
+  {
+    key: "santi.reel.film.poster",
+    kind: "still",
+    status: "final",
+    aspect: { desktop: [1600, 900], mobile: [720, 1280] },
+    files: {
+      desktop: { src: "/media/reel/santi-nuca-desktop-poster.webp", width: 1600, height: 900 },
+      mobile: { src: "/media/reel/santi-nuca-mobile-poster.webp", width: 720, height: 1280 },
+    },
+    alt: "",
+    meta: { source: "Película final de Santi Nuca (REVELADO-PORTFOLIO-FINAL/santi-nuca-{desktop,mobile}.mp4), cuadro 0." },
+  },
+  {
+    key: "santi.reel.loop",
+    kind: "loop",
+    status: "final",
+    aspect: { desktop: [16, 9], mobile: [720, 1280] },
+    files: {
+      desktop: {
+        sources: [
+          { src: "/media/reel/santi-nuca-desktop.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/santi-nuca-desktop.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 1600,
+        height: 900,
+        duration: 15,
+      },
+      mobile: {
+        sources: [
+          { src: "/media/reel/santi-nuca-mobile.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/santi-nuca-mobile.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 720,
+        height: 1280,
+        duration: 15,
+      },
+    },
+    poster: "santi.reel.film.poster",
+    alt: "",
+    meta: { duration: 15, source: "Película final de Santi Nuca, 15 s, sin audio." },
+  },
+  {
+    key: "chef.reel.film.poster",
+    kind: "still",
+    status: "final",
+    aspect: { desktop: [1600, 900], mobile: [716, 840] },
+    files: {
+      desktop: { src: "/media/reel/chef-arturo-desktop-poster.webp", width: 1600, height: 900 },
+      mobile: { src: "/media/reel/chef-arturo-mobile-poster.webp", width: 716, height: 840 },
+    },
+    alt: "",
+    meta: { source: "Película final de Chef Arturo (REVELADO-PORTFOLIO-FINAL/chef-arturo-{desktop,mobile}.mp4), cuadro 0." },
+  },
+  {
+    key: "chef.reel.loop",
+    kind: "loop",
+    status: "final",
+    aspect: { desktop: [16, 9], mobile: [716, 840] },
+    files: {
+      desktop: {
+        sources: [
+          { src: "/media/reel/chef-arturo-desktop.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/chef-arturo-desktop.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 1600,
+        height: 900,
+        duration: 15,
+      },
+      mobile: {
+        sources: [
+          { src: "/media/reel/chef-arturo-mobile.av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+          { src: "/media/reel/chef-arturo-mobile.h264.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+        ],
+        width: 716,
+        height: 840,
+        duration: 15,
+      },
+    },
+    poster: "chef.reel.film.poster",
+    alt: "",
+    meta: { duration: 15, source: "Película final de Chef Arturo, 15 s, sin audio." },
+  },
 
   // ── world objects ───────────────────────────────────────────────────────────
   // the Clásica as the demo's hero shows it (six layers, a double smash), keyed out of the

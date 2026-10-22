@@ -5,7 +5,7 @@ import type { VideoFiles } from "@/data/types";
 import { aspectVars, type ResolvedAsset } from "@/lib/resolved";
 import { claimPlayback, isSaveData, mediaTierFor, releasePlayback } from "@/lib/media";
 import { usePrefersReducedMotion } from "@/lib/motion";
-import { tierForWidth } from "@/lib/tiers";
+import { TIER_QUERIES } from "@/lib/tiers";
 import { useInView, usePageVisible } from "@/lib/useInView";
 import { Placeholder } from "./Placeholder";
 import { Still } from "./Still";
@@ -14,6 +14,16 @@ const noop = () => () => {};
 /** false on the server and during hydration, true afterwards: the <video> is client-only */
 function useHydrated() {
   return useSyncExternalStore(noop, () => true, () => false);
+}
+
+/** the phone tier, live: a resize across it swaps the cut (desktop 16:9 ↔ the mobile cut, docs/26 §F3) */
+function subscribePhone(onChange: () => void) {
+  const mq = window.matchMedia(TIER_QUERIES.sm);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+function usePhone() {
+  return useSyncExternalStore(subscribePhone, () => window.matchMedia(TIER_QUERIES.sm).matches, () => false);
 }
 
 /**
@@ -50,13 +60,17 @@ export function LoopVideo({
   const boxRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hydrated = useHydrated();
+  const phone = usePhone();
   const rm = usePrefersReducedMotion();
   const inView = useInView(boxRef, { threshold: 0.5 });
   const visible = usePageVisible();
   const [failed, setFailed] = useState(false);
+  /** sources skipped after a decode failure: a browser that claims AV1 and cannot decode it falls to H.264 */
+  const [skip, setSkip] = useState(0);
   const [shown, setShown] = useState(false);
 
   const real = asset.status !== "placeholder";
+  const tier = mediaTierFor(phone ? "sm" : "lg");
   const canMount = mount && real && hydrated && !rm && !failed && !isSaveData();
   const shouldPlay = canMount && active && inView && visible;
 
@@ -70,7 +84,8 @@ export function LoopVideo({
     claimPlayback(v);
     v.play().catch(() => setFailed(true));
     return () => releasePlayback(v);
-  }, [shouldPlay]);
+    // a swapped cut is a new element: it plays as the old one did
+  }, [shouldPlay, tier, skip]);
 
   // a clip that never presents its first frame within 4 s of trying is treated as failed
   useEffect(() => {
@@ -83,16 +98,17 @@ export function LoopVideo({
   const floor = poster ? <Still asset={poster} sizes={sizes} fill /> : <Placeholder asset={asset} fill />;
 
   let files: VideoFiles | null = null;
-  if (canMount && real) {
-    const tier = mediaTierFor(tierForWidth(window.innerWidth));
-    files = (asset.files[tier] ?? asset.files.desktop) as VideoFiles;
-  }
+  if (canMount && real) files = (asset.files[tier] ?? asset.files.desktop) as VideoFiles;
+  const sources = files ? files.sources.slice(skip) : [];
+  // a source that loads and then fails to decode is not retried by the browser: try the next one
+  const onVideoError = () => (skip + 1 < (files?.sources.length ?? 0) ? setSkip(skip + 1) : setFailed(true));
 
   return (
     <div ref={boxRef} className={`loop-video ${fill ? "media-fill" : "media-box"} ${className}`} style={aspectVars(asset) as CSSProperties} data-asset={asset.key}>
       {floor}
       {files ? (
         <video
+          key={`${tier}-${skip}`}
           ref={videoRef}
           className="media-video"
           style={{ opacity: shown ? 1 : 0 }}
@@ -105,11 +121,12 @@ export function LoopVideo({
           aria-hidden="true"
           tabIndex={-1}
           onPlaying={() => setShown(true)}
-          onError={() => setFailed(true)}
+          onError={onVideoError}
           onEnded={onEnded}
         >
-          {files.sources.map((s) => (
-            <source key={s.src} src={s.src} type={s.type} />
+          {sources.map((s, i) => (
+            // the last source reports its own failure (the <video> error covers a decode error)
+            <source key={s.src} src={s.src} type={s.type} onError={i === sources.length - 1 ? onVideoError : undefined} />
           ))}
         </video>
       ) : null}

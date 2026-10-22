@@ -222,7 +222,15 @@ describe("rule 6 · asset contracts", () => {
   });
 
   it("TravelSuite360 media never resolves to real files without the privacy sign-off", () => {
-    for (const a of ASSETS.filter((x) => x.key.startsWith("ts."))) expect(resolveAsset(a.key).status, a.key).toBe("placeholder");
+    for (const a of ASSETS.filter((x) => x.key.startsWith("ts."))) {
+      // without the §23 sign-off: a placeholder, always
+      if (a.privacyChecked !== true) expect(resolveAsset(a.key).status, a.key).toBe("placeholder");
+      // with it (the reel film, docs/26 §F2): the review is recorded where the file is declared
+      else expect(a.meta?.source, a.key).toMatch(/datos demo|Spec §23/);
+    }
+    // the unapproved ENSAMBLE captures stay unpublished: the SCREEN poster and the proof are not signed
+    expect(resolveAsset("ts.reel.poster").status).toBe("placeholder");
+    expect(resolveAsset("ts.proof").status).toBe("placeholder");
   });
 
   it("launch blockers are reported, not hidden", () => {

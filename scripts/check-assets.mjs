@@ -46,7 +46,20 @@ const BUDGET = {
 };
 const HERO_BUDGET = { desktop: 180 * KB, mobile: 110 * KB };
 /** per-key overrides (Spec §18): the grain tile is part of the ≤ 8 KB eager budget */
-const KEY_BUDGET = { "franco.hero": HERO_BUDGET, "site.grain": { desktop: 8 * KB, mobile: 8 * KB } };
+/**
+ * The four showreel films are 12–15 s professional cuts, not the 4 s loops §18 sized (docs/26 §F4):
+ * per file, AV1 ≤ 2 MB is the source browsers take first; the H.264 fallback may reach 3.5 MB (Chef's
+ * master, already web-sized at 1.8 Mbit/s, ships as delivered). Only the active card's film loads.
+ */
+const FILM_BUDGET = { desktop: 3.5 * MB, mobile: 2 * MB };
+const KEY_BUDGET = {
+  "franco.hero": HERO_BUDGET,
+  "site.grain": { desktop: 8 * KB, mobile: 8 * KB },
+  "ts.reel.loop": FILM_BUDGET,
+  "rayo.reel.loop": FILM_BUDGET,
+  "santi.reel.loop": FILM_BUDGET,
+  "chef.reel.loop": FILM_BUDGET,
+};
 /** the reel posters are still raw captures until Phase 12 encodes them (served via next/image) */
 const RAW_CAPTURE = /^\/projects\//;
 

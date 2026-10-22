@@ -2,7 +2,6 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { watchConsole } from "./console";
 import { jump } from "./scroll";
-import sharp from "sharp";
 
 /**
  * Phase 4 acceptance (Spec §26): the reel frame and every world's SCREEN state are the same
@@ -84,89 +83,31 @@ async function scrollToFraction(page: Page, slug: Slug, f: number) {
   await jump(page, y);
 }
 
-/** every image inside `selector` decoded */
-const imagesReady = (page: Page, selector: string) =>
-  expect
-    .poll(() =>
-      page.evaluate(async (sel) => {
-        const imgs = Array.from(document.querySelectorAll<HTMLImageElement>(`${sel} img`));
-        await Promise.all(imgs.map((i) => i.decode().catch(() => undefined)));
-        return imgs.every((i) => i.complete && i.naturalWidth > 0);
-      }, selector),
-    )
-    .toBe(true);
-
-async function grab(page: Page, selector: string) {
-  const r = await page.locator(selector).boundingBox();
-  const clip = { x: Math.round(r!.x), y: Math.round(r!.y), width: Math.round(r!.width), height: Math.round(r!.height) };
-  return { clip, png: await page.screenshot({ clip, animations: "disabled" }) };
-}
-
-/** share of pixels whose largest channel difference passes 24/255 */
-async function diffShare(a: Buffer, b: Buffer) {
-  const [ra, rb] = await Promise.all([a, b].map((x) => sharp(x).removeAlpha().raw().toBuffer({ resolveWithObject: true })));
-  expect(rb.info.width).toBe(ra.info.width);
-  expect(rb.info.height).toBe(ra.info.height);
-  let off = 0;
-  for (let i = 0; i < ra.data.length; i += 3) {
-    const d = Math.max(Math.abs(ra.data[i] - rb.data[i]), Math.abs(ra.data[i + 1] - rb.data[i + 1]), Math.abs(ra.data[i + 2] - rb.data[i + 2]));
-    if (d > 24) off++;
-  }
-  return off / (ra.data.length / 3);
-}
-
-test.describe("the shared rectangle", () => {
-  test("each world's SCREEN is its reel frame: ≤ 1% of pixels differ", async ({ page }) => {
+test.describe("the reel films and the cases (docs/26 §F)", () => {
+  // Phase 4's invisible jump compared the reel frame with each world's SCREEN, pixel for pixel. Since
+  // the reel shows the professional films at their own aspect (docs/26 §F3) and a case is its own
+  // document (docs/25), the card and the SCREEN are no longer the same picture: each card is checked
+  // against its film, and each case opens at its SCREEN.
+  test("each card shows its film at the film's own aspect; each case opens at its SCREEN poster", async ({ page }) => {
     test.skip(tiny(page), "tiny viewports read the worlds as static layout");
     for (const [i, slug] of SLUGS.entries()) {
-      await toReel(page, { onGrid: true });
+      await toReel(page);
       await pick(page, i);
-      // the cursor follows the pointer over the reel: keep it away
-      await page.mouse.move(0, 0);
-      const frame = `#trabajo .reel-item[data-index="${i}"] [data-part="frame"]`;
-      await imagesReady(page, frame);
-      const reel = await grab(page, frame);
-
+      const r = await page.locator(`#trabajo .reel-item[data-index="${i}"] [data-part="frame"]`).boundingBox();
+      const film = await page.locator(`#trabajo .reel-item[data-index="${i}"] [data-asset$="reel.loop"]`).getAttribute("data-asset");
+      expect(film, slug).toMatch(/\.reel\.loop$/);
+      const phone = page.viewportSize()!.width < 768;
+      const want = phone ? (slug === "chef-arturo" ? 716 / 840 : 9 / 16) : 16 / 9;
+      expect(Math.abs(r!.width / r!.height - want), slug).toBeLessThan(0.02);
       await page.goto(`/trabajo/${slug}`, { waitUntil: "networkidle" });
       await expect(page.locator("main")).toHaveAttribute("data-started", "");
       expect(await state(page, slug)).toBe("SCREEN");
-      const screen = `#${slug} [data-part="screen"]`;
-      await imagesReady(page, screen);
-      const world = await grab(page, screen);
-
-      // the same rectangle (Spec §07): within a pixel, at the same size
-      for (const k of ["x", "y", "width", "height"] as const) expect(Math.abs(world.clip[k] - reel.clip[k]), `${slug} ${k}`).toBeLessThanOrEqual(1);
-      world.clip.width = reel.clip.width;
-      world.clip.height = reel.clip.height;
-      const again = await page.screenshot({ clip: world.clip, animations: "disabled" });
-      const share = await diffShare(reel.png, again);
-      test.info().annotations.push({ type: "diff", description: `${slug}: ${(share * 100).toFixed(2)}%` });
-      expect(share, slug).toBeLessThanOrEqual(0.01);
-      // control: the same picture 3 px lower is not the same rectangle
-      if (slug !== "travelsuite360") {
-        const shifted = await page.screenshot({ clip: { ...world.clip, y: world.clip.y - 3 }, animations: "disabled" });
-        const control = await diffShare(reel.png, shifted);
-        test.info().annotations.push({ type: "control", description: `${slug} 3 px lower: ${(control * 100).toFixed(2)}%` });
-        expect(control, `${slug} control`).toBeGreaterThan(0.01);
-      }
+      await expect(page.locator(`#${slug} [data-part="screen"]`)).toBeInViewport();
     }
   });
 });
 
 test.describe("entering and leaving", () => {
-  test("Ver caso opens the case at the reel's rectangle: the picture stays where the visitor saw it", async ({ page }) => {
-    test.skip(tiny(page), "tiny viewports read the worlds as static layout");
-    await toReel(page);
-    await pick(page, 1);
-    const reel = await page.locator('#trabajo .reel-item[data-active] [data-part="frame"]').boundingBox();
-    await page.locator("#trabajo .reel-item[data-active] [data-enter]").click();
-    await expect(page).toHaveURL(/\/trabajo\/rayo-smash$/);
-    await expect(page.locator("main")).toHaveAttribute("data-started", "");
-    await expect.poll(() => state(page, "rayo-smash")).toBe("SCREEN");
-    const world = await page.locator('#rayo-smash [data-part="screen"]').boundingBox();
-    for (const k of ["x", "y", "width", "height"] as const) expect(Math.abs(world![k] - reel![k]), k).toBeLessThan(1.5);
-  });
-
   test("Ver caso → one history entry, the case; Back → the reel at the same piece and place", async ({ page }) => {
     const problems = watchConsole(page);
     await toReel(page);

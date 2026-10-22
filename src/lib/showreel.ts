@@ -32,7 +32,8 @@ export function showreelOf(p: Project): ShowreelEntry {
     id: p.id,
     name: p.name,
     route: pathForSection(p.id),
-    poster: p.reel.poster,
+    // with its film, the card's floor is the film's own first frame (docs/26 §F); until then, the poster
+    poster: usable && c.poster ? c.poster : p.reel.poster,
     video: p.reel.loop,
     videoTiers: { desktop: usable && !!c.files?.desktop, mobile: usable && !!c.files?.mobile },
     meta: { reelLine: p.reelLine, relationLine: p.relationLine, title: p.meta.title, description: p.meta.description },
