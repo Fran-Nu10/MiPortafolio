@@ -222,6 +222,34 @@ function anchored(root: HTMLElement, fn: () => void) {
 let resizeAnchor: { el: HTMLElement; top: number } | null = null;
 let resizeSettle = 0;
 let resizeListening = false;
+/**
+ * The view as it was when scrolling last came to rest. WebKit can deliver the tier's media-query
+ * change (and with it a rebuild and ScrollTrigger's measuring pass at scroll 0) before the resize
+ * event: the position read on that event may already be the top. The last resting view is from
+ * before the resize started, so it is the one restored.
+ */
+let restingView: { el: HTMLElement; top: number } | null = null;
+let restingTimer = 0;
+let restingTracked = false;
+const centerSection = () => {
+  const el = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)?.closest<HTMLElement>("[data-section]");
+  return el ? { el, top: el.getBoundingClientRect().top } : null;
+};
+function trackRestingView() {
+  if (typeof window === "undefined" || restingTracked) return;
+  restingTracked = true;
+  window.addEventListener(
+    "scroll",
+    () => {
+      window.clearTimeout(restingTimer);
+      // not while a resize settles: its own scrolls are not where the visitor was
+      restingTimer = window.setTimeout(() => {
+        if (!resizeAnchor) restingView = window.scrollY > 0 ? centerSection() : null;
+      }, 150);
+    },
+    { passive: true },
+  );
+}
 function restoreResize() {
   const a = resizeAnchor;
   if (!a?.el.isConnected) return;
@@ -235,9 +263,9 @@ function noteResize() {
     // every refresh while the resize settles puts the visitor back at once (no frame at the top)
     ScrollTrigger.addEventListener("refresh", restoreResize);
   }
-  if (resizeAnchor || window.scrollY <= 0) return;
-  const el = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)?.closest<HTMLElement>("[data-section]");
-  if (el) resizeAnchor = { el, top: el.getBoundingClientRect().top };
+  if (resizeAnchor) return;
+  window.clearTimeout(restingTimer);
+  resizeAnchor = restingView?.el.isConnected ? restingView : window.scrollY > 0 ? centerSection() : null;
 }
 function settleResize() {
   restoreResize();
@@ -276,6 +304,7 @@ export function useScene(ref: RefObject<HTMLElement | null>, opts: SceneOptions)
   // options are read once per (re)build; the effect re-runs only when `deps` change
   useLayoutEffect(() => {
     registerGsap();
+    trackRestingView();
     const root = ref.current;
     if (!root) return;
     const o = opts;
