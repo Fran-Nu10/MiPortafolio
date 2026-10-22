@@ -4,8 +4,9 @@ import { defineConfig, devices } from "@playwright/test";
  * e2e against the production build (`npm run build` first). Phase 1 runs Chromium on the
  * reference viewports; WebKit and Firefox join in Phase 11 (Spec §27 automation).
  */
-const PORT = 3100;
-export const MOCK_PORT = 3101;
+/** E2E_PORT moves the suite off 3100 when another local app holds it (the mock takes the next port) */
+const PORT = Number(process.env.E2E_PORT ?? 3100);
+export const MOCK_PORT = PORT + 1;
 
 export default defineConfig({
   testDir: "tests/e2e",
