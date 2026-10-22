@@ -2,26 +2,25 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { watchConsole } from "./console";
 import { settled, scenesBuilt } from "./scroll";
-import { RAIL_ENTER_AT, SEAM_LEN } from "../../src/lib/capabilities-rail";
+import { READING_LINE } from "../../src/lib/capabilities-index";
 
 /**
- * Phase 9 acceptance (Spec §26): the rail pinned on lg/xl and stacked on md/sm · focus on an
- * off-screen card scrolls it into view · capability 06 renders the typographic variant ·
- * the profile copy matches the Content Master. Plus the seam, evidence lifecycle (loops only
- * in view, stills under reduced motion), the profile reveal, keyboard order, axe and no-JS.
+ * Capabilities as a live editorial index (docs/26 §C, replacing the Phase 9 rail): six numbered rows
+ * and one shared stage. Wide screens: the rows scroll natively, the stage is sticky beside them (no
+ * pinned section), the active capability follows the reading line both ways and its scene is the
+ * one shown; hover and focus activate too. Narrow screens: each capability is one unit, its scene
+ * right under its words. Plus the profile copy (Content Master 13/21), axe and no-JS.
  */
 
 const CORE = "Diseño y desarrollo productos digitales donde la estrategia, la experiencia de usuario y la ingeniería trabajan con un mismo propósito: crear valor real para cada negocio.";
 const BODY = ["Mi trabajo va más allá de construir una interfaz. Me involucro en cómo se presenta una marca, cómo interactúan sus clientes, cómo funcionan sus procesos y cómo convertir una idea en un producto digital sólido, escalable y preparado para crecer.", "Desde Uruguay, trabajo en proyectos de comercio electrónico, plataformas y sistemas de gestión, combinando criterio de producto, diseño y desarrollo con una visión comercial."];
 const ADS_TITLE = "Un gran producto también necesita llegar a las personas correctas.";
 const ADS = ["Me gusta pensar en todo el recorrido: desde la primera vez que alguien descubre un negocio hasta el momento en que decide consultar, reservar o comprar.", "Por eso, además de diseñar y desarrollar productos digitales, también trabajo con publicidad en Meta Ads. Campañas en Instagram y Facebook que ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad.", "Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla."];
+const NAMES = ["Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Meta Ads y crecimiento"];
+const SCENES = ["product", "engineering", "commerce", "ai", "interactive", "growth"];
 
-const railTier = (page: Page) => {
-  const v = page.viewportSize()!;
-  return v.width >= 1024 && v.height >= 560;
-};
+const wide = (page: Page) => page.viewportSize()!.width >= 1024;
 const reduced = (page: Page) => page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
-
 
 async function open(page: Page) {
   await page.goto("/", { waitUntil: "networkidle" });
@@ -29,215 +28,112 @@ async function open(page: Page) {
   await scenesBuilt(page);
 }
 
-/** the pin's span (holder minus stage): top of the section's pin and its scrollable length */
-const pin = (page: Page) =>
-  page.evaluate(() => {
-    const stage = document.querySelector<HTMLElement>("#capacidades [data-part=stage]")!;
-    const holder = stage.parentElement!;
-    return { top: holder.getBoundingClientRect().top + window.scrollY, len: holder.offsetHeight - stage.offsetHeight, rail: stage.hasAttribute("data-rail") };
-  });
-
-async function to(page: Page, fraction: number) {
-  const p = await pin(page);
-  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), Math.round(p.top + fraction * p.len));
-  await page.waitForTimeout(500);
+/** bring row n (1-based) onto the reading line */
+async function toRow(page: Page, n: number) {
+  await page.evaluate(
+    ([n, line]) => {
+      const r = document.querySelector(`#capacidades [data-row="${n}"]`)!.getBoundingClientRect();
+      window.scrollTo({ top: Math.round(r.top + window.scrollY + r.height / 2 - innerHeight * line), behavior: "instant" });
+    },
+    [n, READING_LINE] as const,
+  );
+  await settled(page);
+  await page.waitForTimeout(200);
 }
 
-const railX = (page: Page) =>
-  page.evaluate(() => {
-    const t = getComputedStyle(document.querySelector("#capacidades [data-part=rail]")!).transform;
-    const m = t.match(/^matrix\(([^)]+)\)$/);
-    return m ? Number(m[1].split(",")[4]) : 0;
+const activeRow = (page: Page) => page.locator("#capacidades [data-row][data-active]").getAttribute("data-row").then(Number);
+const shownScene = (page: Page) => page.locator("#capacidades .cx-stage-scene[data-on] .cx-plate").getAttribute("data-scene");
+
+test.describe("the live index (docs/26 §C)", () => {
+  test("six numbered rows: name, value and reference always in the document, in the approved words", async ({ page }) => {
+    await open(page);
+    await expect(page.locator("#capacidades h2")).toHaveText("Capacidades");
+    await expect(page.locator("#capacidades .cx-seam")).toHaveText("Todo lo anterior pasó por las mismas manos.");
+    await expect(page.locator("#capacidades h3")).toHaveText(NAMES);
+    await expect(page.locator("#capacidades .cx-row .cx-value")).toHaveCount(6);
+    await expect(page.locator("#capacidades .cx-n")).toHaveText(["01", "02", "03", "04", "05", "06"]);
+    // no cards any more: one stage with six scenes (wide) or one scene per unit (narrow)
+    expect(await page.locator("#capacidades .capability, #capacidades [data-capability]").count()).toBe(0);
+    await expect(page.locator("#capacidades .cx-stage-scene .cx-plate")).toHaveCount(6);
+    expect(await page.locator("#capacidades .cx-stage-scene .cx-plate").evaluateAll((e) => e.map((x) => x.getAttribute("data-scene")))).toEqual(SCENES);
   });
 
-const cardRect = (page: Page, n: number) =>
-  page.evaluate((n) => {
-    const r = document.querySelector(`#capacidades [data-capability="${n}"]`)!.getBoundingClientRect();
-    return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
-  }, n);
-
-test.describe("the rail (Spec §12)", () => {
-  test("lg/xl: the section pins; the seam holds its stretch (SEAM_LEN of a viewport); vertical scroll drives the rail horizontally to its end", async ({ page }, info) => {
-    test.skip(!railTier(page), "the rail exists on lg/xl only");
+  test("wide: the stage stays beside the rows; the active capability follows the reading line down and back up", async ({ page }) => {
+    test.skip(!wide(page), "the shared stage is a wide-screen layout");
     const problems = watchConsole(page);
     await open(page);
-    if (await reduced(page)) {
-      // reduced motion: the stacked list, no pin (Spec §16 alternative, docs/15 §7)
-      const p = await pin(page);
-      expect(p.rail).toBe(false);
-      expect(p.len).toBe(0);
-      return;
+    // no pinned section: the stage is sticky inside the index's own column
+    expect(await page.locator("#capacidades .cx-stage").evaluate((e) => getComputedStyle(e).position)).toBe("sticky");
+    expect(await page.locator("#capacidades [data-part=pin]").count()).toBe(0);
+    for (let n = 1; n <= 6; n++) {
+      await toRow(page, n);
+      await expect.poll(() => activeRow(page)).toBe(n);
+      await expect.poll(() => shownScene(page)).toBe(SCENES[n - 1]);
+      // the active scene's plate is in view beside the row, and it is the only scene shown
+      const plate = await page.locator("#capacidades .cx-stage-scene[data-on] .cx-plate").boundingBox();
+      expect(plate!.y).toBeGreaterThanOrEqual(0);
+      expect(plate!.y + plate!.height).toBeLessThanOrEqual(page.viewportSize()!.height + 1);
+      expect(await page.locator("#capacidades .cx-stage-scene[data-on]").count()).toBe(1);
     }
-    const p = await pin(page);
-    expect(p.rail).toBe(true);
-    const vh = page.viewportSize()!.height;
-    expect(p.len / vh).toBeGreaterThan(2);
-    expect(p.len / vh).toBeLessThan(3.5);
-
-    const seamOf = () =>
-      page.evaluate(() => {
-        const el = document.querySelector<HTMLElement>("#capacidades [data-part=seam]")!;
-        const r = el.getBoundingClientRect();
-        return { opacity: Number(getComputedStyle(el).opacity), left: r.left, bottom: r.bottom };
-      });
-    // pin start: the seam is already in (it arrived with the section — never a black frame, docs/25
-    // §5); the kicker and the rail are not in yet
-    await to(page, 0);
-    await expect(page.locator("#capacidades [data-part=stage]")).toHaveAttribute("data-state", "SEAM");
-    expect(await railX(page)).toBeGreaterThan(page.viewportSize()!.width * 0.9);
-    await expect.poll(async () => (await seamOf()).opacity).toBe(1);
-    // the seam holds until the rail's entry (RAIL_ENTER_AT of the seam)
-    await to(page, ((RAIL_ENTER_AT * SEAM_LEN) / 2) * vh / p.len);
-    // scrub 0.8: the playhead settles after the scroll
-    await expect.poll(async () => (await seamOf()).opacity).toBe(1);
-    const seam = await seamOf();
-    expect(seam.left).toBeLessThan(page.viewportSize()!.width / 2);
-    expect(seam.bottom).toBeLessThanOrEqual(vh);
-    await expect(page.locator("#capacidades .seam-line")).toHaveText("Todo lo anterior pasó por las mismas manos.");
-    await info.attach("seam", { body: await page.screenshot(), contentType: "image/png" });
-
-    // the rail in: x = 0, the first card at the gutter; the kicker shown
-    await to(page, (SEAM_LEN * vh) / p.len);
-    await expect(page.locator("#capacidades [data-part=stage]")).toHaveAttribute("data-state", "RAIL");
-    // scrub 0.8 and a pin rounded to whole vh: within a few pixels once the playhead settles
-    await expect.poll(async () => Math.abs(await railX(page))).toBeLessThan(6);
-    expect(Number(await page.locator("#capacidades [data-part=kicker]").evaluate((e) => getComputedStyle(e).opacity))).toBe(1);
-    await expect(page.locator("#capacidades [data-part=kicker]")).toHaveText("Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.");
-    await info.attach("rail in", { body: await page.screenshot(), contentType: "image/png" });
-
-    // 1:1: 300 px of scroll move the rail 300 px
-    const x1 = await railX(page);
-    await page.evaluate(() => window.scrollBy({ top: 300, behavior: "instant" }));
-    await page.waitForTimeout(600);
-    expect(x1 - (await railX(page))).toBeCloseTo(300, -1);
-
-    // the end: 06 fully visible, one gutter from the edge, after the 3× gap and its sub-kicker
-    await to(page, 1);
-    const vw = page.viewportSize()!.width;
-    // the scrub settles after the jump: measure once the rail rests
-    await expect.poll(async () => (await cardRect(page, 6)).right, { timeout: 4000 }).toBeLessThanOrEqual(vw);
-    const six = await cardRect(page, 6);
-    const five = await cardRect(page, 5);
-    expect(six.right).toBeGreaterThan(vw - 64);
-    expect(Math.abs(six.left - five.right - 96)).toBeLessThan(3);
-    await expect(page.locator('#capacidades [data-capability="6"] .capability-sub')).toHaveText("Después de publicar");
-    await info.attach("end", { body: await page.screenshot(), contentType: "image/png" });
+    for (let n = 5; n >= 1; n--) {
+      await toRow(page, n);
+      await expect.poll(() => activeRow(page)).toBe(n);
+      await expect.poll(() => shownScene(page)).toBe(SCENES[n - 1]);
+    }
+    // the inactive rows step back but stay legible (muted on black is AA)
+    const muted = await page.locator('#capacidades [data-row="4"] .cx-name').evaluate((e) => getComputedStyle(e).color);
+    expect(muted).toBe("rgb(142, 139, 132)");
     expect(problems).toEqual([]);
   });
 
-  test("md/sm: no pin; seam, kicker and the six cards stacked in flow, 06 after the sub-kicker", async ({ page }) => {
-    test.skip(railTier(page), "stacked layout is the tablet / phone form");
+  test("wide: hover and keyboard focus activate a row too (nothing is revealed by hover alone)", async ({ page }) => {
+    test.skip(!wide(page), "the shared stage is a wide-screen layout");
     await open(page);
-    const p = await pin(page);
-    expect(p.rail).toBe(false);
-    expect(p.len).toBe(0);
-    const tops = await page.evaluate(() => Array.from(document.querySelectorAll<HTMLElement>("#capacidades [data-capability]")).map((c) => c.getBoundingClientRect().top + window.scrollY));
-    for (let i = 1; i < tops.length; i++) expect(tops[i]).toBeGreaterThanOrEqual(tops[i - 1]);
-    const seamTop = await page.evaluate(() => document.querySelector("#capacidades .seam")!.getBoundingClientRect().top + window.scrollY);
-    expect(seamTop).toBeLessThan(tops[0]);
-    await expect(page.locator('#capacidades [data-capability="6"] .capability-sub')).toHaveText("Después de publicar");
+    await toRow(page, 1);
+    await page.locator('#capacidades [data-row="3"] a').focus();
+    await expect.poll(() => activeRow(page)).toBe(3);
+    await expect.poll(() => shownScene(page)).toBe("commerce");
   });
 
-  test("keyboard: focus on an off-screen card's link brings the card into view, centered", async ({ page }) => {
-    test.skip(!railTier(page), "the rail exists on lg/xl only");
+  test("narrow: each capability is one unit — phones: its scene right under its words; tablets: beside them; no carousel", async ({ page }) => {
+    test.skip(wide(page), "wide screens share one stage");
     await open(page);
-    if (await reduced(page)) return;
-    const p = await pin(page);
-    await to(page, vhFraction(page, p));
-    // card 05 (Rayo link) is off-screen to the right while the rail is at x = 0
-    const before = await cardRect(page, 5);
-    expect(before.left).toBeGreaterThan(page.viewportSize()!.width);
-    await page.locator('#capacidades [data-capability="5"] a').focus();
-    // a smooth scroll: wait for the card to settle at the viewport's center
-    await expect
-      .poll(async () => {
-        const r = await cardRect(page, 5);
-        return Math.abs((r.left + r.right) / 2 - page.viewportSize()!.width / 2);
-      }, { timeout: 4000 })
-      .toBeLessThan(24);
-    const r = await cardRect(page, 5);
-    expect(r.left).toBeGreaterThanOrEqual(0);
-    expect(r.right).toBeLessThanOrEqual(page.viewportSize()!.width);
-    await expect(page.locator('#capacidades [data-capability="5"] a')).toBeFocused();
-    // Tab order follows the list: next is 06's content (no link) → the profile's links or the form
-    await page.keyboard.press("Tab");
-    const next = await page.evaluate(() => document.activeElement?.closest("section")?.id);
-    expect(["capacidades", "perfil", "contacto"]).toContain(next);
-  });
-});
-
-function vhFraction(page: Page, p: { len: number }) {
-  return (SEAM_LEN * page.viewportSize()!.height) / p.len;
-}
-
-test.describe("evidence", () => {
-  test("06 is typographic: statement at lead size, the mono tag «Meta Ads», no image, no numbers", async ({ page }) => {
-    await open(page);
-    const six = page.locator('#capacidades [data-capability="6"]');
-    await expect(six).toHaveAttribute("data-evidence", "typographic");
-    await expect(six.locator("h3")).toHaveText("Meta Ads y crecimiento");
-    await expect(six.locator(".capability-statement")).toHaveText("Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.");
-    await expect(six.locator(".capability-attr")).toHaveText("Meta Ads");
-    expect(await six.locator("img, video, [data-placeholder]").count()).toBe(0);
-    expect(await six.innerText()).not.toMatch(/\d/);
-    // and the section carries none of the banned terms
-    expect(await page.locator("#capacidades").innerText()).not.toMatch(/ROAS|CPA|CPL|CTR|Google Ads|TikTok|growth|full-stack|end-to-end/i);
-  });
-
-  test("the five live elements show the worlds' own copy and material; loops run only in view (stills under reduced motion)", async ({ page }) => {
-    await open(page);
-    const rm = await reduced(page);
-    const els = page.locator("#capacidades [data-evidence-el]");
-    await expect(els).toHaveCount(5);
-    expect(await els.evaluateAll((l) => l.map((e) => (e as HTMLElement).dataset.evidenceEl))).toEqual(["ts-flow", "posters", "chef-commerce", "ts-extraction", "rayo-layers"]);
-    // inside aria-hidden evidence boxes, never focusable
-    expect(await page.locator("#capacidades .capability-evidence a, #capacidades .capability-evidence button, #capacidades .capability-evidence [tabindex]").count()).toBe(0);
-    await expect(page.locator('[data-evidence-el="ts-flow"] .ev-ts-msg')).toHaveText("Necesito viajar a Punta Cana en julio, somos cuatro.");
-    await expect(page.locator('[data-evidence-el="ts-flow"] .ev-ts-res')).toHaveText("reserva confirmada");
-    await expect(page.locator('[data-evidence-el="chef-commerce"] .ev-chef-btn')).toHaveText("Agregar al carrito");
-    expect(await page.locator('[data-evidence-el="posters"] .ev-poster').count()).toBe(3);
-    expect(await page.locator('[data-evidence-el="posters"] [data-placeholder]').count()).toBe(0);
-    expect(await page.locator('[data-evidence-el="rayo-layers"] .ev-rayo-layer img').count()).toBe(6);
-
-    // far from the section: nothing runs
-    expect(await page.locator("#capacidades [data-running]").count()).toBe(0);
-    const p = await pin(page);
-    if (rm) {
-      // final states as stills, no loop
-      await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), p.top);
-      await page.waitForTimeout(400);
-      expect(await els.evaluateAll((l) => l.map((e) => (e as HTMLElement).dataset.step))).toEqual(["2", "2", "2", "3", "1"]);
-      expect(await page.locator("#capacidades [data-running]").count()).toBe(0);
-      return;
+    expect(await page.locator("#capacidades .cx-stage").evaluate((e) => getComputedStyle(e).display)).toBe("none");
+    const tablet = page.viewportSize()!.width >= 768;
+    for (let n = 1; n <= 6; n++) {
+      const row = page.locator(`#capacidades [data-row="${n}"]`);
+      const name = await row.locator(".cx-name").boundingBox();
+      const value = await row.locator(".cx-value").boundingBox();
+      const scene = await row.locator(".cx-unit-scene").boundingBox();
+      if (tablet) {
+        // the words on the left, the demonstration in the column beside them, starting with them
+        expect(scene!.x).toBeGreaterThanOrEqual(value!.x + value!.width - 1);
+        expect(Math.abs(scene!.y - name!.y)).toBeLessThan(40);
+      } else {
+        expect(scene!.y).toBeGreaterThan(value!.y);
+        expect(scene!.y - (value!.y + value!.height)).toBeLessThan(120);
+      }
+      expect(scene!.x + scene!.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
     }
-    // the first card in view: its loop runs and advances
-    if (p.rail) await to(page, (SEAM_LEN * page.viewportSize()!.height) / p.len + 0.02);
-    else await page.locator('#capacidades [data-capability="1"]').scrollIntoViewIfNeeded();
-    await expect(page.locator('[data-evidence-el="ts-flow"]')).toHaveAttribute("data-running", "");
-    const step = await page.locator('[data-evidence-el="ts-flow"]').getAttribute("data-step");
-    await expect.poll(() => page.locator('[data-evidence-el="ts-flow"]').getAttribute("data-step"), { timeout: 3000 }).not.toBe(step);
-    // the last card is out of view: its loop is idle
-    const six = await cardRect(page, 5);
-    if (six.left > page.viewportSize()!.width || six.top > page.viewportSize()!.height) {
-      await expect(page.locator('[data-evidence-el="rayo-layers"]')).not.toHaveAttribute("data-running", "");
-    }
-    // leaving the section stops everything
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-    await expect.poll(() => page.locator("#capacidades [data-running]").count()).toBe(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
   });
 
-  test("on the rail, 05's layers separate with the scroll itself", async ({ page }) => {
-    test.skip(!railTier(page), "scroll-tied separation is a rail behaviour");
+  test("scenes show real material and the approved words only — no metric, no figure", async ({ page }) => {
     await open(page);
-    if (await reduced(page)) return;
-    const sep = () => page.locator('[data-evidence-el="rayo-layers"]').evaluate((e) => Number(getComputedStyle(e).getPropertyValue("--sep")) || 0);
-    await to(page, 0.4);
-    const a = await sep();
-    await to(page, 1);
-    const b = await sep();
-    expect(b).toBeGreaterThan(a);
-    expect(b).toBeCloseTo(1, 1);
-    await expect(page.locator('[data-evidence-el="rayo-layers"]')).toHaveAttribute("data-scrub", "");
+    const text = (await page.locator("#capacidades").textContent()) ?? "";
+    expect(text).toContain("Necesito viajar a Punta Cana en julio, somos cuatro.");
+    expect(text).toContain("reserva confirmada");
+    expect(text).toContain("Agregar al carrito");
+    expect(text).toContain("Próximos clientes");
+    expect(text).not.toMatch(/%|ROAS|conversi[oó]n|CTR/i);
+  });
+
+  test("reduced motion: the scenes show their final state, nothing animates", async ({ page }) => {
+    await open(page);
+    test.skip(!(await reduced(page)), "motion allowed");
+    await page.locator("#capacidades").scrollIntoViewIfNeeded();
+    const anims = await page.evaluate(() => document.getAnimations().filter((a) => ((a.effect as KeyframeEffect | null)?.target as Element | null)?.closest?.("#capacidades")).length);
+    expect(anims).toBe(0);
   });
 });
 
@@ -315,17 +211,18 @@ test.describe("profile (Spec §12, Content Master 13)", () => {
 });
 
 test.describe("accessibility", () => {
-  test("axe on the rail and the profile; every attribution link reaches its world; headings in order", async ({ page }) => {
+  test("axe on the index and the profile; every attribution link reaches its case; headings in order", async ({ page }) => {
     await open(page);
-    const p = await pin(page);
-    if (p.rail && !(await reduced(page))) await to(page, (SEAM_LEN * page.viewportSize()!.height) / p.len + 0.05);
-    else await page.locator("#capacidades").scrollIntoViewIfNeeded();
+    await page.locator("#capacidades").scrollIntoViewIfNeeded();
+    // the stage's cross-fade (360 ms) and the scenes' sequences settle first: axe reads the resting page
+    await settled(page);
+    await page.waitForTimeout(1800);
     const results = await new AxeBuilder({ page }).include("#capacidades").include("#perfil").analyze();
     expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
-    const links = await page.locator("#capacidades .capability-attr[href]").evaluateAll((l) => l.map((a) => (a as HTMLAnchorElement).getAttribute("href")));
+    const links = await page.locator("#capacidades .cx-ref[href]").evaluateAll((l) => l.map((a) => (a as HTMLAnchorElement).getAttribute("href")));
     expect(links).toEqual(["/trabajo/travelsuite360", "/trabajo/chef-arturo", "/trabajo/rayo-smash"]);
-    expect(await page.locator("#capacidades h2").innerText()).toBe("Capacidades");
-    expect(await page.locator("#capacidades h3").allInnerTexts()).toEqual(["Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Meta Ads y crecimiento"]);
+    expect(await page.locator("#capacidades h2").innerText()).toMatch(/Capacidades/i);
+    expect(await page.locator("#capacidades h3").allInnerTexts()).toEqual(NAMES);
   });
 
   test("an attribution link opens its project's case (its own document since docs/25), at its world", async ({ page }) => {
@@ -333,12 +230,10 @@ test.describe("accessibility", () => {
     // on the rail the card travels with the scroll: bring it in through the rail's own focus rule
     // (it centers the card), let the document rest, then click — a click while the rail still
     // moves (scrub 0.8 s) can miss under load
-    const link = page.locator('#capacidades [data-capability="3"] a');
+    const link = page.locator('#capacidades [data-row="3"] a');
     await link.scrollIntoViewIfNeeded();
     await link.focus();
     await settled(page);
-    // activated from the keyboard: a pointer click on a card the rail is still carrying can land on
-    // its neighbour (Playwright re-scrolls the target before clicking, which moves the rail)
     await link.press("Enter");
     // a page navigation now: the URL, not an evaluate across the unload
     await expect(page).toHaveURL(/\/trabajo\/chef-arturo$/);
@@ -351,7 +246,7 @@ test.describe("accessibility", () => {
 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
-  test("the seam, the kicker, the six capabilities and the profile read in order", async ({ page }) => {
+  test("the opening line, the kicker, the six capabilities and the profile read in order", async ({ page }) => {
     await page.goto("/");
     // textContent: the mono labels are uppercased by CSS
     const text = (await page.locator("#capacidades").textContent()) ?? "";
@@ -364,7 +259,8 @@ test.describe("without JavaScript", () => {
     }
     await expect(page.locator("#perfil .profile-core")).toHaveText(CORE);
     expect(await page.locator("#perfil .profile-core").evaluate((e) => getComputedStyle(e).clipPath)).toBe("none");
-    // no pin without JS: the stage is in flow
-    expect(await page.locator("#capacidades [data-part=stage]").evaluate((e) => getComputedStyle(e).position)).toBe("static");
+    // without JS: the units in flow, each with its scene; no shared stage
+    expect(await page.locator("#capacidades .cx-stage").evaluate((e) => getComputedStyle(e).display)).toBe("none");
+    expect(await page.locator("#capacidades .cx-unit-scene").first().evaluate((e) => getComputedStyle(e).display)).toBe("block");
   });
 });

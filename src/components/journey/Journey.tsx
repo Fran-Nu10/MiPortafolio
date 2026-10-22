@@ -8,11 +8,10 @@ import { confirmed, indexLabel, liveLabel, miniLabel, routeErrorText } from "@/l
 import { showreelOf } from "@/lib/showreel";
 import { TS_KEY_WORDS, splitField } from "@/lib/ts-world";
 import { splitPurchaseLine } from "@/lib/chef-world";
-import { resolveEvidence } from "@/lib/capabilities-rail";
+import { SCENE_FOR, wordsFromStatement } from "@/lib/capabilities-index";
 import { splitFinal } from "@/lib/declaration";
 import { GRID_COLUMNS } from "@/lib/shift";
-import { CapabilitiesRail, type CapabilityCardView } from "@/components/capabilities/CapabilitiesRail";
-import type { EvidenceData } from "@/components/capabilities/EvidenceElement";
+import { CapabilitiesIndex, type CapabilityItemView, type SceneData } from "@/components/capabilities/CapabilitiesIndex";
 import { FinalCta } from "@/components/contact/FinalCta";
 import { Declaration } from "@/components/declaration/Declaration";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -91,14 +90,14 @@ export function Journey() {
             ui: { ...SITE.shift.ui, nav: [...SITE.shift.ui.nav], headline: [...SITE.shift.ui.headline], cards: [...SITE.shift.ui.cards] },
           }}
         />
-        <CapabilitiesRail
+        <CapabilitiesIndex
           view={{
             heading: SITE.capabilities.heading,
             seam: SITE.capabilities.seam,
             kicker: SITE.capabilities.kicker,
             subKicker: SITE.capabilities.subKicker,
             bust: resolveAsset("franco.bust"),
-            items: CAPABILITIES.map(capabilityCard),
+            items: CAPABILITIES.map(capabilityItem),
           }}
         />
         {/* the bridge from what was built to what can be built for the visitor (docs/22 §2) */}
@@ -146,49 +145,51 @@ export function Journey() {
 }
 
 /**
- * A capability card: its copy and its evidence (Spec §12). Live elements reuse the worlds' own
- * copy and material; material variants are resolved here (never a placeholder, metrics only
- * when authorized), so the client gets only what may be shown.
+ * A capability of the live index (docs/26 §C): its copy (Content Master 22) and its scene. Every
+ * scene reuses the projects' own approved copy and real material — no metric, no invented result;
+ * the few words a scene adds come from its capability's own statement.
  */
-function capabilityCard(c: (typeof CAPABILITIES)[number]): CapabilityCardView {
-  const base = { index: c.index, name: c.name, statement: c.statement, group: c.group, attribution: c.attribution };
-  if (c.evidence.variant === "element") return { ...base, evidence: { kind: "element", data: evidenceData(c.evidence.element) } };
-  const media = "media" in c.evidence ? c.evidence.media.map((k) => resolveAsset(k)) : [];
-  const variant = resolveEvidence(c.evidence, media.every((m) => m.status !== "placeholder"), process.env.NODE_ENV === "production");
-  return { ...base, evidence: { kind: "slot", variant, media: variant.variant === "typographic" ? [] : media } };
+function capabilityItem(c: (typeof CAPABILITIES)[number]): CapabilityItemView {
+  const key = c.evidence.variant === "element" ? c.evidence.element : "typographic";
+  return { index: c.index, name: c.name, statement: c.statement, group: c.group, attribution: c.attribution, scene: sceneData(SCENE_FOR[key], c.statement) };
 }
 
-/** the live elements' data, straight from the worlds (Content Master 06/07/09 copy, real layers and posters) */
-function evidenceData(id: EvidenceData["id"]): EvidenceData {
+function sceneData(id: SceneData["id"], statement: string): SceneData {
   const ts = getProject("travelsuite360")!;
   const chef = getProject("chef-arturo")!;
+  const santi = getProject("santi-nuca")!;
   const fields = (["TS03.dest", "TS03.date", "TS03.pax"] as const).map((k) => splitField(ts.worldCopy[k]));
   switch (id) {
-    case "ts-flow":
-      return { id, message: ts.worldCopy["TS01.message"], fields, reservation: ts.worldCopy["TS07.reservation"] };
-    case "posters":
+    case "product":
       return {
         id,
-        posters: (["santi-nuca", "rayo-smash", "chef-arturo"] as const).map((slug) => {
-          const p = getProject(slug)!;
-          return { name: p.name, asset: resolveAsset(p.reel.poster) };
-        }),
+        message: ts.worldCopy["TS01.message"],
+        interpreted: ts.worldCopy["TS03.label"],
+        fields,
+        quote: `${ts.worldCopy["TS04.q1"]} · ${ts.worldCopy["TS04.q2"]}`,
+        reservation: ts.worldCopy["TS07.reservation"],
       };
-    case "chef-commerce": {
+    case "engineering":
+      // Santi Nuca's real interface (its film's first frame) over the layers its statement names
+      return { id, poster: resolveAsset(santi.reel.loop).poster ?? resolveAsset(santi.reel.poster), layers: wordsFromStatement(statement, ["Front", "Back", "Datos"]) };
+    case "commerce": {
       const { stepper, add, pay } = splitPurchaseLine(chef.worldCopy["C06.purchase"]);
-      return { id, stepper, add, pay };
+      const [product, price] = chef.worldCopy["C05.product"].split(" · ");
+      return { id, photo: resolveAsset("chef.product"), product: `${product} · ${price}`, stepper, add, pay };
     }
-    case "ts-extraction":
+    case "ai":
       return {
         id,
         message: ts.worldCopy["TS01.message"],
         words: [
-          { word: TS_KEY_WORDS.dest, label: fields[0].label },
-          { word: TS_KEY_WORDS.date, label: fields[1].label },
-          { word: TS_KEY_WORDS.pax, label: fields[2].label },
+          { word: TS_KEY_WORDS.dest, label: fields[0].label, value: fields[0].value },
+          { word: TS_KEY_WORDS.date, label: fields[1].label, value: fields[1].value },
+          { word: TS_KEY_WORDS.pax, label: fields[2].label, value: fields[2].value },
         ],
       };
-    case "rayo-layers":
+    case "interactive":
       return { id, layers: RAYO_LAYERS.map((l) => ({ name: l.name, asset: resolveAsset(l.key), offset: l.offset })), aspect: RAYO_STACK.aspect };
+    case "growth":
+      return { id, stations: wordsFromStatement(statement, ["Negocios", "Personas", "Próximos clientes"]) };
   }
 }

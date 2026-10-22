@@ -3003,396 +3003,781 @@ html.js .at-work-stage[data-anim] {
   inset: 0;
 }
 
-/* ── S12 · capabilities: the stacked list (no JS, md/sm, reduced motion); the pinned
-   rail on lg/xl with motion (Spec §12) ──────────────────────────────────────── */
-.capabilities {
-  padding: 14svh var(--gutter);
+/* ── S12 · capabilities — a live editorial index (docs/26 §C, Content Master 22). Narrow screens,
+   reduced motion and no JS: six editorial units stacked, each with its scene under its words. Wide
+   screens (≥ 1024): the index (≈ 45 %) scrolls natively beside a sticky shared stage (≈ 55 %) whose
+   scene follows the active row. Scenes are plates with one grammar: a tag (number · name), the
+   demonstration, the reference. Their sequences are CSS animations keyed on `data-on`; without them
+   (reduced motion, no JS) every scene shows its final state. ───────────────────────────────────── */
+.cx {
+  padding: 14svh var(--gutter) 12svh;
+  background: var(--color-black);
 }
-.seam,
-.capabilities-kicker,
-.capabilities-list {
-  max-width: 1094px;
-  margin-inline: auto;
-}
-.seam {
-  display: grid;
-  gap: 16px;
-  align-items: end;
-  grid-template-columns: minmax(120px, 240px) 1fr;
-}
-.seam-line {
-  max-width: 32ch;
-}
-.capabilities-kicker {
-  margin-top: 64px;
-}
-.capabilities-list {
-  display: grid;
-  gap: 40px 32px;
-  margin-top: 32px;
-  list-style: none;
-  padding: 0;
-  counter-reset: cap;
-}
-@media (min-width: 768px) {
-  .capabilities-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-/* the card: capability → what it is for → its evidence (a region of its own) → its reference (docs/23 §4) */
-.capability {
+.cx-head {
   position: relative;
   display: grid;
-  gap: 8px;
-  align-content: start;
-  padding-top: 20px;
-  border-top: 1px solid var(--rule-strong);
-  counter-increment: cap;
+  gap: 18px;
+  max-width: 1280px;
+  margin: 0 auto clamp(48px, 9svh, 96px);
 }
-.capability article {
-  display: grid;
-  gap: 14px;
-  align-content: start;
+.cx-eyebrow {
+  margin: 0;
+  color: var(--color-paper-2);
 }
-.capability article::before {
-  content: counter(cap, decimal-leading-zero);
-  font-family: var(--font-mono);
-  font-size: var(--type-micro);
-  letter-spacing: var(--tracking-micro);
-  color: var(--color-muted);
+/* the red is a mark beside small type, never the small type itself (AA) */
+.cx-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 10px;
+  background: var(--color-signal);
+  vertical-align: 1px;
 }
-.capability[data-group="extended"] {
-  /* set apart by space and the sub-kicker only — same type, size and colour */
-  margin-top: 64px;
-}
-@media (min-width: 768px) {
-  .capability[data-group="extended"] {
-    grid-column: 1 / -1;
-    max-width: min(100%, 720px);
-  }
-}
-.capability-sub {
-  margin-bottom: 8px;
-}
-.capability-name {
-  font-size: clamp(28px, 2.7vw, 40px);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.015em;
+/* «Todo lo anterior pasó por las mismas manos.»: the section opens on the projects it follows */
+.cx-seam {
+  max-width: 18ch;
+  margin: 0;
+  font-size: clamp(40px, 6.2vw, 96px);
+  font-weight: 800;
+  line-height: 0.96;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
-.capability-statement {
-  max-width: 38ch;
+.cx-kicker {
+  max-width: 46ch;
+  margin: 0;
+  font-size: var(--type-lead);
+  line-height: 1.35;
+  color: var(--color-paper-2);
+}
+.cx-bust {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(22vw, 260px);
+}
+.cx-body {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.cx-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule-strong);
+}
+.cx-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 20px;
+  row-gap: 10px;
+  padding: 28px 0 36px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.cx-sub {
+  grid-column: 1 / -1;
+  margin: 0 0 6px;
+}
+.cx-n {
+  grid-row: span 3;
+  padding-top: 0.55em;
+  color: var(--color-muted);
+}
+.cx-name {
+  margin: 0;
+  font-size: clamp(30px, 3.6vw, 56px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.cx-value {
+  max-width: 40ch;
+  margin: 0;
   font-size: var(--type-body);
   line-height: 1.45;
   color: var(--color-paper-2);
 }
-.capability[data-evidence="typographic"] .capability-statement {
-  font-size: var(--type-lead);
-  line-height: 1.35;
+.cx-ref {
+  margin: 0;
+  color: var(--color-muted);
+}
+a.cx-ref:hover {
   color: var(--color-paper);
 }
-/* the evidence lives inside its own frame: it never reaches the title or the text */
-.capability-evidence {
-  aspect-ratio: 16 / 10;
-  padding: 16px;
-  overflow: clip;
-  border: 1px solid var(--rule-strong);
-  background: var(--color-panel);
+.cx-unit-scene {
+  grid-column: 1 / -1;
+  margin-top: 18px;
 }
-.capability-evidence:empty {
+.cx-stage {
   display: none;
 }
-.capability-attr {
-  justify-self: start;
-  width: 100%;
-  padding-top: 12px;
-  border-top: 1px solid var(--rule);
-}
-/* 06 · Meta Ads is part of the offer, not a footnote: the one capability with a red rule and room */
-.capability[data-group="extended"] {
-  border-top: 2px solid var(--color-signal);
-}
-.capability[data-group="extended"] .capability-name {
-  font-size: clamp(30px, 3.1vw, 46px);
-}
-.capability[data-group="extended"] .capability-statement {
-  max-width: 34ch;
-}
-a.capability-attr {
-  /* a link is a target: ≥ 44px tall without moving the text (Spec §15) */
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin-block: -11px;
-}
 
-/* the rail: lg/xl, a pin, motion allowed — laid out from first paint so the build only adds
-   transforms; a failed build drops data-anim and the list stacks again */
-@media (min-width: 1024px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
-  html.js .capabilities:has(.capabilities-stage[data-anim]) {
-    padding: 0;
-  }
-  html.js .capabilities-stage[data-anim] {
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    overflow: clip;
-    background: var(--color-black);
-  }
-  html.js .capabilities-stage[data-anim] .seam {
-    position: absolute;
-    left: var(--gutter);
-    bottom: 10svh;
-    display: grid;
-    gap: 20px;
-    grid-template-columns: 1fr;
-    width: min(360px, 26vw);
-    margin: 0;
-    max-width: none;
-  }
-  html.js .capabilities-stage[data-anim] .capabilities-kicker {
-    position: absolute;
-    top: calc(var(--header-h) + 24px);
-    left: var(--gutter);
-    margin: 0;
-    max-width: 64ch;
-  }
-  html.js .capabilities-stage[data-anim] .capabilities-list {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    width: max-content;
-    max-width: none;
-    margin: 0;
-    /* the kicker sits at the top: the cards centre in what is left */
-    padding: 72px 0 0 var(--gutter);
-    will-change: transform;
-  }
-  html.js .capabilities-stage[data-anim] .capability {
-    flex: 0 0 min(420px, 30vw);
-    width: min(420px, 30vw);
-    margin: 0;
-    max-width: none;
-  }
-  html.js .capabilities-stage[data-anim] .capability[data-group="extended"] {
-    flex-basis: min(600px, 42vw);
-    width: min(600px, 42vw);
-    margin-left: 64px;
-  }
-  html.js .capabilities-stage[data-anim] .capability-sub {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    margin: 0 0 12px;
-  }
-}
-
-/* short viewports: a flatter frame and a smaller title keep the card clear of the kicker */
-@media (max-height: 720px) {
-  .capability-evidence {
-    aspect-ratio: 2 / 1;
-    padding: 12px;
-  }
-  .capability-name {
-    font-size: clamp(24px, 2.3vw, 32px);
-  }
-  .capability[data-group="extended"] .capability-name {
-    font-size: clamp(28px, 3vw, 44px);
-  }
-}
-
-
-/* ── evidence elements (live, aria-hidden; a loop runs only while its card is in view) ── */
-.ev {
+/* ── the plate: one grammar for six scenes ── */
+.cx-plate {
   position: relative;
-  height: 100%;
-  min-height: 120px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 14px;
+  aspect-ratio: 16 / 11;
+  margin: 0;
+  padding: clamp(14px, 2.2vw, 28px);
   overflow: clip;
+  background: var(--color-panel);
+  border: 1px solid var(--rule-strong);
 }
-.ev [data-ev-step] {
-  transition: opacity 200ms var(--ease-settle);
-}
-/* cross-fading states: only the current step is shown */
-.ev-ts-flow [data-ev-step] {
-  position: absolute;
-  inset: 0;
+.cx-plate-tag,
+.cx-plate-ref {
   margin: 0;
-  opacity: 0;
+  color: var(--color-muted);
 }
-.ev-ts-flow[data-step="0"] [data-ev-step="0"],
-.ev-ts-flow[data-step="1"] [data-ev-step="1"],
-.ev-ts-flow[data-step="2"] [data-ev-step="2"] {
-  opacity: 1;
-}
-.ev-ts-msg {
-  font-size: var(--type-lead);
-  line-height: 1.3;
-  max-width: 22ch;
-}
-.ev-ts-fields {
-  display: grid;
-  gap: 10px;
-  align-content: start;
-}
-.ev-ts-fields div {
-  display: grid;
-  gap: 2px;
-}
-.ev-ts-fields dd {
-  margin: 0;
-  font-size: 17px;
-}
-.ev-ts-res {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.cx-plate-n {
   color: var(--color-paper);
 }
-.ev-ts-res::before {
+.cx-plate-n::before {
   content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  background: var(--color-signal);
+  vertical-align: 1px;
+}
+.cx-plate-body {
+  position: relative;
+  min-height: 0;
+}
+
+/* 01 · product: the request, its meaning, the offer, the state it reaches */
+.cs-flow {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  align-items: stretch;
+  gap: clamp(12px, 1.4vw, 22px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* the path between the four steps: an S through the 2 × 2 (a column on phones) */
+.cs-flow::before {
+  content: "";
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  top: 50%;
+  height: 1px;
+  background: var(--color-signal);
+  transform-origin: 0 50%;
+  opacity: 0.7;
+}
+.cs-node:nth-child(odd)::after {
+  content: "→";
+  position: absolute;
+  right: calc(-1 * clamp(12px, 1.4vw, 22px));
+  top: 50%;
+  width: clamp(12px, 1.4vw, 22px);
+  text-align: center;
+  color: var(--color-muted);
+  transform: translateY(-50%);
+}
+.cs-node {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: clamp(90px, 9vw, 150px);
+  padding: clamp(12px, 1.2vw, 20px);
+  background: var(--color-black);
+  border: 1px solid var(--rule-strong);
+}
+.cs-msg,
+.cs-quote,
+.cs-state {
+  margin: 0;
+  font-size: clamp(14px, 1.3vw, 20px);
+  line-height: 1.3;
+}
+.cs-label {
+  margin: 0;
+  color: var(--color-muted);
+}
+.cs-fields {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+.cs-fields div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cs-fields dt {
+  color: var(--color-muted);
+}
+.cs-fields dd {
+  margin: 0;
+  font-size: clamp(13px, 1.05vw, 16px);
+}
+.cs-node-state {
+  border-color: var(--color-signal);
+}
+.cs-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--color-signal);
 }
 
-/* three real posters, stacked; the front one cycles (opacity only) */
-.ev-posters {
-  --n: 3;
-}
-.ev-poster {
+/* 02 · engineering: the real interface over the layers that hold it */
+.cs-layers {
   position: absolute;
-  left: calc(var(--i, 0) * 10px);
-  top: calc(var(--i, 0) * 10px);
-  width: calc(100% - (var(--n) - 1) * 10px);
-  height: calc(100% - (var(--n) - 1) * 10px);
-  opacity: 0.35;
-  outline: 1px solid var(--rule);
+  inset: 4% 10% 14% 4%;
 }
-.ev-poster[data-ev-step="1"] {
-  --i: 1;
+.cs-shot,
+.cs-slab {
+  position: absolute;
+  inset: 0;
+  transform: translate(calc(var(--k) * 5%), calc(var(--k) * 9%));
 }
-.ev-poster[data-ev-step="2"] {
-  --i: 2;
+.cs-shot {
+  overflow: clip;
+  border: 1px solid var(--rule-strong);
 }
-.ev-posters[data-step="0"] [data-ev-step="0"],
-.ev-posters[data-step="1"] [data-ev-step="1"],
-.ev-posters[data-step="2"] [data-ev-step="2"] {
-  opacity: 1;
-  z-index: 1;
+.cs-slab {
+  border: 1px solid var(--rule-strong);
+  background: rgb(237 232 222 / 0.04);
+}
+.cs-slab:nth-child(1) {
+  border-color: rgb(230 59 46 / 0.6);
+}
+.cs-slab-label {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  color: var(--color-paper-2);
 }
 
-/* the store's purchase strip (from the Chef world): the current control is lit */
-.ev-chef {
+/* 03 · commerce: the product, its quantity, the cart, the payment */
+.cs-shop {
+  position: absolute;
+  inset: 0;
   display: grid;
-  gap: 10px;
-  align-content: center;
-}
-/* idle controls are muted and outlined (AA on black); the lit one is paper — no translucency,
-   so the text always keeps its contrast */
-.ev-chef [data-ev-step] {
-  color: var(--color-muted);
-  transition:
-    color 200ms var(--ease-settle),
-    background-color 200ms var(--ease-settle),
-    border-color 200ms var(--ease-settle);
-}
-.ev-chef-stepper {
-  display: inline-grid;
-  grid-template-columns: 40px 40px 40px;
-  justify-self: start;
-  height: 40px;
+  grid-template-columns: 0.9fr 1fr;
+  gap: clamp(14px, 2vw, 28px);
   align-items: center;
-  text-align: center;
-  font-size: 17px;
-  border: 1px solid var(--rule-strong);
 }
-.ev-chef-btn {
-  display: block;
-  height: 44px;
-  line-height: 44px;
-  text-align: center;
-  font-size: 15px;
-  font-weight: 500;
-  border: 1px solid var(--rule-strong);
-}
-.ev-chef[data-step="0"] [data-ev-step="0"],
-.ev-chef[data-step="2"] [data-ev-step="2"] {
-  color: var(--color-paper);
-  border-color: var(--color-paper);
-}
-.ev-chef[data-step="1"] [data-ev-step="1"] {
-  color: var(--color-black);
-  background: var(--color-paper);
-  border-color: var(--color-paper);
-}
-
-/* the sentence: the key words underline in turn, then resolve to their field labels */
-.ev-extract {
-  display: grid;
-  align-content: center;
-}
-.ev-extract-msg {
-  font-size: var(--type-lead);
-  line-height: 1.6;
-  max-width: 24ch;
-}
-.ev-word {
-  position: relative;
-  display: inline-block;
-}
-.ev-word-text {
-  text-decoration-line: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.14em;
-  text-decoration-color: transparent;
-  transition: text-decoration-color 200ms var(--ease-settle);
-}
-.ev-word-label {
-  position: absolute;
-  left: 0;
-  top: 100%;
-  margin-top: -4px;
-  color: var(--color-muted);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 200ms var(--ease-settle);
-}
-.ev-extract[data-step="0"] [data-ev-word="0"] .ev-word-text,
-.ev-extract[data-step="1"] [data-ev-word="1"] .ev-word-text,
-.ev-extract[data-step="2"] [data-ev-word="2"] .ev-word-text,
-.ev-extract[data-step="3"] .ev-word-text {
-  text-decoration-color: var(--color-signal);
-}
-.ev-extract[data-step="3"] .ev-word-label {
-  opacity: 1;
-}
-
-/* the Rayo layers at small size; `--sep` 0 (assembled) → 1 (separated): on the rail it is
-   scrubbed by the scroll, elsewhere it toggles on a time loop */
-.ev-rayo {
-  --sep: 0;
-  display: grid;
-  place-items: center;
-}
-.ev-rayo[data-step="1"]:not([data-scrub]) {
-  --sep: 1;
-}
-.ev-rayo-stack {
+.cs-shop-photo {
   position: relative;
   height: 100%;
-  aspect-ratio: var(--ar);
+  overflow: clip;
+  background: var(--color-paper-2);
 }
-.ev-rayo-layer {
+.cs-shop-info {
+  display: grid;
+  gap: 14px;
+  align-content: center;
+}
+.cs-shop-name {
+  margin: 0;
+  font-size: clamp(18px, 1.8vw, 28px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.cs-stepper {
+  display: inline-flex;
+  gap: 18px;
+  align-items: center;
+  justify-self: start;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--rule-strong);
+}
+.cs-qty {
+  position: relative;
+  display: inline-grid;
+}
+.cs-qty > span {
+  grid-area: 1 / 1;
+}
+.cs-qty-a {
+  visibility: hidden;
+}
+.cs-add {
+  justify-self: start;
+  margin: 0;
+  padding: 10px 16px;
+  font-weight: 600;
+  color: var(--color-black);
+  background: var(--color-paper);
+}
+.cs-pay {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+/* 04 · AI: a sentence becomes structured data (a demonstration, not a running integration) */
+.cs-ai {
   position: absolute;
-  transform: translateY(calc(var(--dy) * var(--sep)));
-  transition: transform 600ms var(--ease-settle);
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 18px;
 }
-.ev-rayo[data-scrub] .ev-rayo-layer {
-  transition: none;
+.cs-ai-msg {
+  align-self: center;
+  margin: 0;
+  font-size: clamp(20px, 2.1vw, 34px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+.cs-ai-word {
+  color: inherit;
+  background: none;
+  box-shadow: inset 0 -0.12em 0 var(--color-signal);
+}
+.cs-ai-out {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+.cs-ai-out div {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-top: 2px solid var(--color-signal);
+  background: var(--color-black);
+}
+.cs-ai-out dt {
+  color: var(--color-muted);
+}
+.cs-ai-out dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* 05 · interactive: Rayo's six real layers, apart */
+.cs-rayo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 86%;
+  aspect-ratio: var(--ar);
+  transform: translate(-50%, -50%);
+}
+.cs-rayo-layer {
+  position: absolute;
+  transform: translateY(var(--dy));
+}
+
+/* 06 · growth: from the business to the people who can become its next clients — no figure */
+.cs-grow {
+  position: absolute;
+  inset: 0;
+}
+.cs-ring,
+.cs-core {
+  position: absolute;
+  left: 22%;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.cs-core {
+  width: 18px;
+  height: 18px;
+  background: var(--color-signal);
+}
+.cs-ring {
+  width: calc(26% + var(--k) * 16%);
+  aspect-ratio: 1;
+  border: 1px solid rgb(237 232 222 / calc(0.32 - var(--k) * 0.08));
+}
+.cs-path {
+  position: absolute;
+  left: 22%;
+  right: 8%;
+  top: 50%;
+  height: 1px;
+  background: var(--color-signal);
+  transform-origin: 0 50%;
+}
+.cs-stations {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cs-stations li {
+  position: absolute;
+  top: calc(50% + 14px);
+  display: grid;
+  gap: 8px;
+  font-size: clamp(14px, 1.35vw, 21px);
+  font-weight: 600;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.cs-stations li:nth-child(1) {
+  left: 22%;
+}
+.cs-stations li:nth-child(2) {
+  left: 55%;
+}
+.cs-stations li:nth-child(3) {
+  left: 86%;
+}
+.cs-station-dot {
+  justify-self: center;
+  width: 9px;
+  height: 9px;
+  margin-top: -18px;
+  border-radius: 50%;
+  background: var(--color-paper);
+}
+.cs-stations li:nth-child(3) .cs-station-dot {
+  background: var(--color-signal);
+}
+
+/* phones: compact plates — the 2 × 2 path and the three outputs keep their shape, only smaller; the
+   unit (name, value, demonstration) stays within about one screen */
+@media (max-width: 767.98px) {
+  .cx {
+    padding-block: 10svh 8svh;
+  }
+  .cx-row {
+    padding: 22px 0 26px;
+  }
+  .cx-unit-scene {
+    margin-top: 12px;
+  }
+  .cx-plate {
+    aspect-ratio: 4 / 3;
+    gap: 10px;
+    padding: 12px;
+  }
+  .cx-plate[data-scene="product"],
+  .cx-plate[data-scene="ai"] {
+    aspect-ratio: auto;
+  }
+  .cs-flow,
+  .cs-ai {
+    position: static;
+  }
+  .cs-flow {
+    gap: 8px;
+  }
+  .cs-node {
+    min-height: 0;
+    padding: 10px;
+  }
+  .cs-msg,
+  .cs-quote,
+  .cs-state {
+    font-size: 13px;
+  }
+  .cs-fields dd {
+    font-size: 12px;
+  }
+  .cs-node:nth-child(odd)::after {
+    content: none;
+  }
+  .cs-ai-msg {
+    font-size: 19px;
+  }
+  .cs-ai-out {
+    gap: 6px;
+  }
+  .cs-ai-out div {
+    padding: 8px;
+  }
+  .cs-ai-out dd {
+    font-size: 13px;
+  }
+  .cs-shop {
+    grid-template-columns: 1fr 1.2fr;
+  }
+  .cs-shop-name {
+    font-size: 15px;
+  }
+  .cs-stations li {
+    font-size: 12px;
+  }
+  .cs-stations li:nth-child(2) {
+    left: 54%;
+  }
+  .cs-stations li:nth-child(3) {
+    left: 80%;
+    white-space: normal;
+    text-align: center;
+    max-width: 30%;
+  }
+}
+
+/* tablets: one unit per row, its words on the left and its demonstration beside them */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .cx-row {
+    grid-template-columns: auto minmax(0, 0.85fr) minmax(0, 1.15fr);
+    column-gap: 24px;
+    align-items: start;
+  }
+  .cx-n {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
+  .cx-name,
+  .cx-value,
+  .cx-ref {
+    grid-column: 2;
+  }
+  .cx-row[data-group="extended"] .cx-name {
+    grid-row: 2;
+  }
+  .cx-row[data-group="extended"] .cx-value {
+    grid-row: 3;
+  }
+  .cx-row[data-group="extended"] .cx-ref {
+    grid-row: 4;
+  }
+  .cs-stations li {
+    font-size: 12px;
+  }
+  .cs-stations li:nth-child(3) {
+    left: 82%;
+    max-width: 28%;
+    white-space: normal;
+    text-align: center;
+  }
+  .cx-sub {
+    grid-column: 1 / -1;
+  }
+  .cx-unit-scene {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    margin-top: 0;
+  }
+  .cx-row[data-group="extended"] .cx-unit-scene,
+  .cx-row[data-group="extended"] .cx-n {
+    grid-row: 2 / span 3;
+  }
+  .cx-name {
+    font-size: 30px;
+  }
+  .cs-msg,
+  .cs-quote,
+  .cs-state {
+    font-size: 13px;
+  }
+  .cs-ai-msg {
+    font-size: 20px;
+  }
+}
+
+/* ── wide: the index beside one sticky stage ── */
+@media (min-width: 1024px) {
+  html.js .cx-body {
+    display: grid;
+    grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
+    gap: clamp(32px, 4vw, 72px);
+    align-items: start;
+  }
+  html.js .cx-unit-scene {
+    display: none;
+  }
+  /* the last row reaches the reading line while the stage is still held beside it; the section's
+     own bottom padding gives way to it (no second band of black before the declaration) */
+  html.js .cx-index {
+    padding-bottom: 22svh;
+  }
+  html.js .cx {
+    padding-bottom: 0;
+  }
+  html.js .cx-row {
+    min-height: 30svh;
+    align-content: center;
+    transition: opacity 320ms var(--ease-settle);
+  }
+  html.js .cx-row :is(.cx-name, .cx-value, .cx-n) {
+    transition: color 320ms var(--ease-settle);
+  }
+  /* the active row carries the stage; the others step back, legible (muted is AA on black) */
+  html.js .cx-row:not([data-active]) :is(.cx-name, .cx-value) {
+    color: var(--color-muted);
+  }
+  html.js .cx-row[data-active] .cx-n {
+    color: var(--color-signal);
+  }
+  html.js .cx-row::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2px;
+    background: var(--color-signal);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 520ms var(--ease-settle);
+  }
+  html.js .cx-row[data-active]::after {
+    transform: scaleX(1);
+  }
+  html.js .cx-stage {
+    position: sticky;
+    top: calc(var(--header-h) + 6svh);
+    display: block;
+    height: calc(100svh - var(--header-h) - 12svh);
+  }
+  html.js .cx-stage-in {
+    position: relative;
+    height: 100%;
+  }
+  html.js .cx-stage-scene {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    /* the plate hangs from the stage's top: with the active row before the stage sticks, too */
+    align-content: start;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(14px);
+    transition:
+      opacity 360ms var(--ease-settle),
+      transform 520ms var(--ease-settle),
+      visibility 0s linear 360ms;
+  }
+  html.js .cx-stage-scene[data-on] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  html.js .cx-stage .cx-plate {
+    max-height: 100%;
+  }
+}
+
+/* ── the scenes' sequences: played when a scene turns on (stage) or comes into view (units) ── */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-on] .cs-node {
+    animation: cs-rise 560ms var(--ease-settle) both;
+    animation-delay: calc(var(--k) * 140ms);
+  }
+  html.js [data-on] .cs-flow::before {
+    animation: cs-draw 900ms var(--ease-settle) both;
+  }
+  html.js [data-on] .cs-dot {
+    animation: cs-pop 420ms var(--ease-settle) both 640ms;
+  }
+  html.js [data-on] .cs-shot,
+  html.js [data-on] .cs-slab {
+    animation: cs-stack 900ms var(--ease-reveal) both;
+  }
+  html.js [data-on] .cs-qty-a {
+    visibility: visible;
+    animation: cs-out 300ms var(--ease-settle) both 700ms;
+  }
+  html.js [data-on] .cs-qty-b {
+    animation: cs-in 300ms var(--ease-settle) both 760ms;
+  }
+  html.js [data-on] .cs-add {
+    animation: cs-press 360ms var(--ease-settle) both 1100ms;
+  }
+  html.js [data-on] .cs-pay {
+    animation: cs-rise 420ms var(--ease-settle) both 1360ms;
+  }
+  html.js [data-on] .cs-ai-word {
+    animation: cs-mark 420ms var(--ease-settle) both;
+    animation-delay: calc(200ms + var(--k) * 260ms);
+  }
+  html.js [data-on] .cs-ai-out div {
+    animation: cs-rise 460ms var(--ease-settle) both;
+    animation-delay: calc(420ms + var(--k) * 260ms);
+  }
+  html.js [data-on] .cs-rayo-layer {
+    animation: cs-apart 1100ms var(--ease-reveal) both;
+    animation-delay: calc(var(--k) * 40ms);
+  }
+  html.js [data-on] .cs-ring {
+    animation: cs-reach 900ms var(--ease-settle) both;
+    animation-delay: calc(var(--k) * 160ms);
+  }
+  html.js [data-on] .cs-path {
+    animation: cs-draw 900ms var(--ease-settle) both 420ms;
+  }
+  html.js [data-on] .cs-stations li {
+    animation: cs-rise 460ms var(--ease-settle) both;
+    animation-delay: calc(520ms + var(--k) * 200ms);
+  }
+}
+@keyframes cs-rise {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+@keyframes cs-draw {
+  from {
+    transform: scale(0, 1);
+  }
+}
+@keyframes cs-drawy {
+  from {
+    transform: scale(1, 0);
+  }
+}
+@keyframes cs-pop {
+  from {
+    scale: 0;
+  }
+}
+@keyframes cs-stack {
+  from {
+    transform: translate(0, 0);
+  }
+}
+@keyframes cs-out {
+  to {
+    opacity: 0;
+    translate: 0 -60%;
+  }
+}
+@keyframes cs-in {
+  from {
+    opacity: 0;
+    translate: 0 60%;
+  }
+}
+@keyframes cs-press {
+  50% {
+    scale: 0.96;
+    background: var(--color-signal);
+    color: var(--color-paper);
+  }
+}
+@keyframes cs-mark {
+  from {
+    box-shadow: inset 0 0 0 var(--color-signal);
+  }
+}
+@keyframes cs-apart {
+  from {
+    transform: translateY(0);
+  }
+}
+@keyframes cs-reach {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
 }
 
 /* ── S12b · the commercial declaration (Content Master 20, docs/22): MOSTRAR → CONVENCER →
