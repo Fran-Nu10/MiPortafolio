@@ -162,6 +162,9 @@ export function releaseTitle() {
   desiredTitle = null;
 }
 
+/** where the page was when it left, for its own reload (see `trackScrollPosition`) */
+const LEFT_AT = "journey:left-at";
+
 /** remember the scroll position in the current entry once scrolling settles (reload keeps place) */
 export function trackScrollPosition(): () => void {
   let t = 0;
@@ -169,10 +172,23 @@ export function trackScrollPosition(): () => void {
     window.clearTimeout(t);
     t = window.setTimeout(() => replaceOwnState({ y: Math.round(window.scrollY) }), 300);
   };
+  // a reload while scrolling settles (THE SHIFT's snap keeps scrolling ~0.9 s after a rest) restored
+  // the last settled position — a section away (docs/26 QA). The page leaving records where it is;
+  // in sessionStorage, because a replaceState from pagehide survives a reload only in WebKit
+  const onHide = () => {
+    window.clearTimeout(t);
+    try {
+      sessionStorage.setItem(LEFT_AT, JSON.stringify({ path: location.pathname, y: Math.round(window.scrollY) }));
+    } catch {
+      // storage blocked: the settled position in the history entry still applies
+    }
+  };
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("pagehide", onHide);
   return () => {
     window.clearTimeout(t);
     window.removeEventListener("scroll", onScroll);
+    window.removeEventListener("pagehide", onHide);
   };
 }
 
@@ -182,8 +198,24 @@ export function trackScrollPosition(): () => void {
  */
 export function reloadPosition(): number | null {
   const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+  if (nav?.type === "reload") {
+    const left = takeLeftAt();
+    if (left !== null) return left;
+  }
   const y = ownState().y;
   return (nav?.type === "reload" || nav?.type === "back_forward") && typeof y === "number" ? y : null;
+}
+
+/** the position this document had when it left, read once (a reload of the same path only) */
+function takeLeftAt(): number | null {
+  try {
+    const raw = sessionStorage.getItem(LEFT_AT);
+    sessionStorage.removeItem(LEFT_AT);
+    const left = raw ? (JSON.parse(raw) as { path?: unknown; y?: unknown }) : null;
+    return left && left.path === location.pathname && typeof left.y === "number" ? left.y : null;
+  } catch {
+    return null;
+  }
 }
 
 /** the reel piece to start on: a reload or a return (Back / Forward) restores the one left active */

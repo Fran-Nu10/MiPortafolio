@@ -153,6 +153,24 @@ test.describe("routes", () => {
     await expect(page).toHaveTitle(/Franco Núñez/);
     expect(await page.evaluate(() => history.length)).toBe(before);
   });
+
+  test("a reload while the scroll is still settling returns to where the page was, not to the last rest (docs/26 QA)", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await expect(page.locator("main")).toHaveAttribute("data-started", "");
+    // a rest at the contact (its position settles into the history entry), then straight up to THE SHIFT
+    await page.evaluate(() => document.getElementById("contacto")!.scrollIntoView({ behavior: "instant" }));
+    await page.waitForTimeout(800);
+    await page.evaluate(() => {
+      const s = document.getElementById("shift")!;
+      window.scrollTo({ top: Math.round(s.getBoundingClientRect().top + window.scrollY + innerHeight * 0.5), behavior: "instant" });
+    });
+    await page.waitForTimeout(50);
+    await page.reload({ waitUntil: "networkidle" });
+    await expect(page.locator("main")).toHaveAttribute("data-started", "");
+    await expect
+      .poll(() => page.evaluate(() => { const r = document.getElementById("shift")!.getBoundingClientRect(); return r.top < innerHeight / 2 && r.bottom > innerHeight / 2; }))
+      .toBe(true);
+  });
 });
 
 test.describe("a failed bundle (Spec §24 / §27 \"block GSAP chunk only\", Phase 13)", () => {
