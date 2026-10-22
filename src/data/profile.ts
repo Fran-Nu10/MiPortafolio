@@ -7,7 +7,8 @@ interface Profile {
   /** the explanation: the second and third paragraphs */
   body: string[];
   /** Meta Ads, in its own space (Content Master 21): a headline, its paragraphs and the term set in emphasis */
-  ads: { title: string; paragraphs: string[]; emphasis: string };
+  /** `chain`: Meta Ads' conductor (docs/26 §E), from building products to bringing them to people */
+  ads: { title: string; paragraphs: string[]; emphasis: string; chain: string[] };
   stack: Gated<string>;
   /** href values; the email also completes the form's route error */
   contacts: { email: Gated<string>; linkedin: Gated<string> };
@@ -34,6 +35,8 @@ export const PROFILE: Profile = {
       "Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla.",
     ],
     emphasis: "Meta Ads",
+    /** the brief of 2026-10-22 (Content Master 24): ESTRATEGIA → PRODUCTO → CRECIMIENTO */
+    chain: ["Estrategia", "Producto", "Crecimiento"],
   },
   stack: {
     status: "pending",

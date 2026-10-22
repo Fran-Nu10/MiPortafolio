@@ -4393,6 +4393,36 @@ a.cx-ref:hover {
   padding-top: 40px;
   border-top: 1px solid var(--rule-strong);
 }
+/* Meta Ads' conductor (docs/26 §E): Estrategia → Producto → Crecimiento, joined by a red line */
+.profile-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 0;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+}
+.profile-chain-step {
+  display: flex;
+  align-items: center;
+}
+.profile-chain-word {
+  /* ≥ 19px bold: large text, so the red «Crecimiento» meets AA (3:1) */
+  font-size: clamp(19px, 1.35vw, 22px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.profile-chain-step:last-child .profile-chain-word {
+  color: var(--color-signal);
+}
+.profile-chain-rule {
+  width: clamp(32px, 6vw, 96px);
+  height: 2px;
+  margin: 0 clamp(10px, 1.4vw, 18px);
+  background: var(--color-signal);
+}
 .profile-ads-title {
   max-width: 22em;
   font-size: clamp(24px, 2.6vw, 38px);

@@ -8,7 +8,7 @@ export interface ProfileView {
   /** the explanation: body copy under a hairline */
   body: string[];
   /** Meta Ads in its own space: a headline, its paragraphs, and the term set in discreet emphasis */
-  ads: { title: string; paragraphs: string[]; emphasis: string };
+  ads: { title: string; paragraphs: string[]; emphasis: string; chain: string[] };
   /** only when confirmed */
   stack?: string;
   /** only the routes that exist */
@@ -33,7 +33,9 @@ function emphasize(text: string, term: string) {
  * the declaration of authority (large, alone), the next two explain it (body copy under a hairline),
  * and Meta Ads has a space of its own below — a headline and three short paragraphs. The only
  * first-person text on the site besides the declaration's conclusion; no photo, no cards, no icons.
- * The text is server HTML, readable without JavaScript; two single reveals on entry (ProfileReveal).
+ * The text is server HTML, readable without JavaScript. Motion (ProfileReveal, docs/26 §E): the
+ * declaration enters line by line, each paragraph as it comes into view, and Meta Ads' conductor
+ * — Estrategia → Producto → Crecimiento — draws its red line; all once, never hidden again.
  */
 export function Profile({ view }: { view: ProfileView }) {
   return (
@@ -50,6 +52,15 @@ export function Profile({ view }: { view: ProfileView }) {
         </div>
       </div>
       <section aria-labelledby="perfil-ads-h" className="profile-ads">
+        {/* the conductor: from building the product to bringing it to the right people (docs/26 §E) */}
+        <ol className="profile-chain" aria-label={view.ads.chain.join(", ")}>
+          {view.ads.chain.map((w, i) => (
+            <li key={w} className="profile-chain-step" data-k={i}>
+              {i > 0 ? <span aria-hidden="true" className="profile-chain-rule" /> : null}
+              <span className="profile-chain-word">{w}</span>
+            </li>
+          ))}
+        </ol>
         <h3 id="perfil-ads-h" className="profile-ads-title">
           {view.ads.title}
         </h3>

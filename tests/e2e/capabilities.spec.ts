@@ -177,36 +177,38 @@ test.describe("profile (Spec §12, Content Master 13)", () => {
     expect(await s.innerText()).not.toContain("Un buen producto merece ser descubierto");
   });
 
-  test("one reveal on entry: blocks clipped until the section reaches 75% of the viewport, then shown whole; none under reduced motion", async ({ page }) => {
+  test("motion (docs/26 §E): the declaration enters line by line, the paragraphs as they come, Meta Ads' chain draws; once, never hidden again", async ({ page }) => {
     await open(page);
     const s = page.locator("#perfil");
+    await expect(s.locator(".profile-chain li")).toHaveText(["Estrategia", "Producto", "Crecimiento"]);
     if (await reduced(page)) {
       expect(await s.getAttribute("data-reveal")).toBeNull();
+      expect(await s.locator(".profile-core").evaluate((e) => getComputedStyle(e).opacity)).toBe("1");
       return;
     }
     await expect(s).toHaveAttribute("data-reveal", "pending");
-    const ads = page.locator("#perfil .profile-ads");
-    await expect(ads).toHaveAttribute("data-reveal", "pending");
-    const clipped = await s.locator(".profile-core").evaluate((e) => getComputedStyle(e).clipPath);
-    expect(clipped).toMatch(/inset\(0(px)? 0(px)? 100%( 0(px)?)?\)/);
     await page.evaluate(() => {
-      const r = document.getElementById("perfil")!.getBoundingClientRect();
-      window.scrollTo({ top: r.top + window.scrollY - window.innerHeight * 0.6, behavior: "instant" });
+      const r = document.querySelector("#perfil .profile-core")!.getBoundingClientRect();
+      window.scrollTo({ top: r.top + window.scrollY - window.innerHeight * 0.5, behavior: "instant" });
     });
     await expect(s).toHaveAttribute("data-reveal", "shown");
-    await expect.poll(() => s.locator(".profile-core").evaluate((e) => getComputedStyle(e).clipPath), { timeout: 3000 }).toMatch(/none|inset\(0(px|%)?( 0(px|%)?)*\)/);
-    // the text was never removed from the tree
+    // once in, the split is reverted: one plain paragraph, the exact text
+    await expect.poll(() => s.locator(".profile-core").evaluate((e) => e.children.length), { timeout: 4000 }).toBe(0);
     await expect(s.locator(".profile-core")).toHaveText(CORE);
-    // Meta Ads waits for the visitor: still clipped while it is far below, then revealed once on its own
-    await expect(ads).toHaveAttribute("data-reveal", "pending");
-    expect(await ads.locator(".profile-ads-title").evaluate((e) => getComputedStyle(e).clipPath)).toMatch(/inset\(0(px)? 0(px)? 100%( 0(px)?)?\)/);
+    // the paragraphs come in as they reach the viewport, and stay when the visitor goes back up
     await page.evaluate(() => {
-      const r = document.querySelector("#perfil .profile-ads")!.getBoundingClientRect();
-      window.scrollTo({ top: r.top + window.scrollY - window.innerHeight * 0.6, behavior: "instant" });
+      const r = document.querySelector("#perfil .profile-ads-body p:last-child")!.getBoundingClientRect();
+      window.scrollTo({ top: r.top + window.scrollY - window.innerHeight * 0.5, behavior: "instant" });
     });
-    await expect(ads).toHaveAttribute("data-reveal", "shown");
-    await expect.poll(() => ads.locator(".profile-ads-title").evaluate((e) => getComputedStyle(e).clipPath), { timeout: 3000 }).toMatch(/none|inset\(0(px|%)?( 0(px|%)?)*\)/);
-    await expect(ads.locator(".profile-ads-body p")).toHaveText(ADS);
+    await expect.poll(() => s.locator(".profile-ads-body p").last().evaluate((e) => Number(getComputedStyle(e).opacity)), { timeout: 4000 }).toBe(1);
+    await expect.poll(() => s.locator(".profile-chain-word").last().evaluate((e) => getComputedStyle(e).color), { timeout: 4000 }).toBe("rgb(230, 59, 46)");
+    // once lit, the red word is large text and passes AA
+    const lit = await new AxeBuilder({ page }).include("#perfil .profile-chain").analyze();
+    expect(lit.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => v.id)).toEqual([]);
+    await page.evaluate(() => window.scrollBy({ top: -window.innerHeight, behavior: "instant" }));
+    await page.waitForTimeout(400);
+    expect(await s.locator(".profile-detail p").first().evaluate((e) => Number(getComputedStyle(e).opacity))).toBe(1);
+    await expect(s.locator(".profile-ads-body p")).toHaveText(ADS);
   });
 });
 
