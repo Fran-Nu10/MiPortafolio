@@ -787,3 +787,38 @@ Reglas que siguen valiendo para la 06: **sin métricas, sin resultados, sin evid
 | Complemento | «Hablemos de lo que podemos construir.» |
 
 Campos, validaciones, mensajes de error y de éxito («Brief recibido.»): sin cambios.
+
+## 23 — THE SHIFT: de la complejidad al producto (addendum local, 2026-10-21)
+
+> **Addendum de este export, pendiente de sincronizar con el Claude Doc.** Pedido de Franco «REVELADO 2.2 — MASTER IMPLEMENTATION PROMPT · THE SHIFT — From Complexity to Product» (2026-10-21). Implementación: `docs/25-the-shift.md`. Sección nueva de la home, entre el reel y Capacidades. Los cuatro mundos salen del recorrido principal y quedan como casos en `/trabajo/{slug}`: su copy (§06–§09) no cambia.
+
+**Nombre.** «THE SHIFT» es el nombre de trabajo de la sección; no se muestra: §03 no admite etiquetas de interfaz en inglés. La página muestra su subtítulo.
+
+| Elemento | Texto | Fuente |
+|---|---|---|
+| Título (micro) | «De la complejidad al producto.» | brief |
+| Acto 01 | «01 — El desorden» · «Una idea no alcanza.» | brief |
+| Acto 02 | «02 — La dirección» · «Necesita dirección.» | brief |
+| Acto 03 | «03 — La ejecución» · «Y ejecución.» | brief |
+| Acto 04 | «04 — El resultado» · «De la idea al producto.» | brief |
+| Leyenda | «Interfaz conceptual, diseñada para esta sección.» | propuesta a confirmar |
+| Anotaciones (acto 04) | «Retícula de 12 columnas» (8 en tablet, 4 en teléfono) · «Tipografía: Schibsted Grotesk» · «Estado: publicado» | propuesta a confirmar; describen la propia interfaz |
+
+**La interfaz conceptual.** Es una pieza inventada para la sección, sin proyecto, cliente ni métrica detrás, y la leyenda lo dice. Su marca es la palabra «Concepto». Su texto es ilustrativo; las propuestas están a confirmar:
+- navegación «Inicio · Producto · Contacto»;
+- botón «Empezar» y el eyebrow «01 — Producto»;
+- titular «Todo encuentra su lugar.»;
+- cuerpo «Una estructura clara, para que cada parte cumpla su función.»;
+- botón «Explorar →»;
+- estado «Borrador» → «Publicado» y control «Publicar»;
+- módulos «Estructura · Interfaz · Función».
+
+Para el lector de pantalla es una sola imagen descrita:
+
+> «Interfaz conceptual de un producto digital: navegación, el titular «Todo encuentra su lugar.», tres módulos —Estructura, Interfaz y Función— y un control «Publicar» que pasa el estado de borrador a publicado.»
+
+Reglas:
+- sin números de resultado, sin nombres de proyectos o clientes (lo verifica `tests/shift.test.ts`);
+- no se presenta como trabajo publicado.
+
+**Casos individuales.** `/trabajo/{slug}` conserva el copy de §06–§09 y §17 (metadatos). La prueba suma «← Trabajo» (texto ya existente en el sistema, `SITE.world.back`), que vuelve al reel. «Siguiente →» lleva al caso siguiente; después de Chef Arturo, a Capacidades de la home. Sale del sistema «Ir a {proyecto}», el salto sin JS dentro del documento único: el caso empieza por su mundo y no hace falta.

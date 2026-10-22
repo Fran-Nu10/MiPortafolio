@@ -65,6 +65,7 @@ docs/
   22-commercial-declaration.md          declaración comercial MOSTRAR → CONVENCER → CONVERTIR (entre Capacidades y Perfil)
   23-ux-rhythm-conversion.md            intervención integral: ritmo (huecos), capacidades, contacto, showreel
   24-positioning-copy-pass.md           posicionamiento y autoridad: hero, Perfil + Meta Ads, Work abierto, contacto
+  25-the-shift.md                       THE SHIFT (de la complejidad al producto) y los casos en /trabajo/[slug]
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 ```
 
