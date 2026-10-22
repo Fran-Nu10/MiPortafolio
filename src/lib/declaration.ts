@@ -79,32 +79,33 @@ export interface FieldPose {
 /**
  * The ten words of act I, in the copy's order (productos … valor). An asymmetric constellation,
  * denser right of center, "valor" brightest at the core; far words are smaller, fainter and (on
- * lg/xl) deeper. Landscape and portrait compositions are drawn separately — never a reflow.
+ * lg/xl) deeper. Landscape and portrait compositions are drawn separately — never a reflow. Latent,
+ * not absent: from .28 to .48 (docs/26 §A3 — at .12 the first state read as an empty black screen).
  */
 export const FIELD_WIDE: FieldPose[] = [
-  { x: 0.6, y: 0.27, fs: 1.9, o: 0.3, z: -300 },
-  { x: 0.08, y: 0.16, fs: 1.2, o: 0.16, z: -700 },
-  { x: 0.3, y: 0.68, fs: 1.5, o: 0.22, z: -450 },
-  { x: 0.8, y: 0.58, fs: 1.1, o: 0.14, z: -800 },
-  { x: 0.2, y: 0.4, fs: 2.2, o: 0.34, z: -200 },
-  { x: 0.9, y: 0.12, fs: 1, o: 0.12, z: -900 },
-  { x: 0.52, y: 0.82, fs: 1.3, o: 0.18, z: -600 },
-  { x: 0.03, y: 0.86, fs: 1, o: 0.12, z: -900 },
-  { x: 0.76, y: 0.84, fs: 1.4, o: 0.2, z: -500 },
-  { x: 0.45, y: 0.46, fs: 2.8, o: 0.42, z: -150 },
+  { x: 0.6, y: 0.27, fs: 1.9, o: 0.4, z: -300 },
+  { x: 0.08, y: 0.16, fs: 1.2, o: 0.31, z: -700 },
+  { x: 0.3, y: 0.68, fs: 1.5, o: 0.35, z: -450 },
+  { x: 0.8, y: 0.58, fs: 1.1, o: 0.29, z: -800 },
+  { x: 0.2, y: 0.4, fs: 2.2, o: 0.42, z: -200 },
+  { x: 0.9, y: 0.12, fs: 1, o: 0.28, z: -900 },
+  { x: 0.52, y: 0.82, fs: 1.3, o: 0.32, z: -600 },
+  { x: 0.03, y: 0.86, fs: 1, o: 0.28, z: -900 },
+  { x: 0.76, y: 0.84, fs: 1.4, o: 0.33, z: -500 },
+  { x: 0.45, y: 0.46, fs: 2.8, o: 0.48, z: -150 },
 ];
 
 export const FIELD_PORTRAIT: FieldPose[] = [
-  { x: 0.52, y: 0.2, fs: 4.6, o: 0.3, z: 0 },
-  { x: 0.08, y: 0.14, fs: 3.6, o: 0.16, z: 0 },
-  { x: 0.14, y: 0.58, fs: 4, o: 0.22, z: 0 },
-  { x: 0.48, y: 0.66, fs: 3.4, o: 0.14, z: 0 },
-  { x: 0.1, y: 0.34, fs: 5.2, o: 0.34, z: 0 },
-  { x: 0.7, y: 0.3, fs: 3.4, o: 0.12, z: 0 },
-  { x: 0.4, y: 0.8, fs: 3.8, o: 0.18, z: 0 },
-  { x: 0.62, y: 0.88, fs: 3.4, o: 0.12, z: 0 },
-  { x: 0.08, y: 0.76, fs: 3.8, o: 0.2, z: 0 },
-  { x: 0.42, y: 0.46, fs: 7, o: 0.42, z: 0 },
+  { x: 0.52, y: 0.2, fs: 4.6, o: 0.4, z: 0 },
+  { x: 0.08, y: 0.14, fs: 3.6, o: 0.31, z: 0 },
+  { x: 0.14, y: 0.58, fs: 4, o: 0.35, z: 0 },
+  { x: 0.48, y: 0.66, fs: 3.4, o: 0.29, z: 0 },
+  { x: 0.1, y: 0.34, fs: 5.2, o: 0.42, z: 0 },
+  { x: 0.7, y: 0.3, fs: 3.4, o: 0.28, z: 0 },
+  { x: 0.4, y: 0.8, fs: 3.8, o: 0.32, z: 0 },
+  { x: 0.62, y: 0.88, fs: 3.4, o: 0.28, z: 0 },
+  { x: 0.08, y: 0.76, fs: 3.8, o: 0.33, z: 0 },
+  { x: 0.42, y: 0.46, fs: 7, o: 0.48, z: 0 },
 ];
 
 /** tablets keep the portrait drawing at a smaller size (their space is twice as wide) */

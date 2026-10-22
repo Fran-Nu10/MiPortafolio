@@ -770,21 +770,48 @@ html.js main[data-initial]:not([data-started]) .hero-stage {
   }
 }
 html.js .reel[data-anim] {
-  padding: 18svh 0 0;
+  /* the stage is as tall as what it holds (docs/26 §A1): the heading band, the card, the meta band */
+  --reel-head: calc(var(--header-h) + 150px);
+  --reel-foot: 128px;
+  position: relative;
+  padding: 0;
   /* the active frame's box: the 01–04 index aligns to its right edge, under it */
   --wa: min(var(--reel-w), calc(var(--reel-cap) * var(--active-r)));
   --ha: calc(var(--wa) / var(--active-r));
 }
+/* tablets and up: heading, card and meta fit one screen (the card's height gives way, never the type) */
+@media (min-width: 768px) {
+  html.js .reel[data-anim] {
+    --reel-cap: min(72svh, calc(100svh - var(--reel-head) - var(--reel-foot)));
+  }
+}
+/* tablets: the heading wraps to two lines */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  html.js .reel[data-anim] {
+    --reel-head: calc(var(--header-h) + 200px);
+  }
+}
+/* the heading and the cards are one composition (docs/26 §A1): the heading sits in the stage's own
+   top band, on the active card's left edge, 28px above it — no block of black between them */
 html.js .reel[data-anim] .reel-header {
-  padding-inline: var(--gutter);
+  position: absolute;
+  z-index: 2;
+  left: calc((100vw - var(--wa)) / 2);
+  top: calc(var(--reel-head) - 28px);
+  /* from the card's left edge to the page's right gutter: the title keeps one line on laptops */
+  width: calc(100vw - (100vw - var(--wa)) / 2 - var(--gutter));
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  transform: translateY(-100%);
 }
 html.js .reel[data-anim] .reel-stage {
   position: relative;
-  height: 100svh;
+  height: calc(var(--reel-head) + var(--ha) + var(--reel-foot));
 }
 html.js .reel[data-anim] .reel-viewport {
   position: absolute;
-  inset: 0;
+  inset: var(--reel-head) 0 0;
   overflow: clip;
   /* the browser keeps vertical panning; horizontal touch belongs to the reel */
   touch-action: pan-y;
@@ -798,7 +825,7 @@ html.js .reel[data-anim] .reel-viewport[data-cursor] * {
 html.js .reel[data-anim] .reel-track {
   --w0: min(var(--reel-w), calc(var(--reel-cap) * var(--r0)));
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--reel-gap);
   width: max-content;
   height: 100%;
@@ -916,13 +943,19 @@ html.js .reel[data-anim] .reel-controls {
   position: absolute;
   z-index: 2;
   right: calc((100vw - var(--wa)) / 2);
-  top: calc(50% + var(--ha) / 2 + 16px);
+  top: calc(var(--reel-head) + var(--ha) + 16px);
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
-  max-width: 50vw;
+  /* the right half of the card: never over its name or «Ver caso» (docs/26 §A1, found at 1366) */
+  max-width: calc(var(--wa) / 2);
   column-gap: 4px;
+  /* only its buttons take the pointer: the meta's «Ver caso» beside it stays reachable */
+  pointer-events: none;
+}
+html.js .reel[data-anim] .reel-controls :is(button, a) {
+  pointer-events: auto;
 }
 .reel-nav {
   display: flex;
@@ -978,9 +1011,10 @@ html.js .reel[data-anim] .reel-controls {
 .reel-hint {
   flex-basis: 100%;
   text-align: right;
+  pointer-events: none;
 }
-/* the keys hint only where there is room beside the meta, and only for fine pointers */
-@media (hover: none), (pointer: coarse), (max-width: 1023.98px) {
+/* the keys hint only where there is room beside the meta (the widest card), and only for fine pointers */
+@media (hover: none), (pointer: coarse), (max-width: 1439.98px) {
   .reel-hint {
     display: none;
   }
@@ -991,7 +1025,6 @@ html.js .reel[data-anim] .reel-controls {
      marks follow it in flow, and the stage grows past 100svh on short screens instead of clipping */
   html.js .reel[data-anim] .reel-stage {
     height: auto;
-    min-height: 100svh;
     display: flex;
     flex-direction: column;
   }
@@ -1017,10 +1050,11 @@ html.js .reel[data-anim] .reel-controls {
     aspect-ratio: var(--ar-m);
   }
   /* four marks under the meta, at the bottom of the stage; labels stay for screen readers */
+  /* the marks follow the meta: the stage ends with its content, not at 100svh (docs/26 §A1) */
   html.js .reel[data-anim] .reel-controls {
     position: static;
-    margin-top: auto;
-    padding: 16px 0 calc(16px + env(safe-area-inset-bottom));
+    margin-top: 8px;
+    padding: 12px 0 calc(24px + env(safe-area-inset-bottom));
     max-width: none;
     justify-content: center;
   }
@@ -1045,6 +1079,30 @@ html.js .reel[data-anim] .reel-controls {
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+}
+
+/* phones: the heading in the stage's 18svh band, just above the card, where the screen is tall enough
+   for both; short phones keep it in flow above the stage */
+@media (max-width: 767.98px) {
+  html.js .reel[data-anim] .reel-header {
+    left: var(--gutter);
+    top: calc(18svh - 16px);
+    width: calc(100vw - 2 * var(--gutter));
+  }
+}
+@media (max-width: 767.98px) and (max-height: 699.98px) {
+  html.js .reel[data-anim] {
+    padding-top: 10svh;
+  }
+  html.js .reel[data-anim] .reel-header {
+    position: static;
+    margin: 0 var(--gutter) 12px;
+    transform: none;
+  }
+  /* short phones: the card follows the heading in flow, not the 18svh band */
+  html.js .reel[data-anim] .reel-track {
+    padding-top: 16px;
   }
 }
 

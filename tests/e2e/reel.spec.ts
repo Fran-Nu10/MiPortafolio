@@ -25,25 +25,26 @@ async function toReel(page: Page) {
 const settle = (page: Page) => page.waitForTimeout(650);
 
 test.describe("geometry", () => {
-  test("the active frame is the shared reel rectangle (Spec §06/§07)", async ({ page }) => {
+  test("heading and cards are one composition (docs/26 §A1): the title just above the film, the card centered", async ({ page }) => {
     await toReel(page);
-    const { got, want } = await page.evaluate(() => {
-      const vw = window.innerWidth;
-      // 100svh (no URL bar in the test browser); on phones the stage may grow past it
-      const vh = window.innerHeight;
-      const tier = vw >= 1440 ? "xl" : vw >= 1024 ? "lg" : vw >= 768 ? "md" : "sm";
-      const [aw, ah] = tier === "sm" ? [358, 420] : [1094, 616];
-      let w = tier === "xl" ? Math.min(1094, 0.76 * vw) : tier === "lg" ? 0.76 * vw : tier === "md" ? 0.84 * vw : vw - 32;
-      let h = (w * ah) / aw;
-      const cap = tier === "sm" ? 0.64 * vh : 0.72 * vh;
-      if (h > cap) {
-        h = cap;
-        w = (h * aw) / ah;
-      }
+    const g = await page.evaluate(() => {
       const f = document.querySelector('#trabajo .reel-item[data-active] [data-part="frame"]')!.getBoundingClientRect();
-      return { got: [f.x, f.y, f.width, f.height], want: [(vw - w) / 2, tier === "sm" ? 0.18 * vh : (vh - h) / 2, w, h] };
+      const h = document.querySelector("#trabajo .reel-header")!.getBoundingClientRect();
+      const m = document.querySelector("#trabajo .reel-item[data-active] .reel-meta")!.getBoundingClientRect();
+      const st = document.querySelector('#trabajo [data-part="stage"]')!.getBoundingClientRect();
+      return { vw: innerWidth, vh: innerHeight, f: [f.x, f.y, f.width, f.height], gap: f.top - h.bottom, metaBottom: m.bottom, stageBottom: st.bottom, headerTop: h.top };
     });
-    got.forEach((v, i) => expect(Math.abs(v - want[i]), `rect[${i}]`).toBeLessThan(1.5));
+    // the card centered across the viewport, the heading 16–40 px above it
+    expect(Math.abs(g.f[0] - (g.vw - g.f[2]) / 2)).toBeLessThan(1.5);
+    expect(g.gap).toBeGreaterThanOrEqual(12);
+    expect(g.gap).toBeLessThanOrEqual(40);
+    // the stage ends with its meta: no block of black under it
+    expect(g.stageBottom - g.metaBottom).toBeLessThan(g.vw < 768 ? 140 : 80);
+    // tablets and up: the heading clears the site header, and heading + card + meta fit one screen
+    if (g.vw >= 768) {
+      expect(g.headerTop).toBeGreaterThanOrEqual(56);
+      expect(g.metaBottom).toBeLessThanOrEqual(g.vh + 1);
+    }
   });
 
   test("no horizontal overflow with the reel laid out", async ({ page }) => {
