@@ -85,7 +85,7 @@ const proofFor = (p: Project): ProofView => {
     tone: p.theme.tone,
     aspect: p.reel.aspect,
     chapters: p.proof.chapters,
-    // TravelSuite360: preload staged by its world (Spec §08). Its TS12 red seam led into the Rayo
+    // TravelSuite360: preload staged by its world (Spec §08). Its TS12 accent seam led into the Rayo
     // world of the same document; a case ends on its own proof, so the seam is not drawn (docs/25 §4)
     stagedPreload: p.worldType === "ts-depth",
   };

@@ -16,7 +16,14 @@
   --color-paper: #ede8de;
   --color-paper-2: #d6d0c4;
   --color-muted: #8e8b84;
-  --color-signal: #e63b2e;
+  /* Blue Edition (docs/27): the portfolio's one decorative accent. 6.1:1 on black, 5.5:1 on the panel:
+     AA even for body text. On paper it reads light (2.6:1), so paper surfaces use the deep variant */
+  --color-accent: #6488ff;
+  --color-accent-deep: #3352cc;
+  /* semantic, not identity: a form error's mark and border (a convention, never decoration) */
+  --color-error: #e63b2e;
+  /* a project's own colour, not the portfolio's: Rayo Smash's red field (its brand, untouched) */
+  --color-rayo: #e63b2e;
   --color-ink: #141414;
   --color-panel: #17181b;
   --color-field: #141414;
@@ -467,7 +474,7 @@ html.js .site-header[data-revealed="false"]:not(:focus-within) {
   visibility: hidden;
 }
 .hero-index [data-part="index-1"] {
-  color: var(--color-signal);
+  color: var(--color-accent);
 }
 /* the positioning line (Content Master 21): ~1.3× the lead size, heavier, balanced in three lines —
    a statement that holds its own beside the monumental name without competing with it */
@@ -498,7 +505,7 @@ html.js .site-header[data-revealed="false"]:not(:focus-within) {
     max-width: min(21em, calc(38vw - var(--gutter) - 24px));
   }
 }
-/* z6 · the red line: one 2px element along the band's lower edge, O3 only */
+/* z6 · the accent line: one 2px element along the band's lower edge, O3 only */
 .hero-line {
   position: absolute;
   z-index: 6;
@@ -506,7 +513,7 @@ html.js .site-header[data-revealed="false"]:not(:focus-within) {
   right: 0;
   top: calc(57% - 1px);
   height: 2px;
-  background: var(--color-signal);
+  background: var(--color-accent);
   transform: scaleX(0);
   transform-origin: 0 50%;
   pointer-events: none;
@@ -1202,7 +1209,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   display: inline-block;
 }
 .shift-accent {
-  color: var(--color-signal);
+  color: var(--color-accent);
 }
 .shift-figure {
   display: grid;
@@ -1276,11 +1283,12 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   display: flex;
   align-items: center;
 }
-/* the finished interface: paper, ink, one red (the raw layer is the scene's: hidden without it) */
+/* the finished interface: paper, ink, one blue (the raw layer is the scene's: hidden without it) */
 .sh-raw {
   visibility: hidden;
 }
 .sh-done {
+  --color-accent: var(--color-accent-deep);
   color: var(--color-ink);
 }
 .sh-frame .sh-done {
@@ -1291,7 +1299,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   background: rgb(20 20 20 / 0.14);
 }
 .sh-mark .sh-done {
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .sh-word {
   font-weight: 700;
@@ -1304,7 +1312,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   right: 0;
   bottom: -0.35em;
   height: 2px;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .sh-nav1 .sh-done,
 .sh-nav2 .sh-done,
@@ -1397,7 +1405,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   background: var(--color-muted);
 }
 .sh-chip-label[data-live]::before {
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 /* without the scene the gesture is over: the state reads «Publicado» */
 .sh-chip [data-part="draft"] {
@@ -1418,7 +1426,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   width: 34%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .sh-horizon {
   position: absolute;
@@ -1472,7 +1480,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
 }
 .sh-done .sh-thumb[data-shape="1"] {
   border-radius: 50%;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .sh-done .sh-thumb[data-shape="2"] {
   background: linear-gradient(to top, var(--color-ink) 50%, transparent 50%);
@@ -1500,7 +1508,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   right: 0;
   top: 0;
   height: 3px;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .sh-toggle .sh-raw,
 .sh-toggle .sh-done {
@@ -1524,7 +1532,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
 .sh-track-on {
   position: absolute;
   inset: 0;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .sh-knob {
   position: absolute;
@@ -1558,7 +1566,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
 .sh-meter-fill {
   position: absolute;
   inset: 0;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 
 /* ── with motion ────────────────────────────────────────────────────────────── */
@@ -1664,7 +1672,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
     background: rgb(237 232 222 / 0.5);
   }
   html.js .shift-stage[data-anim] .sh-mark .sh-raw {
-    border: 1.5px solid var(--color-signal);
+    border: 1.5px solid var(--color-accent);
   }
   /* the fragments' type steps back from the act lines: muted (still AA on black), never paper */
   html.js .shift-stage[data-anim] :is(.sh-h1a, .sh-h1b, .sh-word) .sh-raw {
@@ -1692,10 +1700,10 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   }
   html.js .shift-stage[data-anim] .sh-col {
     opacity: 0;
-    background: rgb(230 59 46 / 0.12);
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
     box-shadow:
-      inset 1px 0 0 rgb(230 59 46 / 0.4),
-      inset -1px 0 0 rgb(230 59 46 / 0.4);
+      inset 1px 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent),
+      inset -1px 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
   }
   html.js .shift-stage[data-anim] .sh-col:nth-child(n + 5) {
     display: none;
@@ -1719,7 +1727,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
     flex: none;
     width: 5cqw;
     height: 1px;
-    background: var(--color-signal);
+    background: var(--color-accent);
   }
   html.js .shift-stage[data-anim] .sh-note-v:not([data-v="phone"]) {
     display: none;
@@ -2064,7 +2072,7 @@ html.js .world-stage[data-anim] .world-env {
   background: var(--color-black);
 }
 .world[data-env="red"] .world-env {
-  background: var(--color-signal);
+  background: var(--color-rayo);
 }
 .world[data-env="paper"] .world-env {
   background: var(--color-paper);
@@ -2189,7 +2197,7 @@ html.js .proof-seam {
   z-index: 1;
   visibility: hidden;
   pointer-events: none;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 
 /* ── TravelSuite360 world (Spec §08): a 1440×900 design space (sm 390×844), scaled once ──
@@ -2302,9 +2310,9 @@ html.js .world[data-scene]:has(.world-stage[data-anim]) .world-summary {
   line-height: 1.2;
   color: var(--color-paper);
 }
-/* the red only marks what is active (Revelado 2.2 §8) */
+/* the accent only marks what is active (Revelado 2.2 §8) */
 .ts-tag {
-  color: var(--color-signal);
+  color: var(--color-accent);
 }
 .ts-row {
   display: grid;
@@ -2348,7 +2356,7 @@ html.js .world[data-scene]:has(.world-stage[data-anim]) .world-summary {
   top: -5px;
   width: 10px;
   height: 10px;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .ts-res-text,
 .ts-report {
@@ -2900,9 +2908,9 @@ html:has(dialog.overlay[open]) {
 .overlay-item:focus-visible {
   color: var(--color-paper);
 }
-/* the red only marks what is active (Revelado 2.2 §8) */
+/* the accent only marks what is active (Revelado 2.2 §8) */
 .overlay-item[aria-current] {
-  color: var(--color-signal);
+  color: var(--color-accent);
 }
 .overlay-thumb {
   position: relative;
@@ -3188,7 +3196,7 @@ a.cx-ref:hover {
   right: 25%;
   top: 50%;
   height: 1px;
-  background: var(--color-signal);
+  background: var(--color-accent);
   transform-origin: 0 50%;
   opacity: 0.7;
 }
@@ -3241,13 +3249,13 @@ a.cx-ref:hover {
   font-size: clamp(13px, 1.05vw, 16px);
 }
 .cs-node-state {
-  border-color: var(--color-signal);
+  border-color: var(--color-accent);
 }
 .cs-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 
 /* 02 · engineering: the real interface over the layers that hold it */
@@ -3270,7 +3278,7 @@ a.cx-ref:hover {
   background: rgb(237 232 222 / 0.04);
 }
 .cs-slab:nth-child(1) {
-  border-color: rgb(230 59 46 / 0.6);
+  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
 }
 .cs-slab-label {
   position: absolute;
@@ -3356,7 +3364,7 @@ a.cx-ref:hover {
 .cs-ai-word {
   color: inherit;
   background: none;
-  box-shadow: inset 0 -0.12em 0 var(--color-signal);
+  box-shadow: inset 0 -0.12em 0 var(--color-accent);
 }
 .cs-ai-out {
   display: grid;
@@ -3368,7 +3376,7 @@ a.cx-ref:hover {
   display: grid;
   gap: 4px;
   padding: 10px 12px;
-  border-top: 2px solid var(--color-signal);
+  border-top: 2px solid var(--color-accent);
   background: var(--color-black);
 }
 .cs-ai-out dt {
@@ -3410,7 +3418,7 @@ a.cx-ref:hover {
 .cs-core {
   width: 18px;
   height: 18px;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .cs-ring {
   width: calc(26% + var(--k) * 16%);
@@ -3423,7 +3431,7 @@ a.cx-ref:hover {
   right: 8%;
   top: 50%;
   height: 1px;
-  background: var(--color-signal);
+  background: var(--color-accent);
   transform-origin: 0 50%;
 }
 .cs-stations {
@@ -3461,7 +3469,7 @@ a.cx-ref:hover {
   background: var(--color-paper);
 }
 .cs-stations li:nth-child(3) .cs-station-dot {
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 
 /* phones: compact plates — the 2 × 2 path and the three outputs keep their shape, only smaller; the
@@ -3630,7 +3638,7 @@ a.cx-ref:hover {
     color: var(--color-muted);
   }
   html.js .cx-row[data-active] .cx-n {
-    color: var(--color-signal);
+    color: var(--color-accent);
   }
   html.js .cx-row::after {
     content: "";
@@ -3639,7 +3647,7 @@ a.cx-ref:hover {
     bottom: -1px;
     width: 100%;
     height: 2px;
-    background: var(--color-signal);
+    background: var(--color-accent);
     transform: scaleX(0);
     transform-origin: 0 50%;
     transition: transform 520ms var(--ease-settle);
@@ -3776,13 +3784,13 @@ a.cx-ref:hover {
 @keyframes cs-press {
   50% {
     scale: 0.96;
-    background: var(--color-signal);
+    background: var(--color-accent);
     color: var(--color-paper);
   }
 }
 @keyframes cs-mark {
   from {
-    box-shadow: inset 0 0 0 var(--color-signal);
+    box-shadow: inset 0 0 0 var(--color-accent);
   }
 }
 @keyframes cs-apart {
@@ -3872,7 +3880,7 @@ a.cx-ref:hover {
   display: inline-block;
 }
 .dec-l[data-mark] {
-  color: var(--color-signal);
+  color: var(--color-accent);
 }
 .dec-sweep {
   display: none;
@@ -3902,9 +3910,9 @@ a.cx-ref:hover {
 .dec-final-in {
   display: block;
 }
-/* the one red mark of the phrase: the decision */
+/* the one accent mark of the phrase: the decision */
 .dec-mark {
-  color: var(--color-signal);
+  color: var(--color-accent);
 }
 .dec-close {
   max-width: 40ch;
@@ -4031,7 +4039,7 @@ a.cx-ref:hover {
   html.js .dec-stage[data-anim] .dec-word[data-w="2"] .dec-word-in {
     transform: translateY(105%);
   }
-  /* the red line along CONVENCER.: a bar on the word's baseline, run by the scene (through its middle
+  /* the accent line along CONVENCER.: a bar on the word's baseline, run by the scene (through its middle
      it read as a strike-through) */
   html.js .dec-stage[data-anim] .dec-sweep {
     position: absolute;
@@ -4040,11 +4048,11 @@ a.cx-ref:hover {
     display: block;
     width: 100%;
     height: 0.06em;
-    background: var(--color-signal);
+    background: var(--color-accent);
     opacity: 0;
     pointer-events: none;
   }
-  /* the red line of an aperture: as wide as its word, on its center line */
+  /* the accent line of an aperture: as wide as its word, on its center line */
   html.js .dec-stage[data-anim] .dec-ap {
     position: absolute;
     left: var(--g);
@@ -4053,7 +4061,7 @@ a.cx-ref:hover {
     width: calc(var(--wfs) * var(--em));
     height: 2px;
     margin-top: -1px;
-    background: var(--color-signal);
+    background: var(--color-accent);
     transform: scaleX(0);
     transform-origin: 0 50%;
   }
@@ -4164,7 +4172,7 @@ a.cx-ref:hover {
     height: 10px;
     margin: -5px 0 0 -5px;
     border-radius: 50%;
-    background: var(--color-signal);
+    background: var(--color-accent);
     transform: scale(0);
   }
   html.js .dec-stage[data-anim] .dec-final {
@@ -4488,19 +4496,19 @@ a.cx-ref:hover {
   gap: 10px;
   color: var(--color-paper-2);
 }
-/* the red light of the recording: the same signal the journey has carried since the opening */
+/* the accent light of the recording: the same signal the journey has carried since the opening */
 .cta-eyebrow::before {
   content: "";
   flex: none;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .cta-title {
-  /* signal red: the only red headline on the site */
+  /* the accent: the only headline set in it on the site */
   margin-top: 28px;
-  color: var(--color-signal);
+  color: var(--color-accent);
   font-size: clamp(56px, 9.2vw, 136px);
   line-height: 0.92;
   font-weight: 900;
@@ -4593,11 +4601,11 @@ a.cx-ref:hover {
   min-height: calc(5lh + 36px);
 }
 .field-input[aria-invalid="true"] {
-  border-color: var(--color-signal);
-  box-shadow: 0 0 0 1px var(--color-signal);
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 1px var(--color-error);
 }
 /* focus beats the error state: the form moves focus to the first error, and that is when the
-   visitor most needs to see where they are (the red mark and message stay under the field) */
+   visitor most needs to see where they are (the error mark and message stay under the field) */
 .field-input:focus-visible,
 .field-input[aria-invalid="true"]:focus-visible {
   outline: 2px solid var(--color-paper);
@@ -4605,8 +4613,8 @@ a.cx-ref:hover {
   border-color: var(--color-paper);
   box-shadow: none;
 }
-/* errors read in paper (red at 11 px on the form's panel is 4.25:1, under AA); the red is the mark
-   before the text and the field's own border — the signal still says where the problem is */
+/* errors read in paper; the error red (a semantic colour, not the portfolio's accent) is the mark
+   before the text and the field's own border — it still says where the problem is */
 .field-error,
 .brief-route-error {
   display: flex;
@@ -4620,7 +4628,7 @@ a.cx-ref:hover {
   flex: none;
   width: 6px;
   height: 6px;
-  background: var(--color-signal);
+  background: var(--color-error);
   transform: translateY(-1px);
 }
 .brief-route-error:empty {
@@ -4652,7 +4660,7 @@ a.cx-ref:hover {
     color 200ms var(--ease-settle);
 }
 .brief-submit:hover:not(:disabled) {
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .brief-arrow {
   display: inline-block;
@@ -4714,13 +4722,13 @@ a.cx-ref:hover {
 .end-status:focus {
   outline: none;
 }
-/* the red signal that dims after "Brief recibido." (Spec §02 S16) */
+/* the accent signal that dims after "Brief recibido." (Spec §02 S16) */
 .end-signal {
   display: inline-block;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--color-signal);
+  background: var(--color-accent);
 }
 .end-name {
   font-weight: 900;

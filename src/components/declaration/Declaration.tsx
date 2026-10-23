@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { EASE } from "@/lib/motion";
+import { COLOR, EASE } from "@/lib/motion";
 import { useScene } from "@/lib/useScene";
 import { DEC_AT, DEC_STATES, DEC_UNITS, FIELD_PORTRAIT, FIELD_WIDE, LOOSE, TABLET_FS, decVariant, fieldPoses, foundPose, span, trackAxis, within } from "@/lib/declaration";
 
@@ -37,7 +37,7 @@ function fieldVars(i: number): CSSProperties {
 
 /**
  * A title as letters (docs/26 §D): each one can find its place on its own. The text reads exactly as
- * the title (no extra node, no label); `mark` makes the closing period the one red point.
+ * the title (no extra node, no label); `mark` makes the closing period the one accent point.
  */
 function Letters({ text, mark = false }: { text: string; mark?: boolean }) {
   return (
@@ -150,7 +150,7 @@ export function Declaration({ view }: { view: DeclarationView }) {
           within(state, 0),
         );
       };
-      // an aperture: the word opens from its center line, the two red edges part with it
+      // an aperture: the word opens from its center line, the two accent edges part with it
       const aperture = (i: number, edges: HTMLElement[], state: (typeof DEC_STATES)[number], a: number, b: number) => {
         const half = wordBox[i].h / 2;
         tl.fromTo(words[i], { clipPath: "inset(50% 0% 50% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: span(state, a, b), ease: EASE.reveal, immediateRender: true }, within(state, a));
@@ -173,7 +173,7 @@ export function Declaration({ view }: { view: DeclarationView }) {
         within("DESCUBRE", 0.05),
       );
 
-      // ── … drawn into one red line, which opens on MOSTRAR. ──
+      // ── … drawn into one accent line, which opens on MOSTRAR. ──
       const SHRINK = 0.35;
       const rank = new Map(
         found
@@ -222,8 +222,8 @@ export function Declaration({ view }: { view: DeclarationView }) {
       tl.fromTo(cells, { opacity: 1 }, { opacity: 0.5, duration: span("CONVENCER", 0, 0.4), immediateRender: false }, within("CONVENCER", 0));
       // y stays 0: the CSS first state (translateY 105%) would otherwise be read as pixels
       tl.fromTo(wordIn2, { y: 0, yPercent: 105 }, { y: 0, yPercent: 0, duration: span("CONVENCER", 0.08, 0.72), ease: EASE.settle, immediateRender: true }, within("CONVENCER", 0.08));
-      // … and a red line runs through it: each letter answers as the line passes — a lift, a breath
-      // of scale, a flush of red — then is still again. The word never hides (docs/26 §D)
+      // … and an accent line runs along it: each letter answers as the line passes — a lift, a breath
+      // of scale, a flush of blue — then is still again. The word never hides (docs/26 §D)
       const sweep = pick('[data-part="sweep"]');
       const em2 = fs(words[1]);
       const n2 = letters[1].length;
@@ -232,8 +232,8 @@ export function Declaration({ view }: { view: DeclarationView }) {
       letters[1].forEach((l, k) => {
         const at = within("CONVENCER", 0.56 + (0.3 * (k + 0.5)) / n2);
         const half = span("CONVENCER", 0, 0.05);
-        tl.fromTo(l, { y: 0, scale: 1, color: "rgb(237, 232, 222)" }, { y: -0.05 * em2, scale: 1.07, color: "rgb(230, 59, 46)", duration: half, ease: EASE.settle, immediateRender: false }, at);
-        tl.fromTo(l, { y: -0.05 * em2, scale: 1.07, color: "rgb(230, 59, 46)" }, { y: 0, scale: 1, color: "rgb(237, 232, 222)", duration: half * 1.6, ease: "back.out(2.4)", immediateRender: false }, at + half);
+        tl.fromTo(l, { y: 0, scale: 1, color: COLOR.paper }, { y: -0.05 * em2, scale: 1.07, color: COLOR.accent, duration: half, ease: EASE.settle, immediateRender: false }, at);
+        tl.fromTo(l, { y: -0.05 * em2, scale: 1.07, color: COLOR.accent }, { y: 0, scale: 1, color: COLOR.paper, duration: half * 1.6, ease: "back.out(2.4)", immediateRender: false }, at + half);
       });
       lineIn(lines[1], "CONVENCER", 0.58, 1);
 
@@ -264,7 +264,7 @@ export function Declaration({ view }: { view: DeclarationView }) {
       tl.fromTo(ap3, { scaleX: 0, transformOrigin: apOrigin }, { scaleX: 1, transformOrigin: apOrigin, duration: span("CONVERTIR", 0.38, 0.62), ease: EASE.settle, immediateRender: true }, within("CONVERTIR", 0.38));
       aperture(2, ap3, "CONVERTIR", 0.58, 0.92);
       // CONVERTIR.: decisive — the letters close in from a wider set and lock with a short overshoot;
-      // the period lands last, the red point that ends the movement (docs/26 §D)
+      // the period lands last, the accent point that ends the movement (docs/26 §D)
       const em3 = fs(words[2]);
       const n3 = letters[2].length;
       const body = letters[2].filter((l) => !l.hasAttribute("data-mark"));
@@ -337,7 +337,7 @@ export function Declaration({ view }: { view: DeclarationView }) {
                 <span data-part="word-in" className="dec-word-in">
                   <Letters text={two.title} />
                 </span>
-                {/* the red line that runs through CONVENCER. (docs/26 §D) */}
+                {/* the accent line that runs along CONVENCER.'s baseline (docs/26 §D, docs/27) */}
                 <span aria-hidden="true" data-part="sweep" className="dec-sweep" />
               </h3>
               <p data-part="statement" data-l="2" className="dec-line">

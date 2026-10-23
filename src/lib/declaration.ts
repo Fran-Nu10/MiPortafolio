@@ -3,7 +3,7 @@
  * geometry and timing, no GSAP: the scene (components/declaration) and the tests import it.
  *
  * One pinned stage, one continuous choreography in three movements:
- * - discovery: ten small words latent in depth come into contrast, then are drawn into a red
+ * - discovery: ten small words latent in depth come into contrast, then are drawn into an accent
  *   line that opens like an aperture on MOSTRAR.;
  * - organization: six words arrive loose and settle into a grid; CONVENCER. rises over it;
  * - resolution: the grid collapses into one track with four actions; they converge on one point,
@@ -154,14 +154,14 @@ export const LOOSE: LoosePose[] = [
 export const GRID_COLS: Record<DecVariant, number> = { wide: 3, tablet: 3, phone: 2 };
 
 /**
- * Advance width of each protagonist, in em (Schibsted Grotesk 900, measured): the red line of an
+ * Advance width of each protagonist, in em (Schibsted Grotesk 900, measured): the accent line of an
  * aperture and the final track are as wide as their word. Mirrored in globals.css.
  */
 export const WORD_EM = { MOSTRAR: 5.71, CONVENCER: 6.86, CONVERTIR: 6.66 } as const;
 
 /**
  * Act III's line, split for its typography: the first sentence small, the second monumental with
- * its last word on its own line and the period as the one red mark. Concatenated with single
+ * its last word on its own line and the period as the one accent mark. Concatenated with single
  * spaces, the parts read exactly as the line («Que no solo te vean. Que te elijan.»).
  */
 export function splitFinal(line: string): { first: string; lead: string; word: string; mark: string } {

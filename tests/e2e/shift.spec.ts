@@ -124,12 +124,12 @@ test.describe("the transformation (pinned, with motion)", () => {
       const i = SHIFT_STATES.indexOf(s);
       for (let n = 0; n < LINES.length; n++) expect(await lineShown(page, n), `${s}: line ${n + 1}`).toBe(n === i);
     }
-    // the protagonist reads first: the line is larger than any fragment's type, its accent in red
+    // the protagonist reads first: the line is larger than any fragment's type, its accent in the blue (docs/27)
     await toState(page, "DESORDEN");
     const lineSize = await page.locator("#shift [data-part=act] .shift-line").first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
     const fragSize = await page.locator("#shift .sh-h1a").evaluate((e) => parseFloat(getComputedStyle(e).fontSize) * new DOMMatrix(getComputedStyle(e).transform).a);
     expect(lineSize).toBeGreaterThan(fragSize * 1.15);
-    expect(await page.locator("#shift [data-part=accent]").first().evaluate((e) => getComputedStyle(e).color)).toBe("rgb(230, 59, 46)");
+    expect(await page.locator("#shift [data-part=accent]").first().evaluate((e) => getComputedStyle(e).color)).toBe("rgb(100, 136, 255)");
 
     // act III and IV: every fragment on its place in the finished interface (FLIP, nothing swapped)
     await toState(page, "EJECUCION");

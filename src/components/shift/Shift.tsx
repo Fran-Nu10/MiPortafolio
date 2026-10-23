@@ -175,7 +175,7 @@ export function Shift({ view }: { view: ShiftView }) {
       for (const s of SHIFT_STATES) tl.addLabel(`s:${s}`, SHIFT_AT[s]);
 
       // the act lines (docs/26 §B): one at a time. The old one leaves upward; the new one rises out of
-      // its mask, its first words, then its red accent — the protagonist of each act
+      // its mask, its first words, then its blue accent — the protagonist of each act
       const lead = acts.map((a) => a.querySelector<HTMLElement>('[data-part="lead"]')!);
       const accent = acts.map((a) => a.querySelector<HTMLElement>('[data-part="accent"]')!);
       gsap.set(acts.slice(1), { opacity: 1 });
@@ -283,7 +283,7 @@ export function Shift({ view }: { view: ShiftView }) {
                   <span className="shift-act-n micro">
                     {a.n} — {a.title}
                   </span>
-                  {/* the line reads as one sentence; its two halves move on their own (the accent in red) */}
+                  {/* the line reads as one sentence; its two halves move on their own (the accent in blue) */}
                   <p className="shift-line">
                     <span className="shift-mask">
                       <span data-part="lead" className="shift-lead">

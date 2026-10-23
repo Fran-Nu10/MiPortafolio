@@ -216,7 +216,7 @@ export interface ScatterPose {
 /**
  * Drawn by hand, per variant: a loose diagonal from the top of the space to its lower edge, the
  * container a tilted ghost at its center, the headline's two lines large and apart, the small
- * pieces (navigation, indicators) along the edges, the red mark the one accent near the text.
+ * pieces (navigation, indicators) along the edges, the accent mark the only one near the text.
  * Tension, never noise: no fragment leaves the space or crosses the act lines (tests/shift). Only
  * the containers and lines recede (opacity < .9): a fragment with type stays legible (AA on black).
  */

@@ -46,7 +46,7 @@ type Key = (typeof KEYS)[number];
  * on this world continues the same timeline: TS01 raw → TS02 extraction → TS03 fields →
  * TS04 quote → TS05 selected → TS06 trip (→ TS07 reservation → TS08 report, automatic) →
  * TS09 big reveal (camera retreat) → TS10 name (automatic). TS11/TS12 are the proof and its
- * red seam (ProjectProof). DOM + CSS 3D (lg/xl only) + GSAP; nothing random at runtime.
+ * accent seam (ProjectProof). DOM + CSS 3D (lg/xl only) + GSAP; nothing random at runtime.
  *
  * Accessibility (Spec §19): the message, the `input` label, the origin line and the closing
  * line are real text; every other visual piece is aria-hidden and the states are summarized

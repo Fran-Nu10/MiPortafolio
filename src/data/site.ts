@@ -26,7 +26,7 @@ export const SITE = {
     firma: "Producto × Diseño × Ingeniería × Crecimiento",
     /** option A, approved 2026-10-21 (Content Master 21): an explicit exception to §02 «transformar ideas» */
     support: "Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.",
-    /** red: the hero is the first reveal */
+    /** accent: the hero is the first reveal */
     index: "01",
     /** the opening shows only the light band and "00" */
     openingIndex: "00",
@@ -64,7 +64,7 @@ export const SITE = {
    */
   shift: {
     heading: "De la complejidad al producto.",
-    /** `accent`: the line's last words, set in red (docs/26 §B): the protagonists read at once */
+    /** `accent`: the line's last words, set in blue (docs/26 §B): the protagonists read at once */
     acts: [
       { n: "01", title: "El desorden", line: "Una idea no alcanza.", accent: "no alcanza." },
       { n: "02", title: "La dirección", line: "Necesita dirección.", accent: "dirección." },

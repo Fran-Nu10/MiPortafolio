@@ -30,14 +30,14 @@ export interface ProofView {
   chapters?: { label: string; at: number }[];
   /** preload staged by the world: none → metadata (world active) → auto (from TS09) */
   stagedPreload?: boolean;
-  /** TS12: the red field closes in from the viewport edges toward the next world */
+  /** TS12: the accent field closes in from the viewport edges toward the next world */
   exit?: "seam";
 }
 
 /** the TS reveal states from which the recording may load in full */
 const DEEP_STATES = new Set(["TS09a", "TS09b"]);
 
-/** the seam's red plane: a full-viewport rect with a hole `inset` % from each edge (evenodd) */
+/** the seam's accent plane: a full-viewport rect with a hole `inset` % from each edge (evenodd) */
 const seamClip = (inset: number) => {
   const a = inset;
   const b = 100 - inset;
@@ -48,7 +48,7 @@ const seamClip = (inset: number) => {
  * S4/S6/S9/S11 · Proof (Spec §02 proof sheet). Real media of the real product + the micro case +
  * the two CTAs. The window sits at the reel geometry (the shared rectangle), centered in its
  * stage; it scales .9 → 1 over the first 40% of its pass and dims to .55 over the last 30%
- * (the generic exit; TS → Rayo's red seam is TS12, Phase 5). Normal flow: nothing pins.
+ * (the generic exit; TS → Rayo's accent seam is TS12, Phase 5). Normal flow: nothing pins.
  */
 export function ProjectProof({ proof }: { proof: ProofView }) {
   const ref = useRef<HTMLElement>(null);
@@ -88,17 +88,17 @@ export function ProjectProof({ proof }: { proof: ProofView }) {
       tl.fromTo(win, { opacity: 1 }, { opacity: 0.55, duration: 0.3, immediateRender: false }, 0.7);
       ScrollTrigger.create({ trigger: stage, start: "top bottom", end: "bottom top", scrub: 0.6, animation: tl });
       if (seam) {
-        // TS12 · over the last 30% of the proof's pass the red field closes in from the edges;
+        // TS12 · over the last 30% of the proof's pass the accent field closes in from the edges;
         // the next world's stage then rises over it (no black flash, no cut)
-        const red = gsap.timeline({ defaults: { ease: EASE.none } });
-        red.fromTo(seam, { clipPath: seamClip(0) }, { clipPath: seamClip(50), duration: 0.3 }, 0.7);
+        const field = gsap.timeline({ defaults: { ease: EASE.none } });
+        field.fromTo(seam, { clipPath: seamClip(0) }, { clipPath: seamClip(50), duration: 0.3 }, 0.7);
         const show = (p: number) => gsap.set(seam, { autoAlpha: p > 0.7 && p < 1 ? 1 : 0 });
         ScrollTrigger.create({
           trigger: root,
           start: "top bottom",
           end: "bottom top",
           scrub: 0.6,
-          animation: red,
+          animation: field,
           onUpdate: (self) => show(self.progress),
           onRefresh: (self) => show(self.progress),
         });

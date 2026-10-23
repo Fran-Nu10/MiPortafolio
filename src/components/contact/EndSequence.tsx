@@ -9,7 +9,7 @@ export const END_T = { hold: 1.2, dim: 0.8, black: 0.4, name: 0.6 } as const;
 
 /**
  * S16 · End (Spec §02). Triggered by the form's success (a 2xx from Resend), never by scroll.
- * "Brief recibido." (mono, paper on black) holds 1.2 s → the red signal dims to 0 over 800 ms
+ * "Brief recibido." (mono, paper on black) holds 1.2 s → the accent signal dims to 0 over 800 ms
  * → full black 400 ms → FRANCO NÚÑEZ reveals in 600 ms. No other text; the header hides
  * (store `endActive`); focus moves to the status node. Reduced motion: the same states as
  * instant swaps with 1.2 s holds. Without JavaScript the server returns this block statically:
@@ -34,7 +34,7 @@ export function EndSequence({ success, name }: { success: string; name: string }
       gsap.set(status, { opacity: 1 });
       gsap.set(signal, { opacity: 1 });
       const tl = gsap.timeline();
-      // the red dims (and the line with it) → black
+      // the accent dims (and the line with it) → black
       tl.to(signal, { opacity: 0, duration: rm ? 0 : END_T.dim, ease: "none" }, END_T.hold);
       tl.to(status, { opacity: 0, duration: rm ? 0 : END_T.dim, ease: "none" }, END_T.hold);
       tl.call(() => (root.dataset.endStep = "dark"), [], END_T.hold + (rm ? 0 : END_T.dim));

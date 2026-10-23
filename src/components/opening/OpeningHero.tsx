@@ -32,7 +32,7 @@ const OPEN = "inset(0% 0% 0% 0%)";
  *   O0  black + grain (CSS, first paint)
  *   O1  a 14vh light band opens (time-based)
  *   O2  focus: LQIP → sharp once the portrait decodes (or LQIP at 2.5 s); index 00; header in
- *   O3  gesture 1 — the band opens to the full viewport, the red line crosses once, 00 → 01
+ *   O3  gesture 1 — the band opens to the full viewport, the accent line crosses once, 00 → 01
  *   H1  gesture 2 — FRANCO behind the body, NÚÑEZ in front; firma and support mask up
  *   H2  gesture 3 — positioning: portrait −12vh at .55, the names part, the support line rises
  *       to statement size; then the scene unpins
@@ -228,7 +228,7 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
 
   const tl = gsap.timeline({ defaults: { ease: EASE.settle } });
   tl.addLabel("s:O2", 0);
-  // O3 · the band opens to the full viewport; the red line crosses once; 00 → 01
+  // O3 · the band opens to the full viewport; the accent line crosses once; 00 → 01
   // (nothing starts at 0: a tween at 0 would render its from-state while the opening still runs)
   tl.fromTo(p.aperture, { clipPath: inset(BAND_INSET) }, { clipPath: OPEN, duration: 0.85, ease: EASE.reveal, immediateRender: false }, 0.15);
   tl.fromTo(p.line, { scaleX: 0 }, { scaleX: 1, duration: 0.38, ease: EASE.none, immediateRender: false }, 0.02);
@@ -345,7 +345,7 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
 
 /**
  * Reduced motion (Spec §16): two states, cuts only — black with grain → the portrait sharp
- * and full (no band, no focus pull, no red line) → names, firma, support line, index 01.
+ * and full (no band, no focus pull, no accent line) → names, firma, support line, index 01.
  */
 function buildReduced(api: SceneApi): gsap.core.Timeline | null {
   const { gsap, root } = api;

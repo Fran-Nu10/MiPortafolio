@@ -39,6 +39,15 @@ export const EASE = {
   none: "none",
 } as const;
 
+/**
+ * Colours a timeline tweens to (GSAP interpolates values, not CSS variables). The same values live in
+ * globals.css as --color-paper / --color-accent (Blue Edition, docs/27) — keep both equal.
+ */
+export const COLOR = {
+  paper: "rgb(237, 232, 222)",
+  accent: "rgb(100, 136, 255)",
+} as const;
+
 /** Absolute durations, only for time-based sequences (opening, End, reel snap). Seconds. */
 export const DUR = {
   reelSettle: 0.42,
