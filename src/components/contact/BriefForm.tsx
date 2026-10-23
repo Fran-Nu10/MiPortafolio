@@ -148,6 +148,8 @@ export function BriefForm({ copy, renderedAt }: { copy: BriefFormCopy; renderedA
           name="name"
           type="text"
           autoComplete="name"
+          autoCapitalize="words"
+          enterKeyHint="next"
           required
           minLength={LIMITS.name.min}
           maxLength={LIMITS.name.max}
@@ -167,6 +169,9 @@ export function BriefForm({ copy, renderedAt }: { copy: BriefFormCopy; renderedA
           type="email"
           autoComplete="email"
           inputMode="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          enterKeyHint="next"
           required
           maxLength={LIMITS.email.max}
           value={values.email}

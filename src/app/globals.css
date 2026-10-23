@@ -718,6 +718,7 @@ html.js main[data-initial]:not([data-started]) .hero-stage {
   display: flex;
   align-items: baseline;
   gap: 12px;
+  min-width: 0;
 }
 .reel-meta-row {
   display: flex;
@@ -1111,6 +1112,15 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   html.js .reel[data-anim] .reel-track {
     padding-top: 16px;
   }
+}
+/* the card's index («01 / 04») and the name are each one piece: on a narrow card the name moves under
+   the index instead of either breaking (docs/27 §7) */
+.reel-meta-head {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+.reel-meta-head > * {
+  white-space: nowrap;
 }
 
 /* the reel cursor (fine pointers, motion allowed) */
