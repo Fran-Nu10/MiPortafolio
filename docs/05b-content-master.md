@@ -853,3 +853,68 @@ Reglas:
 **Showreel.** Las cuatro tarjetas muestran las películas finales de Franco. La de TravelSuite360 muestra sólo datos demo: «Ana Demo», «Bruno Ejemplo», «Agencia Demo». Ver la revisión de §23 en `docs/26` §F2. No hay copy nuevo.
 
 **Tipografía en rojo, regla.** El rojo de texto se usa sólo en tamaños grandes, donde cumple AA para texto grande: los remates de THE SHIFT, el punto de «CONVERTIR.», «Crecimiento» y «Ahora, el tuyo.». En micro-textos el rojo es una marca (un punto o un cuadrado) junto a texto en papel.
+
+## 25 — Blue Edition: identidad personal, Una sola visión, Perfil y Meta Ads (addendum local, 2026-10-23)
+
+> **Addendum de este export, pendiente de sincronizar con el Claude Doc.** Pedido de Franco «REVELADO 2.2 — MASTER PROMPT · BLUE EDITION · PERSONAL IDENTITY · ART DIRECTION · MOBILE-FIRST RECONSTRUCTION» (2026-10-23). Implementación: `docs/27-blue-edition-mobile-first.md`. Todo el copy nuevo de esta sección viene del brief o de texto ya aprobado; cada línea dice su fuente.
+
+**Reemplaza a:**
+- la frase del busto «Todo lo anterior pasó por las mismas manos.» (§11/§14, texto clave de `CLAUDE.md`);
+- el titular del reel «Trabajo seleccionado.» (§21);
+- el bloque de Meta Ads del Perfil (§21: el titular y los tres párrafos);
+- su conductor «Estrategia → Producto → Crecimiento» (§24).
+
+**Una sola visión** (sección nueva, entre THE SHIFT y Capacidades; texto del brief):
+- **Titular:** «Distintas disciplinas.» / «Una sola visión.»
+- **Pensar:** «Entender el problema, el negocio y las oportunidades.»
+- **Diseñar:** «Dar estructura, identidad y experiencia a la solución.»
+- **Construir:** «Convertir las decisiones en un producto digital real y funcional.»
+- **Cierre:** «Una sola dirección, desde la primera decisión hasta el producto funcionando.»
+- **Lo que no dice:** que las fotografías, las marcas o los productos de los proyectos sean de Franco. La frase anterior se prestaba a esa lectura. Las figuras son abstractas (puntos, retícula, módulos) y no llevan texto.
+
+**Capacidades.** El encabezado visible pasa a ser «Capacidades», seguido del kicker de siempre. «Después de publicar» queda sólo para lectores de pantalla, porque el kicker ya lo dice.
+
+**Showreel.** «Proyectos que construí.» (texto del brief). Comunica autoría del trabajo, no de cada recurso de los proyectos. Se retira la etiqueta «Trabajo · 01–04».
+
+**Perfil.** La declaración y los dos párrafos de §21 no cambian. Cada párrafo lleva al lado un recurso visual que no agrega afirmaciones:
+- junto al primero, sus propias cuatro frases, en orden: «una marca», «sus clientes», «sus procesos», «un producto digital». Lo verifica un test contra el párrafo;
+- junto al segundo, un fragmento real de un proyecto por cada tipo que el párrafo nombra:
+  - la Cookie levain de Chef Arturo, con el pie «Comercio electrónico»;
+  - la interfaz de TravelSuite360, con datos demo, con el pie «Plataforma y sistema de gestión».
+- Los pies dicen sólo el tipo. Según §21, el Perfil no nombra TravelSuite360. **[CONFIRMAR]** si Franco quiere el nombre de los proyectos en esos pies.
+- La etiqueta «Perfil» queda sólo para lectores de pantalla.
+
+**Meta Ads**, un capítulo propio dentro del Perfil:
+- **Titular** (brief): «Construirlo es una parte.» / «Hacer que lo descubran es la otra.»
+- **Secuencia** (brief): Producto → Descubrimiento → Acción. Cada paso lleva una línea tomada del texto aprobado de §21:
+  - Producto: «Una buena experiencia digital.», de «Porque una buena experiencia digital importa.»;
+  - Descubrimiento: «Campañas en Instagram y Facebook.», de «Campañas en Instagram y Facebook que ayudan…»;
+  - Acción: «Consultar, reservar o comprar.», de «…decide consultar, reservar o comprar.»
+- **Texto** (brief, sin cambios): «Además de diseñar y desarrollar productos digitales, creo campañas en Meta Ads para conectar marcas con personas interesadas en sus productos y servicios.»
+- Se conservan las dos precisiones de §21: Instagram y Facebook, y el recorrido del descubrimiento a la acción.
+- Sin resultados, cifras, porcentajes ni clientes.
+
+**Microetiquetas.** Pasan a ser sólo para lectores de pantalla:
+- el subtítulo de THE SHIFT, «De la complejidad al producto.»;
+- los números de acto («01 — El desorden»…).
+
+Se retiran de la vista:
+- las etiquetas de número y nombre de las planchas de Capacidades, que repetían la fila;
+- la referencia de las planchas, que también estaba en la fila;
+- la numeración «01–06» de las palabras de la Propuesta.
+
+Se conservan:
+- el índice «00 → 01» del hero, que es la coreografía de la apertura;
+- la numeración del índice de Capacidades;
+- las referencias de proyecto;
+- el índice «01 / 04» de las tarjetas;
+- los estados de las interfaces;
+- la leyenda «Interfaz conceptual, diseñada para esta sección.»
+
+**Color, regla (reemplaza la de §24).** El acento del portfolio es el azul eléctrico `#6488FF`, que da 6,1:1 sobre negro: cumple AA también como texto normal. Sobre papel se usa `#3352CC` (5,3:1).
+
+El rojo queda sólo como:
+- **color semántico de error del formulario:** una marca y un borde, con el texto en papel;
+- **color propio de Rayo Smash:** el campo de su mundo.
+
+No se recolorean películas, fotografías, logotipos ni interfaces de los proyectos.

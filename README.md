@@ -67,6 +67,7 @@ docs/
   24-positioning-copy-pass.md           posicionamiento y autoridad: hero, Perfil + Meta Ads, Work abierto, contacto
   25-the-shift.md                       THE SHIFT (de la complejidad al producto) y los casos en /trabajo/[slug]
   26-final-art-direction-motion.md      dirección de arte final: ritmo, índice de capacidades, motion, películas del showreel
+  27-blue-edition-mobile-first.md       Blue Edition (azul #6488FF), Una sola visión, Perfil y Meta Ads, microetiquetas, mobile-first
   01–04, 05-v2-*, 06-spanish-*          historia de ENSAMBLE (no son fuente de verdad)
 ```
 
