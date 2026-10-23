@@ -23,7 +23,7 @@ import { Shift } from "@/components/shift/Shift";
 import { Vision } from "@/components/vision/Vision";
 import { JourneyClient } from "./JourneyClient";
 import { FEATURES, RENDERED_AT } from "./features";
-import { headerView, openLink, reelName } from "./shared";
+import { headerView, openLink } from "./shared";
 
 /**
  * The home journey (Spec §01–§03, docs/25): one server-rendered document. Hero → reel (what is
@@ -70,7 +70,6 @@ export function Journey() {
       <main id="contenido">
         <OpeningHero hero={SITE.hero} portrait={resolveAsset("franco.hero")} grain={resolveAsset("site.grain")} skipOpening={false} />
         <ProjectReel
-          label={reelName()}
           heading={SITE.reel.heading}
           items={reelItems}
           copy={{ hint: SITE.reel.hint, restHint: SITE.reel.restHint(total), prev: SITE.reel.prev, next: SITE.reel.next, a11y: SITE.reel.a11y, cursor: SITE.reel.cursor }}

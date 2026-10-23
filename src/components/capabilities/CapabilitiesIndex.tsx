@@ -132,7 +132,8 @@ export function CapabilitiesIndex({ view }: { view: CapabilitiesView }) {
               onPointerEnter={(e) => e.pointerType === "mouse" && setActive(i)}
               onFocus={() => setActive(i)}
             >
-              {c.group === "extended" ? <p className="micro muted cx-sub">{view.subKicker}</p> : null}
+              {/* the group's name: the kicker already says it on screen; it stays for screen readers */}
+              {c.group === "extended" ? <p className="sr-only">{view.subKicker}</p> : null}
               <span className="cx-n micro" aria-hidden="true">
                 {pad(c.index)}
               </span>
@@ -172,16 +173,12 @@ export function CapabilitiesIndex({ view }: { view: CapabilitiesView }) {
   );
 }
 
-/** one plate: the capability's number and name as a tag, the demonstration, its reference */
+/** one plate: the demonstration alone — its number, name and reference are the row's (docs/27 §4) */
 function Plate({ c, children }: { c: CapabilityItemView; children: ReactNode }) {
   return (
-    <figure className="cx-plate" data-scene={c.scene.id}>
-      <figcaption className="cx-plate-tag micro">
-        <span className="cx-plate-n">{pad(c.index)}</span> {c.name}
-      </figcaption>
+    <div className="cx-plate" data-scene={c.scene.id}>
       <div className="cx-plate-body">{children}</div>
-      <p className="cx-plate-ref micro">{c.attribution.label}</p>
-    </figure>
+    </div>
   );
 }
 

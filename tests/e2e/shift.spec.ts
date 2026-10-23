@@ -95,7 +95,10 @@ test.describe("place in the journey", () => {
     // «Una sola visión» between THE SHIFT and the capabilities since docs/27 §3
     expect(ids).toEqual(["inicio", "trabajo", "shift", "vision", "capacidades", "propuesta", "perfil", "contacto"]);
     for (const slug of ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"]) await expect(page.locator(`#${slug}`)).toHaveCount(0);
+    // the title stays for screen readers; on screen the four lines carry the section (docs/27 §4)
     await expect(page.locator("#shift h2")).toHaveText("De la complejidad al producto.");
+    expect(await page.locator("#shift h2").evaluate((e) => e.getBoundingClientRect().width)).toBeLessThanOrEqual(1);
+    expect(await page.locator("#shift .shift-act-n").evaluateAll((e) => e.every((x) => x.getBoundingClientRect().width <= 1))).toBe(true);
     await expect(page.locator("#shift .shift-line")).toHaveText(LINES);
     // the interface is one described image: nothing in it takes focus, nothing pretends to be a control
     await expect(page.locator("#shift [role=img]")).toHaveAttribute("aria-label", /Interfaz conceptual/);

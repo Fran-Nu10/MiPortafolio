@@ -1195,6 +1195,20 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
+/* the section's title and the acts' «01 — El desorden» numbers are for screen readers only (docs/27
+   §4): the four lines carry the section. They keep their box (positioned, 1 px), so the scene that
+   fades them still runs */
+.shift .shift-title,
+.shift .shift-act-n {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
 /* each half of a line rises out of its own mask (docs/26 §B); the accent is the act's protagonist */
 .shift-mask {
   display: inline-block;
@@ -3338,31 +3352,13 @@ a.cx-ref:hover {
 .cx-plate {
   position: relative;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 14px;
+  grid-template-rows: 1fr;
   aspect-ratio: 16 / 11;
   margin: 0;
   padding: clamp(14px, 2.2vw, 28px);
   overflow: clip;
   background: var(--color-panel);
   border: 1px solid var(--rule-strong);
-}
-.cx-plate-tag,
-.cx-plate-ref {
-  margin: 0;
-  color: var(--color-muted);
-}
-.cx-plate-n {
-  color: var(--color-paper);
-}
-.cx-plate-n::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 8px;
-  background: var(--color-signal);
-  vertical-align: 1px;
 }
 .cx-plate-body {
   position: relative;
@@ -4042,6 +4038,10 @@ a.cx-ref:hover {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+/* the words' «01–06» only counted them (docs/27 §4) */
+.dec-n {
+  display: none;
+}
 .dec-cell {
   position: relative;
   display: grid;
@@ -4301,9 +4301,9 @@ a.cx-ref:hover {
     transform: scaleX(0);
     transform-origin: 0 50%;
   }
+  /* the words' «01–06» only counted them (docs/27 §4) */
   html.js .dec-stage[data-anim] .dec-n {
-    display: block;
-    opacity: 0;
+    display: none;
   }
   html.js .dec-stage[data-anim] .dec-gw {
     display: block;

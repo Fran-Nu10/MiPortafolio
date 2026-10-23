@@ -267,7 +267,7 @@ describe("the selection is open-ended (Content Master 21)", () => {
   });
 
   it("the heading and the capabilities kicker carry no number", () => {
-    expect(SITE.reel.heading).toBe("Trabajo seleccionado.");
+    expect(SITE.reel.heading).toBe("Proyectos que construí.");
     expect(SITE.capabilities.kicker).toBe("Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.");
   });
 });
@@ -289,7 +289,7 @@ describe("copy fidelity · Content Master rev 26", () => {
   });
 
   it("reel, CTA, success, seam", () => {
-    expect(SITE.reel.heading).toBe("Trabajo seleccionado.");
+    expect(SITE.reel.heading).toBe("Proyectos que construí.");
     expect(SITE.cta.title).toBe("Ahora, el tuyo.");
     expect(SITE.cta.eyebrow).toBe("Tu próximo proyecto empieza acá");
     expect(SITE.cta.support).toBe("Una idea nueva, un negocio que quiere crecer o un producto que necesita dar el siguiente paso. Contame qué tenés en mente.");

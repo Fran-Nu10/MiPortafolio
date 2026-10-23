@@ -64,9 +64,8 @@ test.describe("without JavaScript", () => {
     for (const text of [
       "Producto × Diseño × Ingeniería × Crecimiento",
       "Transforma ideas y negocios en productos digitales que destacan, funcionan y generan oportunidades.",
-      "Trabajo seleccionado.",
-      // THE SHIFT (docs/25)
-      "De la complejidad al producto.",
+      "Proyectos que construí.",
+      // THE SHIFT (docs/25): its four lines (its title is for screen readers since docs/27 §4)
       "Una idea no alcanza.",
       "De la idea al producto.",
       // «Una sola visión» (docs/27 §3)
@@ -78,6 +77,7 @@ test.describe("without JavaScript", () => {
     ]) {
       await expect(page.getByText(text, { exact: true }).filter({ visible: true }).first(), text).toBeVisible();
     }
+    await expect(page.getByRole("heading", { level: 2, name: "De la complejidad al producto." })).toBeAttached();
     // the four projects: each a card of the reel, each a real link to its case
     for (const slug of ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"]) await expect(page.locator(`#trabajo a[href="/trabajo/${slug}"]`).first()).toBeVisible();
   });

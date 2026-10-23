@@ -35,8 +35,8 @@ export const SITE = {
   reel: {
     /** the range «01–NN» is added from the real number of projects (lib/content `rangeLabel`) */
     label: "Trabajo",
-    /** no number: the selection keeps growing (Content Master 21) */
-    heading: "Trabajo seleccionado.",
+    /** authorship, not a catalogue (Content Master 25, 2026-10-23); no number: the selection keeps growing (21) */
+    heading: "Proyectos que construí.",
     enter: "Ver caso",
     open: "Abrir ↗",
     /** first visit, disappears after the first interaction */

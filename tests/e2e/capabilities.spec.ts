@@ -56,10 +56,15 @@ test.describe("the live index (docs/26 §C)", () => {
     await expect(page.locator("#capacidades h3")).toHaveText(NAMES);
     await expect(page.locator("#capacidades .cx-row .cx-value")).toHaveCount(6);
     await expect(page.locator("#capacidades .cx-n")).toHaveText(["01", "02", "03", "04", "05", "06"]);
-    // no cards any more: one stage with six scenes (wide) or one scene per unit (narrow)
+    // no cards any more: one stage with six scenes (wide) or one scene per unit (narrow) — never both
+    // (docs/27 §7.4: the second set doubled the section's nodes)
     expect(await page.locator("#capacidades .capability, #capacidades [data-capability]").count()).toBe(0);
-    await expect(page.locator("#capacidades .cx-stage-scene .cx-plate")).toHaveCount(6);
-    expect(await page.locator("#capacidades .cx-stage-scene .cx-plate").evaluateAll((e) => e.map((x) => x.getAttribute("data-scene")))).toEqual(SCENES);
+    const set = wide(page) ? "#capacidades .cx-stage-scene .cx-plate" : "#capacidades .cx-unit-scene .cx-plate";
+    await expect(page.locator(set)).toHaveCount(6);
+    expect(await page.locator(set).evaluateAll((e) => e.map((x) => x.getAttribute("data-scene")))).toEqual(SCENES);
+    await expect(page.locator(wide(page) ? "#capacidades .cx-unit-scene" : "#capacidades .cx-stage-scene")).toHaveCount(0);
+    // the plates carry the demonstration only: the row says their number, name and reference
+    expect(await page.locator("#capacidades .cx-plate figcaption, #capacidades .cx-plate .micro.cx-plate-ref").count()).toBe(0);
   });
 
   test("wide: the stage stays beside the rows; the active capability follows the reading line down and back up", async ({ page }) => {

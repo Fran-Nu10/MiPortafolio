@@ -44,7 +44,7 @@ const noop = () => () => {};
  * `activeIndex` is React state (it changes structure: tab order, video lifecycle, labels);
  * the track position is GSAP's. Without JavaScript the reel is a vertical list (Phase 1).
  */
-export function ProjectReel({ label, heading, items, copy }: { label: string; heading: string; items: ReelItemView[]; copy: ReelCopy }) {
+export function ProjectReel({ heading, items, copy }: { heading: string; items: ReelItemView[]; copy: ReelCopy }) {
   const rootRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLOListElement>(null);
@@ -334,7 +334,6 @@ export function ProjectReel({ label, heading, items, copy }: { label: string; he
       }
     >
       <header className="reel-header">
-        <p className="micro muted">{label}</p>
         <h2 id="trabajo-h" className="reel-heading" data-part="heading">
           {heading}
         </h2>
