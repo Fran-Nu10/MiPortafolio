@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import type { ResolvedAsset } from "@/lib/resolved";
 import { READING_LINE, WIDE_QUERY, pickActive } from "@/lib/capabilities-index";
 import { Cutout } from "@/components/media/Cutout";
@@ -25,18 +25,33 @@ export interface CapabilityItemView {
 }
 
 export interface CapabilitiesView {
+  /** the section's visible title (its opening line moved to «Una sola visión», docs/27 §3) */
   heading: string;
-  /** «Todo lo anterior pasó por las mismas manos.»: the section's opening line */
-  seam: string;
   kicker: string;
   subKicker: string;
-  /** shown beside the opening line once it exists (never as a placeholder box) */
-  bust: ResolvedAsset;
   items: CapabilityItemView[];
 }
 
 const ID = "capacidades";
 const pad = (n: number) => String(n).padStart(2, "0");
+
+/**
+ * Wide layout, live. The server (and the first client render) assume narrow: the HTML carries one set
+ * of scenes — under each row, what phones, tablets and no-JS show. On wide screens the client then
+ * swaps them for the shared stage's set. Rendering both sets doubled the section's nodes and their
+ * hydration (docs/26: +435 nodes, the mobile LCP's render delay; docs/27 §7.4).
+ */
+function subscribeWide(on: () => void) {
+  const mq = window.matchMedia(WIDE_QUERY);
+  mq.addEventListener("change", on);
+  return () => mq.removeEventListener("change", on);
+}
+const useWide = () =>
+  useSyncExternalStore(
+    subscribeWide,
+    () => window.matchMedia(WIDE_QUERY).matches,
+    () => false,
+  );
 
 /**
  * S12 · Capabilities — a live editorial index (docs/26 §C; copy Content Master 22). Six numbered rows
@@ -51,6 +66,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 export function CapabilitiesIndex({ view }: { view: CapabilitiesView }) {
   const sectionRef = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
+  const wide = useWide();
 
   // wide layout: the active row is the one on the reading line (rAF-throttled, passive)
   useEffect(() => {
@@ -93,23 +109,15 @@ export function CapabilitiesIndex({ view }: { view: CapabilitiesView }) {
     );
     scenes.forEach((s) => io.observe(s));
     return () => io.disconnect();
-  }, []);
-
-  const bust = view.bust.status !== "placeholder" ? view.bust : null;
+  }, [wide]);
 
   return (
     <section ref={sectionRef} id={ID} aria-labelledby="capacidades-h" data-section={ID} className="cx">
       <header className="cx-head">
-        <h2 id="capacidades-h" className="micro cx-eyebrow">
+        <h2 id="capacidades-h" className="cx-title">
           {view.heading}
         </h2>
-        <p className="cx-seam">{view.seam}</p>
         <p className="cx-kicker">{view.kicker}</p>
-        {bust ? (
-          <div className="cx-bust" aria-hidden="true">
-            <Cutout asset={bust} />
-          </div>
-        ) : null}
       </header>
 
       <div className="cx-body">
@@ -137,10 +145,12 @@ export function CapabilitiesIndex({ view }: { view: CapabilitiesView }) {
               ) : (
                 <p className="micro cx-ref">{c.attribution.label}</p>
               )}
-              {/* narrow screens: the demonstration right under its words */}
-              <div className="cx-unit-scene" data-unit-scene="" aria-hidden="true">
-                <Scene c={c} />
-              </div>
+              {/* narrow screens (and the server's HTML): the demonstration right under its words */}
+              {wide ? null : (
+                <div className="cx-unit-scene" data-unit-scene="" aria-hidden="true">
+                  <Scene c={c} />
+                </div>
+              )}
             </li>
           ))}
         </ol>
@@ -148,11 +158,13 @@ export function CapabilitiesIndex({ view }: { view: CapabilitiesView }) {
         {/* wide screens: one stage beside the index, the active capability's scene in it */}
         <div className="cx-stage" aria-hidden="true">
           <div className="cx-stage-in">
-            {view.items.map((c, i) => (
-              <div key={c.index} className="cx-stage-scene" data-on={i === active ? "" : undefined}>
-                <Scene c={c} />
-              </div>
-            ))}
+            {wide
+              ? view.items.map((c, i) => (
+                  <div key={c.index} className="cx-stage-scene" data-on={i === active ? "" : undefined}>
+                    <Scene c={c} />
+                  </div>
+                ))
+              : null}
           </div>
         </div>
       </div>

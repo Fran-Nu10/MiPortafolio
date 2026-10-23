@@ -3028,6 +3028,222 @@ html.js .at-work-stage[data-anim] {
   inset: 0;
 }
 
+/* ── «Distintas disciplinas. Una sola visión.» (docs/27 §3, Content Master 25) ─────────────────
+   One figure in three states — loose points, the grid, the built block — joined by one accent
+   conductor. Phones and tablets: the stages down one column, the conductor along it through the
+   figures' centres. Wide: three columns, the conductor across under the figures. The static page
+   is the finished transformation; VisionScene only plays it with the scroll. ──────────────────── */
+.vision {
+  --fig: 96px;
+  --vision-gap: 56px;
+  --vision-close-gap: 64px;
+  /* the close's line height in px (lead × 1.3): where its point sits */
+  --vision-close-lh: calc(var(--type-lead) * 1.3);
+  padding: 16svh var(--gutter) 14svh;
+  max-width: calc(1280px + 2 * var(--gutter));
+  margin-inline: auto;
+}
+.vision-title {
+  margin: 0;
+  font-size: clamp(40px, 11.4vw, 104px);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+.vision-title-line {
+  display: block;
+}
+.vision-accent {
+  color: var(--color-accent);
+}
+.vision-body {
+  position: relative;
+  margin-top: clamp(48px, 9svh, 112px);
+}
+.vision-stages {
+  display: grid;
+  gap: var(--vision-gap);
+  margin: 0;
+  padding: 0 0 0 36px;
+  list-style: none;
+}
+.vision-stage {
+  position: relative;
+  display: grid;
+  align-content: start;
+}
+.vision-fig {
+  display: block;
+  width: var(--fig);
+  height: var(--fig);
+  overflow: visible;
+}
+/* the stage's point on the conductor, level with its figure's centre */
+.vision-node {
+  position: absolute;
+  top: calc(var(--fig) / 2 - 6px);
+  left: -36px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-black);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+/* the conductor, one stretch per stage: from this node down to the next one (the stage's height plus
+   the gap); the last stretch reaches the close's own point */
+.vision-seg {
+  position: absolute;
+  top: calc(var(--fig) / 2 + 6px);
+  left: -31px;
+  width: 2px;
+  height: calc(100% + var(--vision-gap) - 12px);
+  background: var(--color-accent);
+  transform-origin: 50% 0;
+}
+.vision-stage:last-child .vision-seg {
+  height: calc(100% - var(--fig) / 2 + var(--vision-close-gap) + 0.65 * var(--vision-close-lh) - 12px);
+}
+.vision-word {
+  margin: 22px 0 0;
+  font-size: clamp(32px, 9.4vw, 44px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.vision-line {
+  max-width: 30ch;
+  margin: 12px 0 0;
+  font-size: var(--type-body);
+  line-height: 1.5;
+  color: var(--color-paper-2);
+}
+.vision-close {
+  position: relative;
+  max-width: 26ch;
+  margin: var(--vision-close-gap) 0 0 36px;
+  font-size: var(--type-lead);
+  font-weight: 500;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+/* where the conductor ends: the decision carried to the working product */
+.vision-close::before {
+  content: "";
+  position: absolute;
+  top: calc(0.65 * var(--vision-close-lh) - 6px);
+  left: -36px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+/* the figures: strokes stay one weight at every size */
+.vf-line {
+  fill: none;
+  stroke: var(--color-paper-2);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  vector-effect: non-scaling-stroke;
+}
+.vf-guides line {
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+  vector-effect: non-scaling-stroke;
+}
+.vf-point {
+  fill: var(--color-paper);
+}
+.vf-module {
+  fill: var(--color-paper);
+}
+.vf-accent {
+  fill: var(--color-accent);
+}
+/* tablets: each stage's figure beside its words */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .vision {
+    --fig: 132px;
+  }
+  .vision {
+    --vision-gap: 64px;
+  }
+  .vision-stages {
+    padding-left: 48px;
+  }
+  .vision-node {
+    left: -48px;
+  }
+  .vision-seg {
+    left: -43px;
+  }
+  .vision-stage {
+    grid-template-columns: var(--fig) minmax(0, 1fr);
+    column-gap: 40px;
+  }
+  .vision-fig {
+    grid-row: 1 / span 2;
+  }
+  .vision-word {
+    margin-top: 18px;
+  }
+  .vision-close {
+    margin-left: 48px;
+  }
+  .vision-close::before {
+    left: -48px;
+  }
+}
+/* wide: three columns, the conductor across, under the figures */
+@media (min-width: 1024px) {
+  .vision {
+    --fig: clamp(132px, 12vw, 176px);
+    --vision-col-gap: clamp(32px, 4vw, 72px);
+  }
+  .vision-stages {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--vision-col-gap);
+    padding-left: 0;
+  }
+  .vision-node {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-top: 28px;
+  }
+  /* across: from this node to the next column's (the column plus the gap); the last to the edge */
+  .vision-seg {
+    top: calc(var(--fig) + 33px);
+    left: 12px;
+    width: calc(100% + var(--vision-col-gap) - 12px);
+    height: 2px;
+    transform-origin: 0 50%;
+  }
+  .vision-stage:last-child .vision-seg {
+    width: calc(100% - 12px);
+    height: 2px;
+  }
+  .vision-word {
+    margin-top: 28px;
+    font-size: clamp(40px, 3.7vw, 60px);
+  }
+  .vision-line {
+    font-size: clamp(17px, 1.25vw, 20px);
+  }
+  /* the close under the last stage, where the conductor arrives */
+  .vision-close {
+    margin: clamp(56px, 10svh, 112px) 0 0 calc((100% - 2 * var(--vision-col-gap)) * 2 / 3 + 2 * var(--vision-col-gap));
+    max-width: 24ch;
+  }
+  .vision-close::before {
+    content: none;
+  }
+}
+
 /* ── S12 · capabilities — a live editorial index (docs/26 §C, Content Master 22). Narrow screens,
    reduced motion and no JS: six editorial units stacked, each with its scene under its words. Wide
    screens (≥ 1024): the index (≈ 45 %) scrolls natively beside a sticky shared stage (≈ 55 %) whose
@@ -3045,29 +3261,13 @@ html.js .at-work-stage[data-anim] {
   max-width: 1280px;
   margin: 0 auto clamp(48px, 9svh, 96px);
 }
-.cx-eyebrow {
+/* the section's own title (its opening line became «Una sola visión», docs/27 §3) */
+.cx-title {
   margin: 0;
-  color: var(--color-paper-2);
-}
-/* the red is a mark beside small type, never the small type itself (AA) */
-.cx-eyebrow::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 10px;
-  background: var(--color-signal);
-  vertical-align: 1px;
-}
-/* «Todo lo anterior pasó por las mismas manos.»: the section opens on the projects it follows */
-.cx-seam {
-  max-width: 18ch;
-  margin: 0;
-  font-size: clamp(40px, 6.2vw, 96px);
+  font-size: var(--type-statement);
   font-weight: 800;
-  line-height: 0.96;
-  letter-spacing: -0.03em;
-  text-wrap: balance;
+  line-height: 1;
+  letter-spacing: -0.025em;
 }
 .cx-kicker {
   max-width: 46ch;
@@ -3075,12 +3275,6 @@ html.js .at-work-stage[data-anim] {
   font-size: var(--type-lead);
   line-height: 1.35;
   color: var(--color-paper-2);
-}
-.cx-bust {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: min(22vw, 260px);
 }
 .cx-body {
   max-width: 1280px;
@@ -4362,95 +4556,264 @@ a.cx-ref:hover {
   }
 }
 
-/* ── S13 · profile (Content Master 21) ───────────────────────────────────────
-   Editorial, not corporate: a declaration set alone and large, an explanation under a hairline,
-   and Meta Ads in a space of its own below — hierarchy by size, weight and space, never cards. */
+/* ── S13 · profile (Content Master 21 and 25; composition docs/27 §3) ────────────────────────────
+   Editorial, not a column: the declaration large and alone, then each paragraph beside a visual of
+   its own (its four phrases on the accent thread; real fragments of the projects it names), the
+   alignment alternating. Phones: the visuals between the paragraphs, in reading order. Then Meta Ads,
+   a chapter of its own: a two-line headline, three steps on one thread, one paragraph. ─────────── */
 .profile {
-  display: grid;
-  gap: 24px;
-  padding: 14svh var(--gutter);
-  max-width: calc(1094px + 2 * var(--gutter));
+  padding: 12svh var(--gutter) 6svh;
+  max-width: calc(1280px + 2 * var(--gutter));
   margin-inline: auto;
+}
+.profile-grid {
+  display: grid;
+  gap: 44px;
+  align-items: start;
 }
 /* the declaration of authority: the first paragraph, alone */
 .profile-core {
-  max-width: 28em;
-  font-size: clamp(25px, 3vw, 42px);
-  line-height: 1.18;
+  max-width: 24em;
+  margin: 0;
+  font-size: clamp(25px, 3.1vw, 46px);
+  line-height: 1.16;
   font-weight: 500;
   letter-spacing: -0.015em;
   text-wrap: balance;
 }
-/* the explanation: body copy, quieter, under a hairline */
-.profile-detail {
-  display: grid;
-  gap: 20px;
-  max-width: 54ch;
-  margin-top: 48px;
-  padding-top: 28px;
-  border-top: 1px solid var(--rule);
+.profile-p {
+  max-width: 52ch;
+  margin: 0;
   font-size: clamp(17px, 1.35vw, 20px);
-  line-height: 1.55;
+  line-height: 1.6;
   color: var(--color-paper-2);
 }
-/* Meta Ads: its own space, set off by distance and a rule */
-.profile-ads {
-  display: grid;
-  gap: 24px;
-  margin-top: 10svh;
-  padding-top: 40px;
-  border-top: 1px solid var(--rule-strong);
+/* the first paragraph's four phrases, joined by the accent thread into the last: the product */
+.profile-phrases {
+  --thread: 1;
+  position: relative;
+  margin: 0;
+  padding-left: 30px;
+  font-size: clamp(22px, 2.1vw, 32px);
 }
-/* Meta Ads' conductor (docs/26 §E): Estrategia → Producto → Crecimiento, joined by a red line */
-.profile-chain {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 0;
-  margin: 0 0 4px;
+.profile-phrases::before {
+  content: "";
+  position: absolute;
+  top: 0.6em;
+  bottom: 0.6em;
+  left: 5px;
+  width: 2px;
+  background: var(--color-accent);
+  transform: scaleY(var(--thread));
+  transform-origin: 50% 0;
+}
+.profile-phrases ol {
+  display: grid;
+  gap: 0.5em;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
-.profile-chain-step {
-  display: flex;
-  align-items: center;
+.profile-phrase {
+  position: relative;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
-.profile-chain-word {
-  /* ≥ 19px bold: large text, so the red «Crecimiento» meets AA (3:1) */
-  font-size: clamp(19px, 1.35vw, 22px);
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+.profile-phrase-node {
+  position: absolute;
+  top: calc(0.6em - 6px);
+  left: -30px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-black);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
 }
-.profile-chain-step:last-child .profile-chain-word {
-  color: var(--color-signal);
+.profile-phrase:last-child {
+  color: var(--color-accent);
 }
-.profile-chain-rule {
-  width: clamp(32px, 6vw, 96px);
-  height: 2px;
-  margin: 0 clamp(10px, 1.4vw, 18px);
-  background: var(--color-signal);
+.profile-phrase:last-child .profile-phrase-node {
+  background: var(--color-accent);
 }
-.profile-ads-title {
-  max-width: 22em;
-  font-size: clamp(24px, 2.6vw, 38px);
-  line-height: 1.12;
-  font-weight: 900;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-}
-.profile-ads-body {
+/* the projects the second paragraph names: real fragments, framed, with their reference */
+.profile-projects {
   display: grid;
-  gap: 20px;
-  max-width: 54ch;
-  font-size: clamp(17px, 1.35vw, 20px);
-  line-height: 1.55;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+.profile-shot:nth-child(2) {
+  margin-top: 40px;
+}
+.profile-shot-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-panel);
+  outline: 1px solid var(--rule);
+}
+.profile-shot-frame img {
+  object-fit: cover;
+}
+.profile-shot-caption {
+  margin: 10px 0 0;
   color: var(--color-paper-2);
 }
-/* «Meta Ads»: discreet but recognizable — heavier and fully paper against the quieter body */
+/* small phones: the fragments square and the steps tighter — the chapter stays within reach */
+@media (max-width: 430px) {
+  .profile-grid {
+    gap: 36px;
+  }
+  .profile-shot-frame {
+    aspect-ratio: 1 / 1;
+  }
+  .profile-shot:nth-child(2) {
+    margin-top: 28px;
+  }
+  .profile-ads {
+    --ads-fig: 60px;
+    --ads-gap: 32px;
+  }
+  .profile-step-word {
+    margin-top: 14px;
+  }
+}
+@media (min-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    row-gap: clamp(64px, 12svh, 140px);
+  }
+  .profile-core {
+    grid-column: 1 / span 10;
+  }
+  .profile-phrases {
+    grid-column: 1 / span 4;
+    grid-row: 2;
+  }
+  .profile-p1 {
+    grid-column: 6 / span 6;
+    grid-row: 2;
+    align-self: center;
+  }
+  .profile-p2 {
+    grid-column: 1 / span 5;
+    grid-row: 3;
+    align-self: center;
+  }
+  .profile-projects {
+    grid-column: 7 / span 6;
+    grid-row: 3;
+    gap: 24px;
+  }
+  .profile-shot:nth-child(2) {
+    margin-top: 72px;
+  }
+}
+
+/* Meta Ads: a chapter of its own — headline, sequence, one paragraph */
+.profile-ads {
+  --ads-fig: 72px;
+  --ads-gap: 40px;
+  display: grid;
+  gap: clamp(40px, 7svh, 72px);
+  margin-top: clamp(72px, 12svh, 180px);
+  padding-top: clamp(40px, 6svh, 64px);
+  border-top: 1px solid var(--rule-strong);
+}
+.profile-ads-title {
+  max-width: 20ch;
+  margin: 0;
+  font-size: var(--type-statement);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+.profile-ads-line {
+  display: block;
+}
+.profile-ads-accent {
+  color: var(--color-accent);
+}
+/* the three steps on one thread: down the column on phones and tablets, across on wide screens */
+.profile-steps {
+  display: grid;
+  gap: var(--ads-gap);
+  margin: 0;
+  padding: 0 0 0 36px;
+  list-style: none;
+}
+.profile-step {
+  position: relative;
+  display: grid;
+  align-content: start;
+}
+.profile-step-fig {
+  display: block;
+  width: var(--ads-fig);
+  height: var(--ads-fig);
+  overflow: visible;
+}
+.profile-step-node {
+  position: absolute;
+  top: calc(var(--ads-fig) / 2 - 6px);
+  left: -36px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-black);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+.profile-step:last-child .profile-step-node {
+  background: var(--color-accent);
+}
+.profile-step-seg {
+  position: absolute;
+  top: calc(var(--ads-fig) / 2 + 6px);
+  left: -31px;
+  width: 2px;
+  height: calc(100% + var(--ads-gap) - 12px);
+  background: var(--color-accent);
+  transform-origin: 50% 0;
+}
+.profile-step-word {
+  margin: 18px 0 0;
+  font-size: clamp(20px, 6.4vw, 28px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.profile-step-line {
+  margin: 8px 0 0;
+  font-size: var(--type-body);
+  line-height: 1.45;
+  color: var(--color-paper-2);
+}
+.af-module {
+  fill: var(--color-paper);
+}
+.af-accent {
+  fill: var(--color-accent);
+}
+.af-echo {
+  fill: none;
+  stroke: var(--color-paper-2);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  vector-effect: non-scaling-stroke;
+}
+.profile-ads-p {
+  max-width: 44ch;
+  margin: 0;
+  font-size: clamp(18px, 1.55vw, 23px);
+  line-height: 1.5;
+}
+/* «Meta Ads»: the term, in the accent (6.1:1 on black) */
 .profile-ads-em {
   font-weight: 700;
-  color: var(--color-paper);
+  color: var(--color-accent);
 }
 .profile-foot {
   margin-top: 8px;
@@ -4458,17 +4821,69 @@ a.cx-ref:hover {
 .profile-meta {
   margin-top: 32px;
 }
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .profile-ads {
+    --ads-fig: 96px;
+  }
+  .profile-steps {
+    padding-left: 48px;
+  }
+  .profile-step {
+    grid-template-columns: var(--ads-fig) minmax(0, 1fr);
+    column-gap: 32px;
+  }
+  .profile-step-fig {
+    grid-row: 1 / span 2;
+  }
+  .profile-step-word {
+    align-self: end;
+    margin-top: 14px;
+  }
+  .profile-step-node {
+    left: -48px;
+  }
+  .profile-step-seg {
+    left: -43px;
+  }
+}
 @media (min-width: 1024px) {
-  .profile {
+  .profile-ads {
+    --ads-fig: clamp(96px, 8vw, 120px);
+    --ads-gap: clamp(32px, 4vw, 72px);
     grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
   }
-  .profile-label {
-    grid-column: 1 / span 2;
+  .profile-ads-title,
+  .profile-steps {
+    grid-column: 1 / -1;
   }
-  .profile-body,
-  .profile-ads,
-  .profile-foot {
-    grid-column: 4 / span 8;
+  .profile-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--ads-gap);
+    padding-left: 0;
+  }
+  .profile-step-node {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-top: 24px;
+  }
+  .profile-step-seg {
+    top: calc(var(--ads-fig) + 29px);
+    left: 12px;
+    width: calc(100% + var(--ads-gap) - 12px);
+    height: 2px;
+    transform-origin: 0 50%;
+  }
+  .profile-step-word {
+    margin-top: 22px;
+    font-size: clamp(24px, 2.2vw, 34px);
+  }
+  .profile-ads-p {
+    grid-column: 1 / span 6;
+  }
+  .profile {
+    padding-block: 14svh 10svh;
   }
 }
 

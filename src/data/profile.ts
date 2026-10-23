@@ -6,9 +6,19 @@ interface Profile {
   core: string;
   /** the explanation: the second and third paragraphs */
   body: string[];
-  /** Meta Ads, in its own space (Content Master 21): a headline, its paragraphs and the term set in emphasis */
-  /** `chain`: Meta Ads' conductor (docs/26 §E), from building products to bringing them to people */
-  ads: { title: string; paragraphs: string[]; emphasis: string; chain: string[] };
+  /**
+   * the visual beside each paragraph of the explanation (docs/27 §3): the first paragraph's own four
+   * phrases, in order (verified by test against the paragraph), and the kinds of project the second
+   * one names, each shown by a real fragment of one of the projects — captioned by its kind only (the
+   * Perfil does not name TravelSuite360, Content Master 21); `slug` picks the material
+   */
+  facets: { phrases: string[]; projects: { slug: "chef-arturo" | "travelsuite360"; kind: string }[] };
+  /**
+   * Meta Ads, a chapter of its own (Content Master 25, 2026-10-23): a two-line headline, a sequence of
+   * three steps — each with a short line taken from the approved copy of Content Master 21 — and one
+   * paragraph with the term set in emphasis
+   */
+  ads: { title: [string, string]; steps: { word: string; line: string }[]; paragraph: string; emphasis: string };
   stack: Gated<string>;
   /** href values; the email also completes the form's route error */
   contacts: { email: Gated<string>; linkedin: Gated<string> };
@@ -27,16 +37,24 @@ export const PROFILE: Profile = {
     "Mi trabajo va más allá de construir una interfaz. Me involucro en cómo se presenta una marca, cómo interactúan sus clientes, cómo funcionan sus procesos y cómo convertir una idea en un producto digital sólido, escalable y preparado para crecer.",
     "Desde Uruguay, trabajo en proyectos de comercio electrónico, plataformas y sistemas de gestión, combinando criterio de producto, diseño y desarrollo con una visión comercial.",
   ],
-  ads: {
-    title: "Un gran producto también necesita llegar a las personas correctas.",
-    paragraphs: [
-      "Me gusta pensar en todo el recorrido: desde la primera vez que alguien descubre un negocio hasta el momento en que decide consultar, reservar o comprar.",
-      "Por eso, además de diseñar y desarrollar productos digitales, también trabajo con publicidad en Meta Ads. Campañas en Instagram y Facebook que ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad.",
-      "Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla.",
+  facets: {
+    phrases: ["una marca", "sus clientes", "sus procesos", "un producto digital"],
+    projects: [
+      { slug: "chef-arturo", kind: "Comercio electrónico" },
+      { slug: "travelsuite360", kind: "Plataforma y sistema de gestión" },
     ],
+  },
+  ads: {
+    title: ["Construirlo es una parte.", "Hacer que lo descubran es la otra."],
+    // the precisions of the approved text (Content Master 21) carried by the steps: Instagram and
+    // Facebook; the path from discovering a business to consulting, booking or buying
+    steps: [
+      { word: "Producto", line: "Una buena experiencia digital." },
+      { word: "Descubrimiento", line: "Campañas en Instagram y Facebook." },
+      { word: "Acción", line: "Consultar, reservar o comprar." },
+    ],
+    paragraph: "Además de diseñar y desarrollar productos digitales, creo campañas en Meta Ads para conectar marcas con personas interesadas en sus productos y servicios.",
     emphasis: "Meta Ads",
-    /** the brief of 2026-10-22 (Content Master 24): ESTRATEGIA → PRODUCTO → CRECIMIENTO */
-    chain: ["Estrategia", "Producto", "Crecimiento"],
   },
   stack: {
     status: "pending",

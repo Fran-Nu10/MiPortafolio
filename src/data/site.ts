@@ -105,10 +105,25 @@ export const SITE = {
     capabilitiesName: "Capacidades",
   },
 
+  /**
+   * «Una sola visión» (Content Master 25, approved by Franco on 2026-10-23): it replaces the
+   * capabilities' opening line «Todo lo anterior pasó por las mismas manos.», which read as if every
+   * asset of the projects (photographs, brands, products) were Franco's. It says how the work is done:
+   * one person connects strategy, design and technology, from the first decision to the working product.
+   */
+  vision: {
+    heading: ["Distintas disciplinas.", "Una sola visión."] as [string, string],
+    stages: [
+      { word: "Pensar", line: "Entender el problema, el negocio y las oportunidades." },
+      { word: "Diseñar", line: "Dar estructura, identidad y experiencia a la solución." },
+      { word: "Construir", line: "Convertir las decisiones en un producto digital real y funcional." },
+    ],
+    close: "Una sola dirección, desde la primera decisión hasta el producto funcionando.",
+  },
+
   capabilities: {
-    /** sr-only section heading: the rail words are the visual title */
+    /** the section's visible title since «Una sola visión» took the opening line (docs/27 §3) */
     heading: "Capacidades",
-    seam: "Todo lo anterior pasó por las mismas manos.",
     kicker: "Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.",
     subKicker: "Después de publicar",
   },

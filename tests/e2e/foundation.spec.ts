@@ -69,7 +69,10 @@ test.describe("without JavaScript", () => {
       "De la complejidad al producto.",
       "Una idea no alcanza.",
       "De la idea al producto.",
-      "Todo lo anterior pasó por las mismas manos.",
+      // «Una sola visión» (docs/27 §3)
+      "Una sola visión.",
+      "Entender el problema, el negocio y las oportunidades.",
+      "Una sola dirección, desde la primera decisión hasta el producto funcionando.",
       "Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.",
       "Ahora, el tuyo.",
     ]) {

@@ -51,7 +51,8 @@ describe("the live index (docs/26 §C)", () => {
     expect(CAPABILITIES[5].evidence).toEqual({ variant: "typographic", tag: "Meta Ads" });
     expect(CAPABILITIES[5].statement).not.toMatch(/\d/);
     expect(CAPABILITIES[5].attribution).toEqual({ label: "Meta Ads" });
-    expect(SITE.capabilities.seam).toBe("Todo lo anterior pasó por las mismas manos.");
+    // the old opening line is gone: «Una sola visión» says how the work is done (Content Master 25)
+    expect(JSON.stringify(SITE)).not.toContain("Todo lo anterior pasó por las mismas manos.");
   });
 });
 
@@ -80,8 +81,16 @@ describe("EvidenceSlot guard (Spec §12)", () => {
   });
 });
 
-describe("profile (Content Master 13, rewritten in Content Master 21 · 2026-10-21)", () => {
-  const ALL = [PROFILE.core, ...PROFILE.body, PROFILE.ads.title, ...PROFILE.ads.paragraphs];
+describe("profile (Content Master 13, rewritten in Content Master 21 · 2026-10-21; Meta Ads in 25)", () => {
+  const ALL = [
+    PROFILE.core,
+    ...PROFILE.body,
+    ...PROFILE.facets.phrases,
+    ...PROFILE.facets.projects.map((p) => p.kind),
+    ...PROFILE.ads.title,
+    ...PROFILE.ads.steps.flatMap((s) => [s.word, s.line]),
+    PROFILE.ads.paragraph,
+  ];
 
   it("the declaration, the explanation and Meta Ads are verbatim; the label is the nav word", () => {
     expect(PROFILE.label).toBe(SITE.nav.profile);
@@ -92,14 +101,29 @@ describe("profile (Content Master 13, rewritten in Content Master 21 · 2026-10-
       "Mi trabajo va más allá de construir una interfaz. Me involucro en cómo se presenta una marca, cómo interactúan sus clientes, cómo funcionan sus procesos y cómo convertir una idea en un producto digital sólido, escalable y preparado para crecer.",
       "Desde Uruguay, trabajo en proyectos de comercio electrónico, plataformas y sistemas de gestión, combinando criterio de producto, diseño y desarrollo con una visión comercial.",
     ]);
-    expect(PROFILE.ads.title).toBe("Un gran producto también necesita llegar a las personas correctas.");
-    expect(PROFILE.ads.paragraphs).toEqual([
-      "Me gusta pensar en todo el recorrido: desde la primera vez que alguien descubre un negocio hasta el momento en que decide consultar, reservar o comprar.",
-      "Por eso, además de diseñar y desarrollar productos digitales, también trabajo con publicidad en Meta Ads. Campañas en Instagram y Facebook que ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad.",
-      "Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla.",
-    ]);
+    // Meta Ads, its own chapter (Content Master 25, 2026-10-23)
+    expect(PROFILE.ads.title).toEqual(["Construirlo es una parte.", "Hacer que lo descubran es la otra."]);
+    expect(PROFILE.ads.steps.map((s) => s.word)).toEqual(["Producto", "Descubrimiento", "Acción"]);
+    expect(PROFILE.ads.paragraph).toBe(
+      "Además de diseñar y desarrollar productos digitales, creo campañas en Meta Ads para conectar marcas con personas interesadas en sus productos y servicios.",
+    );
     expect(PROFILE.ads.emphasis).toBe("Meta Ads");
-    expect(PROFILE.ads.paragraphs.some((p) => p.includes(PROFILE.ads.emphasis))).toBe(true);
+    expect(PROFILE.ads.paragraph.includes(PROFILE.ads.emphasis)).toBe(true);
+  });
+
+  it("the visuals add no claim: the four phrases are the first paragraph's own, in order; the steps' lines keep the approved precisions", () => {
+    const p1 = PROFILE.body[0];
+    let at = -1;
+    for (const phrase of PROFILE.facets.phrases) {
+      const next = p1.indexOf(phrase, at + 1);
+      expect(next, phrase).toBeGreaterThan(at);
+      at = next;
+    }
+    // Content Master 21's precisions, carried by the steps: Instagram and Facebook; consult, book, buy
+    expect(PROFILE.ads.steps.map((s) => s.line)).toEqual(["Una buena experiencia digital.", "Campañas en Instagram y Facebook.", "Consultar, reservar o comprar."]);
+    // the kinds are the second paragraph's own words
+    expect(PROFILE.body[1]).toContain("comercio electrónico");
+    expect(PROFILE.body[1]).toContain("plataformas y sistemas de gestión");
   });
 
   it("the declaration opens the profile and stays a sentence, not a paragraph (hierarchy needs a short lead)", () => {
@@ -119,7 +143,7 @@ describe("profile (Content Master 13, rewritten in Content Master 21 · 2026-10-
   });
 
   it("Meta Ads claims no results, no ad spend, no clients and no figures", () => {
-    for (const s of [PROFILE.ads.title, ...PROFILE.ads.paragraphs]) {
+    for (const s of [...PROFILE.ads.title, ...PROFILE.ads.steps.flatMap((x) => [x.word, x.line]), PROFILE.ads.paragraph]) {
       expect(s, s).not.toMatch(/\d|%|ROAS|retorno|inversi[oó]n|presupuesto|ventas|resultados|clientes de|certific/i);
     }
   });

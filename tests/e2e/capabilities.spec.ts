@@ -9,13 +9,15 @@ import { READING_LINE } from "../../src/lib/capabilities-index";
  * and one shared stage. Wide screens: the rows scroll natively, the stage is sticky beside them (no
  * pinned section), the active capability follows the reading line both ways and its scene is the
  * one shown; hover and focus activate too. Narrow screens: each capability is one unit, its scene
- * right under its words. Plus the profile copy (Content Master 13/21), axe and no-JS.
+ * right under its words. Plus the profile (Content Master 13/21/25, composition docs/27 §3), axe and no-JS.
  */
 
 const CORE = "Diseño y desarrollo productos digitales donde la estrategia, la experiencia de usuario y la ingeniería trabajan con un mismo propósito: crear valor real para cada negocio.";
 const BODY = ["Mi trabajo va más allá de construir una interfaz. Me involucro en cómo se presenta una marca, cómo interactúan sus clientes, cómo funcionan sus procesos y cómo convertir una idea en un producto digital sólido, escalable y preparado para crecer.", "Desde Uruguay, trabajo en proyectos de comercio electrónico, plataformas y sistemas de gestión, combinando criterio de producto, diseño y desarrollo con una visión comercial."];
-const ADS_TITLE = "Un gran producto también necesita llegar a las personas correctas.";
-const ADS = ["Me gusta pensar en todo el recorrido: desde la primera vez que alguien descubre un negocio hasta el momento en que decide consultar, reservar o comprar.", "Por eso, además de diseñar y desarrollar productos digitales, también trabajo con publicidad en Meta Ads. Campañas en Instagram y Facebook que ayudan a dar a conocer una marca, atraer personas interesadas y aprovechar mejor cada oportunidad.", "Porque una buena experiencia digital importa. Pero también importa que la gente llegue a descubrirla."];
+const ADS_TITLE = "Construirlo es una parte. Hacer que lo descubran es la otra.";
+const ADS = "Además de diseñar y desarrollar productos digitales, creo campañas en Meta Ads para conectar marcas con personas interesadas en sus productos y servicios.";
+const STEPS = ["Producto", "Descubrimiento", "Acción"];
+const PHRASES = ["una marca", "sus clientes", "sus procesos", "un producto digital"];
 const NAMES = ["Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Meta Ads y crecimiento"];
 const SCENES = ["product", "engineering", "commerce", "ai", "interactive", "growth"];
 
@@ -47,8 +49,10 @@ const shownScene = (page: Page) => page.locator("#capacidades .cx-stage-scene[da
 test.describe("the live index (docs/26 §C)", () => {
   test("six numbered rows: name, value and reference always in the document, in the approved words", async ({ page }) => {
     await open(page);
+    // the section's own title (its opening line became «Una sola visión», docs/27 §3)
     await expect(page.locator("#capacidades h2")).toHaveText("Capacidades");
-    await expect(page.locator("#capacidades .cx-seam")).toHaveText("Todo lo anterior pasó por las mismas manos.");
+    expect(await page.locator("#capacidades h2").evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThan(30);
+    expect(await page.locator("#capacidades").innerText()).not.toContain("Todo lo anterior pasó por las mismas manos.");
     await expect(page.locator("#capacidades h3")).toHaveText(NAMES);
     await expect(page.locator("#capacidades .cx-row .cx-value")).toHaveCount(6);
     await expect(page.locator("#capacidades .cx-n")).toHaveText(["01", "02", "03", "04", "05", "06"]);
@@ -137,53 +141,67 @@ test.describe("the live index (docs/26 §C)", () => {
   });
 });
 
-test.describe("profile (Spec §12, Content Master 13)", () => {
-  test("the copy is exact; no photo, no title beyond «Perfil»; pending stack and contacts are absent", async ({ page }) => {
+test.describe("profile (Spec §12, Content Master 13, 21 and 25; docs/27 §3)", () => {
+  test("the copy is exact; the visuals are real material and the paragraphs' own words; no portrait, no TravelSuite360 name, pending stack and contacts absent", async ({ page }) => {
     await open(page);
     const s = page.locator("#perfil");
     await expect(s.locator("h2")).toHaveText("Perfil");
     await expect(s.locator(".profile-core")).toHaveText(CORE);
-    await expect(s.locator(".profile-detail p")).toHaveText(BODY);
-    // Meta Ads has a space of its own: a headline, three paragraphs, and the term in emphasis
+    await expect(s.locator(".profile-p")).toHaveText(BODY);
+    await expect(s.locator(".profile-phrase")).toHaveText(PHRASES);
+    await expect(s.locator(".profile-shot-caption")).toHaveText(["Comercio electrónico", "Plataforma y sistema de gestión"]);
+    // the fragments are the projects' real, final or derived material — never a placeholder, never a portrait
+    expect(await s.locator("[data-placeholder]").count()).toBe(0);
+    expect(await s.locator(".profile-shot [data-asset]").evaluateAll((e) => e.map((x) => x.getAttribute("data-asset")))).toEqual(["chef.product", "ts.reel.film.poster"]);
+    expect(await s.locator('[data-asset^="franco"]').count()).toBe(0);
+    // Meta Ads, a chapter of its own: the headline, three steps, one paragraph with the term in emphasis
     await expect(s.locator("h3")).toHaveText(ADS_TITLE);
-    await expect(s.locator(".profile-ads-body p")).toHaveText(ADS);
+    await expect(s.locator(".profile-step-word")).toHaveText(STEPS);
+    await expect(s.locator(".profile-ads-p")).toHaveText(ADS);
     await expect(s.locator(".profile-ads-em")).toHaveText("Meta Ads");
-    expect(await s.locator("img, video, [data-placeholder]").count()).toBe(0);
     expect(await s.locator(".profile-meta").count()).toBe(0);
-    expect(await s.innerText()).not.toMatch(/fundador|solo\b|por mi cuenta|CONFIRMAR|hola@|TravelSuite|agencias de viaje/i);
+    expect(await s.innerText()).not.toMatch(/fundador|solo\b|por mi cuenta|CONFIRMAR|hola@|TravelSuite|agencias de viaje|\d+ ?%|ROAS/i);
   });
 
-  test("hierarchy: the declaration is larger than the explanation, which is larger than nothing it replaced; Meta Ads sits below, set off by a rule", async ({ page }) => {
+  test("composition: the declaration leads; each paragraph has its visual beside it (wide) or right before it (narrow); Meta Ads below, set off by a rule", async ({ page }) => {
     await open(page);
     const s = page.locator("#perfil");
     const size = (sel: string) => s.locator(sel).first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
-    const core = await size(".profile-core");
-    const detail = await size(".profile-detail p");
-    const adsTitle = await size(".profile-ads-title");
-    const adsBody = await size(".profile-ads-body p");
-    expect(core).toBeGreaterThan(detail * 1.35);
-    expect(adsTitle).toBeGreaterThan(adsBody * 1.3);
-    expect(core).toBeGreaterThanOrEqual(adsTitle);
-    // order down the page: declaration → explanation → Meta Ads
-    const tops = await s.evaluate((root) => [".profile-core", ".profile-detail", ".profile-ads"].map((q) => root.querySelector(q)!.getBoundingClientRect().top + window.scrollY));
-    expect(tops[0]).toBeLessThan(tops[1]);
-    expect(tops[1]).toBeLessThan(tops[2]);
+    expect(await size(".profile-core")).toBeGreaterThan((await size(".profile-p")) * 1.35);
+    expect(await size(".profile-ads-title")).toBeGreaterThan((await size(".profile-ads-p")) * 1.3);
+    const box = (sel: string) => s.locator(sel).boundingBox().then((b) => b!);
+    const [core, phrases, p1, projects, p2, ads] = await Promise.all([".profile-core", ".profile-phrases", ".profile-p1", ".profile-projects", ".profile-p2", ".profile-ads"].map(box));
+    expect(core.y).toBeLessThan(phrases.y);
+    if (wide(page)) {
+      // beside: the phrases left of the first paragraph, the fragments right of the second (alignment alternates)
+      expect(phrases.x + phrases.width).toBeLessThanOrEqual(p1.x + 1);
+      expect(p2.x + p2.width).toBeLessThanOrEqual(projects.x + 1);
+      expect(Math.abs(phrases.y + phrases.height / 2 - (p1.y + p1.height / 2))).toBeLessThan(Math.max(phrases.height, p1.height));
+    } else {
+      // reading order: declaration → phrases → paragraph → fragments → paragraph, no overlap
+      for (const [a, b] of [[phrases, p1], [p1, projects], [projects, p2]] as const) expect(a.y + a.height).toBeLessThanOrEqual(b.y + 1);
+    }
+    expect(p2.y + p2.height).toBeLessThan(ads.y);
     expect(await s.locator(".profile-ads").evaluate((e) => getComputedStyle(e).borderTopWidth)).toBe("1px");
-    // the emphasis is heavier than the text around it, never a link or an image
+    // the steps: one row on wide screens, a column on narrow ones; nothing leaves the viewport
+    const steps = await s.locator(".profile-step").evaluateAll((e) => e.map((x) => x.getBoundingClientRect().toJSON() as DOMRect));
+    if (wide(page)) expect(new Set(steps.map((r) => Math.round(r.top))).size).toBe(1);
+    else for (let i = 1; i < steps.length; i++) expect(steps[i].top).toBeGreaterThanOrEqual(steps[i - 1].bottom);
+    for (const r of steps) expect(r.right).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
     const em = await s.locator(".profile-ads-em").evaluate((e) => ({ w: Number(getComputedStyle(e).fontWeight), p: Number(getComputedStyle(e.parentElement!).fontWeight), tag: e.tagName }));
     expect(em.w).toBeGreaterThan(em.p);
     expect(em.tag).toBe("STRONG");
-    // the sixth capability's rail card is not duplicated here: the profile adds the human side only
+    // the sixth capability's card is not duplicated here: the profile adds the human side only
     expect(await s.innerText()).not.toContain("Un buen producto merece ser descubierto");
   });
 
-  test("motion (docs/26 §E): the declaration enters line by line, the paragraphs as they come, Meta Ads' chain draws; once, never hidden again", async ({ page }) => {
+  test("motion (docs/26 §E, docs/27 §3): the declaration by lines, the rest once as it comes; never hidden again", async ({ page }) => {
     await open(page);
     const s = page.locator("#perfil");
-    await expect(s.locator(".profile-chain li")).toHaveText(["Estrategia", "Producto", "Crecimiento"]);
     if (await reduced(page)) {
       expect(await s.getAttribute("data-reveal")).toBeNull();
       expect(await s.locator(".profile-core").evaluate((e) => getComputedStyle(e).opacity)).toBe("1");
+      expect(await s.locator(".profile-shot-frame").first().evaluate((e) => getComputedStyle(e).clipPath)).toBe("none");
       return;
     }
     await expect(s).toHaveAttribute("data-reveal", "pending");
@@ -195,20 +213,23 @@ test.describe("profile (Spec §12, Content Master 13)", () => {
     // once in, the split is reverted: one plain paragraph, the exact text
     await expect.poll(() => s.locator(".profile-core").evaluate((e) => e.children.length), { timeout: 4000 }).toBe(0);
     await expect(s.locator(".profile-core")).toHaveText(CORE);
-    // the paragraphs come in as they reach the viewport, and stay when the visitor goes back up
+    // down to Meta Ads' paragraph: everything on the way is in, the last step's accent module arrived
     await page.evaluate(() => {
-      const r = document.querySelector("#perfil .profile-ads-body p:last-child")!.getBoundingClientRect();
+      const r = document.querySelector("#perfil .profile-ads-p")!.getBoundingClientRect();
       window.scrollTo({ top: r.top + window.scrollY - window.innerHeight * 0.5, behavior: "instant" });
     });
-    await expect.poll(() => s.locator(".profile-ads-body p").last().evaluate((e) => Number(getComputedStyle(e).opacity)), { timeout: 4000 }).toBe(1);
-    await expect.poll(() => s.locator(".profile-chain-word").last().evaluate((e) => getComputedStyle(e).color), { timeout: 4000 }).toBe("rgb(230, 59, 46)");
-    // once lit, the red word is large text and passes AA
-    const lit = await new AxeBuilder({ page }).include("#perfil .profile-chain").analyze();
-    expect(lit.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => v.id)).toEqual([]);
-    await page.evaluate(() => window.scrollBy({ top: -window.innerHeight, behavior: "instant" }));
+    await expect.poll(() => s.locator(".profile-ads-p").evaluate((e) => Number(getComputedStyle(e).opacity)), { timeout: 4000 }).toBe(1);
+    await expect.poll(() => s.locator('.profile-step [data-part="act"]').evaluate((e) => Number(getComputedStyle(e).opacity)), { timeout: 4000 }).toBe(1);
+    // the visitor goes back up: nothing hides again
+    await page.evaluate(() => {
+      const r = document.querySelector("#perfil .profile-p1")!.getBoundingClientRect();
+      window.scrollTo({ top: r.top + window.scrollY - window.innerHeight * 0.5, behavior: "instant" });
+    });
     await page.waitForTimeout(400);
-    expect(await s.locator(".profile-detail p").first().evaluate((e) => Number(getComputedStyle(e).opacity))).toBe(1);
-    await expect(s.locator(".profile-ads-body p")).toHaveText(ADS);
+    for (const sel of [".profile-p1", ".profile-p2", ".profile-phrase", ".profile-step-word"]) {
+      expect(await s.locator(sel).first().evaluate((e) => Number(getComputedStyle(e).opacity)), sel).toBe(1);
+    }
+    expect(await s.locator(".profile-shot-frame").last().evaluate((e) => getComputedStyle(e).clipPath)).toBe("none");
   });
 });
 
@@ -248,11 +269,11 @@ test.describe("accessibility", () => {
 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
-  test("the opening line, the kicker, the six capabilities and the profile read in order", async ({ page }) => {
+  test("the title, the kicker, the six capabilities and the profile read in order", async ({ page }) => {
     await page.goto("/");
     // textContent: the mono labels are uppercased by CSS
     const text = (await page.locator("#capacidades").textContent()) ?? "";
-    const order = ["Todo lo anterior pasó por las mismas manos.", "Cinco cosas que se repiten", "Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Después de publicar", "Meta Ads y crecimiento", "Meta Ads"];
+    const order = ["Capacidades", "Cinco cosas que se repiten", "Producto", "Ingeniería web", "Comercio digital", "IA y automatización", "Experiencias interactivas", "Después de publicar", "Meta Ads y crecimiento", "Meta Ads"];
     let at = -1;
     for (const o of order) {
       const i = text.indexOf(o, at + 1);

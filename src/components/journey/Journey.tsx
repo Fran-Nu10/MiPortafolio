@@ -20,6 +20,7 @@ import { OpeningHero } from "@/components/opening/OpeningHero";
 import { Profile } from "@/components/profile/Profile";
 import { ProjectReel, type ReelItemView } from "@/components/reel/ProjectReel";
 import { Shift } from "@/components/shift/Shift";
+import { Vision } from "@/components/vision/Vision";
 import { JourneyClient } from "./JourneyClient";
 import { FEATURES, RENDERED_AT } from "./features";
 import { headerView, openLink, reelName } from "./shared";
@@ -90,13 +91,13 @@ export function Journey() {
             ui: { ...SITE.shift.ui, nav: [...SITE.shift.ui.nav], headline: [...SITE.shift.ui.headline], cards: [...SITE.shift.ui.cards] },
           }}
         />
+        {/* how the work is done (docs/27 §3): one figure through Pensar → Diseñar → Construir */}
+        <Vision view={{ heading: SITE.vision.heading, stages: SITE.vision.stages.map((s) => ({ ...s })), close: SITE.vision.close }} />
         <CapabilitiesIndex
           view={{
             heading: SITE.capabilities.heading,
-            seam: SITE.capabilities.seam,
             kicker: SITE.capabilities.kicker,
             subKicker: SITE.capabilities.subKicker,
-            bust: resolveAsset("franco.bust"),
             items: CAPABILITIES.map(capabilityItem),
           }}
         />
@@ -113,8 +114,16 @@ export function Journey() {
           view={{
             label: PROFILE.label,
             core: PROFILE.core,
-            body: PROFILE.body,
-            ads: PROFILE.ads,
+            body: [PROFILE.body[0], PROFILE.body[1]],
+            facets: {
+              phrases: [...PROFILE.facets.phrases],
+              projects: PROFILE.facets.projects.map((f) => ({
+                kind: f.kind,
+                // the projects' own material: Chef Arturo's product, TravelSuite360's interface (demo data)
+                asset: resolveAsset(f.slug === "chef-arturo" ? "chef.product" : "ts.reel.film.poster"),
+              })),
+            },
+            ads: { title: PROFILE.ads.title, steps: PROFILE.ads.steps.map((s) => ({ ...s })), paragraph: PROFILE.ads.paragraph, emphasis: PROFILE.ads.emphasis },
             stack: confirmed(PROFILE.stack),
             contacts,
           }}

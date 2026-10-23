@@ -76,7 +76,8 @@ test.describe("place in the journey", () => {
     await open(page);
     // the home journey since THE SHIFT (docs/25): the worlds are their projects' cases
     const ids = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll<HTMLElement>("[data-section]")).map((e) => e.dataset.section))]);
-    expect(ids).toEqual(["inicio", "trabajo", "shift", "capacidades", "propuesta", "perfil", "contacto"]);
+    // «Una sola visión» between THE SHIFT and the capabilities since docs/27 §3
+    expect(ids).toEqual(["inicio", "trabajo", "shift", "vision", "capacidades", "propuesta", "perfil", "contacto"]);
     await expect(page.locator("#propuesta h2")).toHaveText("MOSTRAR. CONVENCER. CONVERTIR.");
     await expect(page.locator("#propuesta h3")).toHaveText(TITLES);
   });

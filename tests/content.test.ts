@@ -295,7 +295,9 @@ describe("copy fidelity · Content Master rev 26", () => {
     expect(SITE.cta.support).toBe("Una idea nueva, un negocio que quiere crecer o un producto que necesita dar el siguiente paso. Contame qué tenés en mente.");
     expect(SITE.cta.aside).toBe("Hablemos de lo que podemos construir.");
     expect(SITE.cta.success).toBe("Brief recibido.");
-    expect(SITE.capabilities.seam).toBe("Todo lo anterior pasó por las mismas manos.");
+    expect(SITE.vision.heading).toEqual(["Distintas disciplinas.", "Una sola visión."]);
+    expect(SITE.vision.stages.map((s) => s.word)).toEqual(["Pensar", "Diseñar", "Construir"]);
+    expect(SITE.vision.close).toBe("Una sola dirección, desde la primera decisión hasta el producto funcionando.");
     expect(SITE.cta.fields).toMatchObject({ name: "Nombre", email: "Email", brief: "¿Qué estamos construyendo?" });
     expect(SITE.cta.button).toEqual({ idle: "Enviar proyecto", pending: "Enviando…" });
   });
@@ -352,13 +354,19 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       SITE.shift.heading,
       ...SITE.shift.acts.flatMap((a) => [a.title, a.line]),
       SITE.shift.concept,
-      SITE.capabilities.seam,
+      // «Una sola visión» (Content Master 25): the title, the three stages and the close
+      ...SITE.vision.heading,
+      ...SITE.vision.stages.flatMap((s) => [s.word, s.line]),
+      SITE.vision.close,
       ...CAPABILITIES.map((c) => c.statement),
-      // the profile (Content Master 21): the declaration, the explanation and Meta Ads
+      // the profile (Content Master 21 and 25): the declaration, the explanation, its visuals' words, Meta Ads
       PROFILE.core,
       ...PROFILE.body,
-      PROFILE.ads.title,
-      ...PROFILE.ads.paragraphs,
+      ...PROFILE.facets.phrases,
+      ...PROFILE.facets.projects.map((p) => p.kind),
+      ...PROFILE.ads.title,
+      ...PROFILE.ads.steps.flatMap((s) => [s.word, s.line]),
+      PROFILE.ads.paragraph,
       SITE.cta.support,
       SITE.cta.eyebrow,
       SITE.cta.aside,
@@ -371,7 +379,9 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       SITE.cta.title,
       SITE.cta.fields.brief,
     ];
-    for (const m of must) expect(html, `index.html misses «${m}»`).toContain(escapeHtml(m));
+    // the copy as text: inline emphasis (<strong>, <span>) and React's text separators do not split it
+    const text = html.replace(/<!-- -->/g, "").replace(/<\/?(strong|span)\b[^>]*>/g, "");
+    for (const m of must) expect(text, `index.html misses «${m}»`).toContain(escapeHtml(m));
   });
 
   it.each(PROJECTS.map((p) => [p.id, p] as const))("trabajo/%s.html is readable without JS: the whole case is in the document", (id, p) => {

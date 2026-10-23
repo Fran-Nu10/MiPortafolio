@@ -89,10 +89,11 @@ const drift = (page: Page) =>
   );
 
 test.describe("place in the journey", () => {
-  test("hero → reel → THE SHIFT → capabilities → declaration → profile → contact; no world in the home", async ({ page }) => {
+  test("hero → reel → THE SHIFT → vision → capabilities → declaration → profile → contact; no world in the home", async ({ page }) => {
     await open(page);
     const ids = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll<HTMLElement>("main [data-section]")).map((e) => e.dataset.section))]);
-    expect(ids).toEqual(["inicio", "trabajo", "shift", "capacidades", "propuesta", "perfil", "contacto"]);
+    // «Una sola visión» between THE SHIFT and the capabilities since docs/27 §3
+    expect(ids).toEqual(["inicio", "trabajo", "shift", "vision", "capacidades", "propuesta", "perfil", "contacto"]);
     for (const slug of ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"]) await expect(page.locator(`#${slug}`)).toHaveCount(0);
     await expect(page.locator("#shift h2")).toHaveText("De la complejidad al producto.");
     await expect(page.locator("#shift .shift-line")).toHaveText(LINES);
