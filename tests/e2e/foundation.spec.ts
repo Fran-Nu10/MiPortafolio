@@ -190,7 +190,7 @@ test.describe("a failed bundle (Spec §24 / §27 \"block GSAP chunk only\", Phas
     await page.route("**/*", (r) => (gsapChunks.some((c) => r.request().url().endsWith(c)) ? r.abort() : r.continue()));
     await page.goto("/", { waitUntil: "networkidle" });
     await expect(page.locator("html")).toHaveAttribute("data-js-failed", "");
-    expect(await page.locator("html").getAttribute("class")).not.toMatch(/js/);
+    expect(await page.locator("html").getAttribute("class")).not.toMatch(/\bjs\b/);
     // THE SHIFT reads as its static page: the four lines and the finished interface
     await expect(page.locator("#shift .shift-line").filter({ visible: true })).toHaveCount(4);
     expect(await page.locator("#shift .sh-frame .sh-done").evaluate((e) => Number(getComputedStyle(e).opacity))).toBe(1);
