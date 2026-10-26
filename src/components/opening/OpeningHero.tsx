@@ -4,6 +4,7 @@ import { useRef, type CSSProperties } from "react";
 import type { CutoutFiles } from "@/data/types";
 import { EASE } from "@/lib/motion";
 import { setJourney } from "@/lib/journey-store";
+import { TIER_QUERIES } from "@/lib/tiers";
 import { BAND_INSET, HERO_UNITS, HERO_UNITS_RM, OPENING, focusWhenReady, inset, parseInsetTop, splitName } from "@/lib/opening";
 import { aspectVars, type ResolvedAsset } from "@/lib/resolved";
 import { useScene, type SceneApi } from "@/lib/useScene";
@@ -214,7 +215,11 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
   // …and as far as the space under NÚÑEZ allows once it has parted down (+4vh)
   const copyBottom = p.support.getBoundingClientRect().bottom;
   const aboveSupport = p.support.getBoundingClientRect().top - p.idx0.parentElement!.getBoundingClientRect().top;
-  const lastBottom = p.last.getBoundingClientRect().bottom + 0.04 * H + 16;
+  // phones part the names less (docs/28 §3): FRANCO would rise under the header, NÚÑEZ into the copy
+  const phone = window.matchMedia(TIER_QUERIES.sm).matches;
+  const rise = (phone ? 0.02 : 0.06) * H;
+  const drop = (phone ? 0.015 : 0.04) * H;
+  const lastBottom = p.last.getBoundingClientRect().bottom + drop + 16;
   const headroom = copyBottom > lastBottom ? (copyBottom - lastBottom - aboveSupport) / Math.max(1, p.support.offsetHeight) : 1;
   const k = Math.max(1, Math.min(statement / lead, room, headroom));
   const grow = p.support.offsetHeight * (k - 1);
@@ -246,8 +251,8 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
   tl.addLabel("s:H1", 2);
   // H2 · positioning hold
   tl.to(p.portrait, { y: -0.12 * H, opacity: 0.55, duration: 0.9 }, 2.05);
-  tl.to(p.first, { y: -0.06 * H, duration: 0.9 }, 2.05);
-  tl.to(p.last, { y: 0.04 * H, duration: 0.9 }, 2.05);
+  tl.to(p.first, { y: -rise, duration: 0.9 }, 2.05);
+  tl.to(p.last, { y: drop, duration: 0.9 }, 2.05);
   tl.to(p.support, { scale: k, duration: 0.9 }, 2.05);
   tl.to([p.idx0.parentElement!, p.firma], { y: -grow, duration: 0.9 }, 2.05);
   tl.addLabel("s:H2", 3);

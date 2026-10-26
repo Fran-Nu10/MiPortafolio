@@ -542,12 +542,16 @@ html:not(.js) .hero-index,
 /* sm: the vertical crop — FRA / NCO above, NÚ / ÑEZ below (Revelado 2.2 §6) */
 @media (max-width: 767.98px) {
   .hero-stage {
-    /* FRA / NCO start low enough to part upward (−6vh at H2) without meeting the header */
-    --first-top: calc(var(--header-h) + 6svh);
+    /* the name takes what the screen leaves (docs/28 §3): four lines (FRA / NCO / NÚ / ÑEZ ≈ 3.9 em)
+       under the header, and the descriptor and the value proposition (≈ 300 px with their margins)
+       above the bottom — 26vw where that fits, smaller on short phones, never into the copy */
+    --hero-size: min(26vw, calc((100svh - var(--header-h) - 300px) / 3.9));
+    /* FRA / NCO clear the header even after their small rise at H2 (−2vh on phones) */
+    --first-top: calc(var(--header-h) + 2svh + 14px);
     /* the body overlaps the lower half of NCO */
     --portrait-top: calc(var(--first-top) + var(--hero-size) * 1.25);
-    /* portrait height: the 4:5 crop at 86vw, capped so the copy always fits below */
-    --ph: min(calc(86vw * 1.25), calc(100svh - var(--portrait-top) - 230px));
+    /* the portrait spans from NCO to the foot of ÑEZ */
+    --ph: min(calc(86vw * 1.25), calc(var(--hero-size) * 2.65));
   }
   .hero-name {
     /* stacked capitals with accents (Ú, Ñ) need room between the two lines */
@@ -568,10 +572,11 @@ html:not(.js) .hero-index,
     margin-inline: auto;
     aspect-ratio: var(--ar-m);
   }
+  /* NÚ / ÑEZ right under NCO, in front of the body */
   .hero-name-last {
     left: auto;
     right: calc(var(--hero-size) * -0.06);
-    top: calc(var(--portrait-top) + var(--ph) * 0.4);
+    top: calc(var(--first-top) + var(--hero-size) * 2.02);
     text-align: right;
   }
   .hero-copy {
