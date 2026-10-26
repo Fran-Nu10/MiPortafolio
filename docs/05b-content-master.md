@@ -918,3 +918,42 @@ El rojo queda sólo como:
 - **color propio de Rayo Smash:** el campo de su mundo.
 
 No se recolorean películas, fotografías, logotipos ni interfaces de los proyectos.
+
+## 26 — Servicios y limpieza de copy de producción (addendum local, 2026-10-26)
+
+> **Addendum de este export, pendiente de sincronizar con el Claude Doc.** Pedido de Franco «REVELADO 2.2 — FINAL UX & SERVICES REBUILD» (2026-10-26). Implementación: `docs/28-services-mobile-final-polish.md`. El copy de esta sección es el del brief, sin cambios.
+
+**Servicios** (reemplaza a Capacidades: §11/§14, §22 y §24, incluidas sus seis capacidades, sus escenas y sus referencias a proyectos):
+- **Nombre de la sección:** «Servicios».
+- **Titular:** «Lo que puedo crear para vos.»
+- **Subtítulo:** «De una página web a un sistema completo para tu negocio.»
+- **Los ocho servicios:**
+  - 01 — **Páginas web.** Sitios profesionales, landing pages, portfolios y páginas para marcas, negocios y profesionales.
+  - 02 — **Tiendas online.** Shopify, tiendas de ropa, ecommerce, catálogos digitales y experiencias de compra.
+  - 03 — **Sistemas a medida.** Plataformas de reservas, gestión de clientes, pedidos, ventas y procesos internos.
+  - 04 — **Diseño y experiencia.** Identidad visual digital, interfaces modernas, diseño responsive y experiencias interactivas.
+  - 05 — **Inteligencia artificial.** Asistentes inteligentes, automatizaciones, chatbots e integraciones para ahorrar tiempo.
+  - 06 — **Aplicaciones web.** Aplicaciones y plataformas digitales personalizadas, con usuarios, paneles y funcionalidades propias.
+  - 07 — **Publicidad en Meta Ads.** Campañas en Instagram y Facebook para llegar a personas interesadas en tus productos o servicios.
+  - 08 — **Estrategia digital.** Planificación y mejora de la presencia digital, desde la idea inicial hasta el lanzamiento.
+- **Lo que se retira:** el kicker «Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.» y el subgrupo «Después de publicar».
+- **Lo que no se agrega:** tecnologías, cifras ni resultados más allá de estas líneas.
+- **Enlace del último caso:** después de Chef Arturo, «Siguiente → Servicios». El ancla `/#capacidades` sigue llevando a la sección.
+
+**Copy de producción retirado** (anotaciones internas, no mensaje comercial):
+- **THE SHIFT:**
+  - la leyenda «Interfaz conceptual, diseñada para esta sección.»;
+  - las anotaciones del acto IV: «Retícula de N columnas», «Tipografía: Schibsted Grotesk» y «Estado: publicado».
+- **La interfaz conceptual:**
+  - pierde sus números: «01 — Producto» pasa a «Producto», y salen los «01 / 02 / 03» de sus módulos y su póster;
+  - sigue descripta para lectores de pantalla («Interfaz conceptual de un producto digital: …»);
+  - su marca visible es «Concepto».
+- **El índice «00 → 01» del hero:** queda como señal de la apertura. «00» aparece en O2 y «01» en el tic de O3, y se retira al entrar la composición (H1). La composición estática no lo muestra.
+
+**Se conserva**, porque cumple una función:
+- los estados de las interfaces de los casos;
+- los créditos;
+- el stack de Prospector;
+- los placeholders honestos de las pruebas pendientes;
+- la ayuda de interacción del reel («Arrastrá o usá ← →»);
+- las etiquetas del formulario.
