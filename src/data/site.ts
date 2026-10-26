@@ -71,19 +71,12 @@ export const SITE = {
       { n: "03", title: "La ejecución", line: "Y ejecución.", accent: "ejecución." },
       { n: "04", title: "El resultado", line: "De la idea al producto.", accent: "al producto." },
     ],
-    concept: "Interfaz conceptual, diseñada para esta sección.",
-    /** act IV: the system, annotated (the grid's columns are the ones each variant draws) */
-    notes: {
-      grid: (columns: number) => `Retícula de ${columns} columnas`,
-      type: "Tipografía: Schibsted Grotesk",
-      state: "Estado: publicado",
-    },
     /** the conceptual interface's own words (shown inside it; read as one image description) */
     ui: {
       brand: "Concepto",
       nav: ["Inicio", "Producto", "Contacto"],
       cta: "Empezar",
-      eyebrow: "01 — Producto",
+      eyebrow: "Producto",
       headline: ["Todo encuentra", "su lugar."],
       body: "Una estructura clara, para que cada parte cumpla su función.",
       button: "Explorar →",

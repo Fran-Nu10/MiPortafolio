@@ -81,12 +81,6 @@ export function Journey() {
           view={{
             heading: SITE.shift.heading,
             acts: SITE.shift.acts.map((a) => ({ ...a })),
-            concept: SITE.shift.concept,
-            notes: {
-              grid: { wide: SITE.shift.notes.grid(GRID_COLUMNS.wide), tablet: SITE.shift.notes.grid(GRID_COLUMNS.tablet), phone: SITE.shift.notes.grid(GRID_COLUMNS.phone) },
-              type: SITE.shift.notes.type,
-              state: SITE.shift.notes.state,
-            },
             ui: { ...SITE.shift.ui, nav: [...SITE.shift.ui.nav], headline: [...SITE.shift.ui.headline], cards: [...SITE.shift.ui.cards] },
           }}
         />

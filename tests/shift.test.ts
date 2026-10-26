@@ -134,9 +134,8 @@ describe("THE SHIFT · composition", () => {
     expect(explodeOffset(300, 300)).toBe(0);
   });
 
-  it("the grid annotation states the columns each variant draws", () => {
+  it("each variant draws its own grid", () => {
     expect(GRID_COLUMNS).toEqual({ wide: 12, tablet: 8, phone: 4 });
-    for (const v of SHIFT_VARIANTS) expect(SITE.shift.notes.grid(GRID_COLUMNS[v])).toContain(String(GRID_COLUMNS[v]));
   });
 });
 
@@ -145,8 +144,9 @@ describe("THE SHIFT · copy (Content Master §23)", () => {
     expect(SITE.shift.acts.map((a) => a.line)).toEqual(["Una idea no alcanza.", "Necesita dirección.", "Y ejecución.", "De la idea al producto."]);
   });
 
-  it("the interface says what it is: conceptual, no project, no metric", () => {
-    expect(SITE.shift.concept).toMatch(/conceptual/i);
+  it("the interface is described as conceptual (for screen readers; no visible caption since docs/28 §4): no project, no metric", () => {
+    expect(SITE.shift.ui.label).toMatch(/^Interfaz conceptual/);
+    expect(JSON.stringify(SITE.shift)).not.toMatch(/diseñada para esta sección|Retícula de|Estado: publicado|Tipografía:/);
     const ui = JSON.stringify(SITE.shift.ui);
     expect(ui).not.toMatch(/\d+\s*%|\+\d|clientes|ventas|usuarios/i);
     for (const name of ["TravelSuite", "Rayo", "Santi", "Chef", "Prospector"]) expect(ui).not.toContain(name);

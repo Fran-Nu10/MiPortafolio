@@ -30,8 +30,6 @@ export interface ShiftView {
   heading: string;
   acts: { n: string; title: string; line: string; accent: string }[];
   /** the caption that says what the interface is */
-  concept: string;
-  notes: { grid: Record<ShiftVariant, string>; type: string; state: string };
   ui: {
     brand: string;
     nav: string[];
@@ -137,9 +135,6 @@ export function Shift({ view }: { view: ShiftView }) {
       const frameAt = keys.indexOf("frame");
       const acts = q('[data-part="act"]');
       const cols = q('[data-part="col"]').filter((el) => el.offsetWidth > 0 || el.offsetHeight > 0);
-      const notes = q('[data-part="note"]').filter((el) => el.offsetWidth > 0);
-      const noteLines = notes.map((n) => n.querySelector<HTMLElement>('[data-part="note-line"]')!);
-      const concept = pick('[data-part="concept"]');
       const knob = pick('[data-part="knob"]');
       const track = pick('[data-part="track"]');
       const on = pick('[data-part="on"]');
@@ -168,8 +163,6 @@ export function Shift({ view }: { view: ShiftView }) {
       // first target immediately (the others would show their final state until the playhead got there)
       gsap.set(cols, { scaleY: 0, opacity: 0, transformOrigin: "50% 0%" });
       gsap.set(done, { opacity: 0 });
-      gsap.set(notes, { opacity: 0 });
-      gsap.set(noteLines, { scaleX: 0, transformOrigin: "0% 50%" });
 
       const tl = gsap.timeline({ defaults: { ease: EASE.none } });
       for (const s of SHIFT_STATES) tl.addLabel(`s:${s}`, SHIFT_AT[s]);
@@ -251,16 +244,9 @@ export function Shift({ view }: { view: ShiftView }) {
       if (card2) tl.fromTo(card2, { y: 0 }, { y: lift, duration: span("EJECUCION", 0.86, 1), ease: EASE.settle, immediateRender: false }, within("EJECUCION", 0.86));
       tl.fromTo(answer, { opacity: 0 }, { opacity: 1, duration: span("EJECUCION", 0.86, 1), immediateRender: true }, within("EJECUCION", 0.86));
 
-      // ── III → IV · the result: the camera steps back, the system is annotated ──
+      // ── III → IV · the result: the camera steps back on the finished interface ──
       swap(2, "RESULTADO");
       tl.fromTo(plane, { scale: 1 }, { scale: RESULT_SCALE[variant], duration: span("RESULTADO", 0.05, 0.7), ease: EASE.settle, immediateRender: false }, within("RESULTADO", 0.05));
-      tl.fromTo(noteLines, { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: span("RESULTADO", 0.4, 0.75), ease: EASE.settle, stagger: span("RESULTADO", 0, 0.06), immediateRender: true }, within("RESULTADO", 0.4));
-      tl.fromTo(notes, { opacity: 0 }, { opacity: 1, duration: span("RESULTADO", 0.42, 0.72), stagger: span("RESULTADO", 0, 0.06), immediateRender: true }, within("RESULTADO", 0.42));
-      // the caption follows the interface's lower left corner as it steps back
-      const k = 1 - RESULT_SCALE[variant];
-      const cx = (k * planeBox.w) / 2;
-      const cy = -(k * planeBox.h) / 2;
-      tl.fromTo(concept, { opacity: 0, x: cx, y: cy + 8 }, { opacity: 1, x: cx, y: cy, duration: span("RESULTADO", 0.6, 0.95), ease: EASE.settle, immediateRender: true }, within("RESULTADO", 0.6));
 
       // the hold: the result rests until the pin releases
       tl.set({}, {}, SHIFT_UNITS);
@@ -317,7 +303,6 @@ export function Shift({ view }: { view: ShiftView }) {
                     <span className="sh-poster">
                       <span className="sh-sun" />
                       <span className="sh-horizon" />
-                      <span className="sh-poster-n">01</span>
                     </span>
                   }
                 />
@@ -328,14 +313,12 @@ export function Shift({ view }: { view: ShiftView }) {
                     raw={
                       <>
                         <span className="sh-thumb" />
-                        <span className="sh-card-n">{String(i + 1).padStart(2, "0")}</span>
                         <span className="sh-card-t">{c}</span>
                       </>
                     }
                     done={
                       <>
                         <span className="sh-thumb" data-shape={i} />
-                        <span className="sh-card-n">{String(i + 1).padStart(2, "0")}</span>
                         <span className="sh-card-t">{c}</span>
                         {i === 1 ? <span data-part="answer" className="sh-answer" /> : null}
                       </>
@@ -398,28 +381,8 @@ export function Shift({ view }: { view: ShiftView }) {
                   }
                 />
               </div>
-              <figcaption data-part="concept" className="shift-concept micro">
-                {view.concept}
-              </figcaption>
             </figure>
 
-            {/* act IV: the system, annotated (decorative: the interface's label already describes it) */}
-            <p data-part="note" data-n="grid" className="sh-note" aria-hidden="true">
-              <span data-part="note-line" className="sh-note-line" />
-              {SHIFT_VARIANTS.map((v) => (
-                <span key={v} data-v={v} className="sh-note-v">
-                  {view.notes.grid[v]}
-                </span>
-              ))}
-            </p>
-            <p data-part="note" data-n="type" className="sh-note" aria-hidden="true">
-              <span data-part="note-line" className="sh-note-line" />
-              {view.notes.type}
-            </p>
-            <p data-part="note" data-n="state" className="sh-note" aria-hidden="true">
-              <span data-part="note-line" className="sh-note-line" />
-              {view.notes.state}
-            </p>
           </div>
         </div>
       </div>

@@ -353,7 +353,6 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       // THE SHIFT (Content Master 23): the title, the four acts and what the interface is
       SITE.shift.heading,
       ...SITE.shift.acts.flatMap((a) => [a.title, a.line]),
-      SITE.shift.concept,
       // «Una sola visión» (Content Master 25): the title, the three stages and the close
       ...SITE.vision.heading,
       ...SITE.vision.stages.flatMap((s) => [s.word, s.line]),

@@ -476,6 +476,12 @@ html.js .site-header[data-revealed="false"]:not(:focus-within) {
 .hero-index [data-part="index-1"] {
   color: var(--color-accent);
 }
+/* the index is the opening's cue (00 in O2, 01 at O3) and leaves with H1 (docs/28 §4): the static
+   composition — no JS, reduced motion, tiny viewports — never shows it */
+html:not(.js) .hero-index,
+.hero:not([data-anim]) .hero-index {
+  display: none;
+}
 /* the positioning line (Content Master 21): ~1.3× the lead size, heavier, balanced in three lines —
    a statement that holds its own beside the monumental name without competing with it */
 .hero-support {
@@ -1247,11 +1253,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   width: 100%;
   aspect-ratio: var(--ui-ar);
 }
-.shift-concept {
-  margin: 0;
-  color: var(--color-muted);
-}
-.sh-note,
 .sh-grid {
   display: none;
 }
@@ -1365,9 +1366,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   border: 1px solid currentColor;
   border-radius: 999px;
 }
-.sh-eyebrow,
-.sh-card-n,
-.sh-poster-n {
+.sh-eyebrow {
   font-family: var(--font-mono);
   letter-spacing: 0.08em;
 }
@@ -1460,13 +1459,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   height: 1px;
   background: rgb(237 232 222 / 0.5);
 }
-.sh-poster-n {
-  position: absolute;
-  left: 6%;
-  bottom: 8%;
-  font-size: 0.8em;
-  color: rgb(237 232 222 / 0.7);
-}
 .sh-cross {
   position: absolute;
   inset: 0;
@@ -1509,11 +1501,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
 .sh-done .sh-thumb[data-shape="2"] {
   background: linear-gradient(to top, var(--color-ink) 50%, transparent 50%);
   box-shadow: inset 0 0 0 1px var(--color-ink);
-}
-.sh-card-n {
-  font-size: 0.72em;
-  /* ≥ 4.5:1 on the module paper */
-  opacity: 0.72;
 }
 .sh-card-t {
   font-weight: 600;
@@ -1674,9 +1661,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   html.js .shift-stage[data-anim] .shift-ui {
     transform-style: preserve-3d;
   }
-  html.js .shift-stage[data-anim] .shift-concept {
-    opacity: 0;
-  }
   html.js .shift-stage[data-anim] .sh-el {
     will-change: transform;
   }
@@ -1703,9 +1687,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
     color: var(--color-muted);
   }
   /* the raw type stays AA on black at every pose (it is read as part of the image, but it is type) */
-  html.js .shift-stage[data-anim] .sh-raw .sh-card-n {
-    opacity: 1;
-  }
   html.js .shift-stage[data-anim] .sh-chip [data-part="draft"] {
     opacity: 1;
   }
@@ -1730,42 +1711,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
       inset -1px 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
   }
   html.js .shift-stage[data-anim] .sh-col:nth-child(n + 5) {
-    display: none;
-  }
-
-  /* act IV: the annotations */
-  html.js .shift-stage[data-anim] .sh-note {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    gap: 1.6cqw;
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: max(11px, 2.6cqw);
-    letter-spacing: 0.06em;
-    color: var(--color-paper-2);
-    white-space: nowrap;
-    opacity: 0;
-  }
-  html.js .shift-stage[data-anim] .sh-note-line {
-    flex: none;
-    width: 5cqw;
-    height: 1px;
-    background: var(--color-accent);
-  }
-  html.js .shift-stage[data-anim] .sh-note-v:not([data-v="phone"]) {
-    display: none;
-  }
-  /* phones: the annotations above the interface (it steps back from the act lines), the caption under it */
-  html.js .shift-stage[data-anim] .sh-note[data-n="grid"] {
-    left: 6%;
-    top: 28.6%;
-  }
-  html.js .shift-stage[data-anim] .sh-note[data-n="state"] {
-    left: 54%;
-    top: 28.6%;
-  }
-  html.js .shift-stage[data-anim] .sh-note[data-n="type"] {
     display: none;
   }
 
@@ -1808,32 +1753,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
     html.js .shift-stage[data-anim] .sh-col:nth-child(n + 9) {
       display: none;
     }
-    html.js .shift-stage[data-anim] .sh-note {
-      font-size: max(11px, 1.5cqw);
-      gap: 1cqw;
-    }
-    html.js .shift-stage[data-anim] .sh-note-line {
-      width: 3cqw;
-    }
-    html.js .shift-stage[data-anim] .sh-note-v[data-v="phone"] {
-      display: none;
-    }
-    html.js .shift-stage[data-anim] .sh-note-v[data-v="tablet"] {
-      display: inline;
-    }
-    html.js .shift-stage[data-anim] .sh-note[data-n="grid"] {
-      left: 8%;
-      top: 91.6%;
-    }
-    html.js .shift-stage[data-anim] .sh-note[data-n="type"] {
-      left: 38%;
-      top: 91.6%;
-      display: flex;
-    }
-    html.js .shift-stage[data-anim] .sh-note[data-n="state"] {
-      left: 72%;
-      top: 91.6%;
-    }
   }
 
   /* landscape screens */
@@ -1874,33 +1793,6 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
     }
     html.js .shift-stage[data-anim] .sh-col:nth-child(n + 5) {
       display: block;
-    }
-    html.js .shift-stage[data-anim] .sh-note {
-      font-size: max(11px, 0.85cqw);
-      gap: 0.6cqw;
-    }
-    html.js .shift-stage[data-anim] .sh-note-line {
-      width: 2cqw;
-    }
-    html.js .shift-stage[data-anim] .sh-note-v[data-v="phone"] {
-      display: none;
-    }
-    html.js .shift-stage[data-anim] .sh-note-v[data-v="wide"] {
-      display: inline;
-    }
-    html.js .shift-stage[data-anim] .sh-note[data-n="grid"] {
-      left: 38%;
-      top: 10.4%;
-    }
-    html.js .shift-stage[data-anim] .sh-note[data-n="type"] {
-      left: 66%;
-      top: 10.4%;
-      display: flex;
-    }
-    html.js .shift-stage[data-anim] .sh-note[data-n="state"] {
-      left: auto;
-      right: 9%;
-      top: 74.4%;
     }
   }
 }
@@ -3063,7 +2955,8 @@ html.js .at-work-stage[data-anim] {
   --vision-close-gap: 64px;
   /* the close's line height in px (lead × 1.3): where its point sits */
   --vision-close-lh: calc(var(--type-lead) * 1.3);
-  padding: 16svh var(--gutter) 14svh;
+  /* phones: THE SHIFT's interface ends right above (its caption is gone, docs/28 §4): less air before the title */
+  padding: 8svh var(--gutter) 14svh;
   max-width: calc(1280px + 2 * var(--gutter));
   margin-inline: auto;
 }
@@ -3189,6 +3082,11 @@ html.js .at-work-stage[data-anim] {
   fill: var(--color-accent);
 }
 /* tablets: each stage's figure beside its words */
+@media (min-width: 768px) {
+  .vision {
+    padding-top: 16svh;
+  }
+}
 @media (min-width: 768px) and (max-width: 1023.98px) {
   .vision {
     --fig: 132px;

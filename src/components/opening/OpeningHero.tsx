@@ -241,6 +241,8 @@ function buildFull(api: SceneApi, played: { current: boolean }): gsap.core.Timel
   tl.fromTo(p.last, MASKED, { ...SHOWN, duration: 0.7, immediateRender: false }, 1.18);
   tl.fromTo(p.firma, MASKED, { ...SHOWN, duration: 0.5, immediateRender: false }, 1.4);
   tl.fromTo(p.support, MASKED, { ...SHOWN, duration: 0.5, immediateRender: false }, 1.48);
+  // the index was the opening's cue: it leaves as the composition arrives (docs/28 §4)
+  tl.fromTo(p.idx1, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.3, ease: EASE.settle, immediateRender: false }, 1.3);
   tl.addLabel("s:H1", 2);
   // H2 · positioning hold
   tl.to(p.portrait, { y: -0.12 * H, opacity: 0.55, duration: 0.9 }, 2.05);
@@ -365,7 +367,7 @@ function buildReduced(api: SceneApi): gsap.core.Timeline | null {
 
   const tl = gsap.timeline();
   tl.addLabel("s:O2", 0);
-  tl.set([p.first, p.last, p.firma, p.support, p.idx1], { autoAlpha: 1 }, 0.5);
+  tl.set([p.first, p.last, p.firma, p.support], { autoAlpha: 1 }, 0.5);
   tl.addLabel("s:H1", 0.5);
   tl.to({}, { duration: HERO_UNITS_RM - 0.5 }, 0.5);
   return tl;

@@ -147,10 +147,10 @@ test.describe("the transformation (pinned, with motion)", () => {
     const meter = await look(page, "#shift .sh-done .sh-meter");
     expect(fill.width).toBeGreaterThan(meter.width - 1);
 
-    // the result: the camera steps back, the caption says what the interface is
+    // the result: the camera steps back on the finished interface; no caption, no annotation (docs/28 §4)
     await toState(page, "RESULTADO");
-    expect((await look(page, "#shift [data-part=concept]")).o).toBeGreaterThan(0.99);
-    await expect(page.locator("#shift [data-part=concept]")).toHaveText("Interfaz conceptual, diseñada para esta sección.");
+    expect(await page.locator("#shift figcaption, #shift .sh-note, #shift [data-part=concept]").count()).toBe(0);
+    expect(await page.locator("#shift").innerText()).not.toMatch(/Interfaz conceptual|Retícula de|Estado: publicado|Tipografía:/);
     const ui = await look(page, "#shift [data-part=plane]");
     const vw = page.viewportSize()!.width;
     expect(ui.left).toBeGreaterThanOrEqual(0);
@@ -163,7 +163,6 @@ test.describe("the transformation (pinned, with motion)", () => {
 
     // back, state by state, to the disorder again
     for (const s of [...SHIFT_STATES].reverse()) await toState(page, s);
-    expect((await look(page, "#shift [data-part=concept]")).o).toBeLessThan(0.01);
     expect((await look(page, "#shift [data-part=on]")).o).toBeLessThan(0.01);
     const again = await drift(page);
     expect(again.filter((f) => f.d > 20).length / again.length).toBeGreaterThan(0.8);
@@ -280,27 +279,26 @@ test.describe("static page", () => {
       expect(y).toBeGreaterThan(last);
       last = y;
     }
-    // the finished interface, at rest: the switch on, «Publicado», the caption
+    // the finished interface, at rest: the switch on, «Publicado»; nothing annotates it
     expect((await look(page, "#shift .sh-frame .sh-done")).o).toBeGreaterThan(0.99);
     expect((await look(page, "#shift [data-part=live]")).o).toBeGreaterThan(0.99);
     expect((await look(page, "#shift [data-part=draft]")).o).toBeLessThan(0.01);
-    expect((await look(page, "#shift [data-part=concept]")).o).toBeGreaterThan(0.99);
-    expect(await page.locator("#shift .sh-note:visible").count()).toBe(0);
+    expect(await page.locator("#shift figcaption, #shift .sh-note").count()).toBe(0);
     const results = await new AxeBuilder({ page }).include("#shift").analyze();
     expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => v.id)).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
     expect(problems).toEqual([]);
   });
 
-  test("without JavaScript: the four lines, the interface and its caption", async ({ browser }, info) => {
+  test("without JavaScript: the four lines and the interface (described for screen readers, no visible caption)", async ({ browser }, info) => {
     const ctx = await browser.newContext({ ...info.project.use, javaScriptEnabled: false });
     const page = await ctx.newPage();
     await page.goto("/");
     const s = page.locator("#shift");
     await expect(s.locator(".shift-line")).toHaveText(LINES);
     await expect(s.locator("[role=img]")).toHaveAttribute("aria-label", /Interfaz conceptual/);
-    await expect(s.locator("figcaption")).toHaveText("Interfaz conceptual, diseñada para esta sección.");
-    for (const sel of [".shift-line", ".sh-frame .sh-done", ".sh-h1a .sh-done", "figcaption"]) {
+    await expect(s.locator("figcaption")).toHaveCount(0);
+    for (const sel of [".shift-line", ".sh-frame .sh-done", ".sh-h1a .sh-done"]) {
       const o = await s.locator(sel).first().evaluate((e) => Number(getComputedStyle(e).opacity));
       expect(o, sel).toBe(1);
     }
