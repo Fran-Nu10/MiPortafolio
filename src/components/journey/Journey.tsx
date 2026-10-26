@@ -1,23 +1,18 @@
-import { CAPABILITIES } from "@/data/capabilities";
 import { PROFILE } from "@/data/profile";
-import { PROJECTS, getProject } from "@/data/projects";
-import { RAYO_LAYERS, RAYO_STACK } from "@/data/rayo-layers";
+import { PROJECTS } from "@/data/projects";
+import { SERVICES } from "@/data/services";
 import { SITE } from "@/data/site";
 import { resolveAsset } from "@/lib/assets";
 import { confirmed, indexLabel, liveLabel, miniLabel, routeErrorText } from "@/lib/content";
 import { showreelOf } from "@/lib/showreel";
-import { TS_KEY_WORDS, splitField } from "@/lib/ts-world";
-import { splitPurchaseLine } from "@/lib/chef-world";
-import { SCENE_FOR, wordsFromStatement } from "@/lib/capabilities-index";
 import { splitFinal } from "@/lib/declaration";
-import { GRID_COLUMNS } from "@/lib/shift";
-import { CapabilitiesIndex, type CapabilityItemView, type SceneData } from "@/components/capabilities/CapabilitiesIndex";
 import { FinalCta } from "@/components/contact/FinalCta";
 import { Declaration } from "@/components/declaration/Declaration";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { FrancoAtWork } from "@/components/moments/FrancoAtWork";
 import { OpeningHero } from "@/components/opening/OpeningHero";
 import { Profile } from "@/components/profile/Profile";
+import { Services } from "@/components/services/Services";
 import { ProjectReel, type ReelItemView } from "@/components/reel/ProjectReel";
 import { Shift } from "@/components/shift/Shift";
 import { Vision } from "@/components/vision/Vision";
@@ -27,7 +22,7 @@ import { headerView, openLink } from "./shared";
 
 /**
  * The home journey (Spec §01–§03, docs/25): one server-rendered document. Hero → reel (what is
- * built) → THE SHIFT (how complexity becomes product) → capabilities → the declaration → profile →
+ * built) → THE SHIFT (how complexity becomes product) → Una sola visión → services → the declaration → profile →
  * contact. The four project worlds are not scenes of it any more: each is its own case at
  * `/trabajo/{slug}` (CaseStudy), opened from the reel. Every word of copy is in the initial HTML;
  * motion is layered on top by each section's own client code. Copy flows server → client as props;
@@ -86,14 +81,8 @@ export function Journey() {
         />
         {/* how the work is done (docs/27 §3): one figure through Pensar → Diseñar → Construir */}
         <Vision view={{ heading: SITE.vision.heading, stages: SITE.vision.stages.map((s) => ({ ...s })), close: SITE.vision.close }} />
-        <CapabilitiesIndex
-          view={{
-            heading: SITE.capabilities.heading,
-            kicker: SITE.capabilities.kicker,
-            subKicker: SITE.capabilities.subKicker,
-            items: CAPABILITIES.map(capabilityItem),
-          }}
-        />
+        {/* what can be built for the visitor (docs/28 §1): eight services, an accordion */}
+        <Services view={{ label: SITE.services.label, heading: SITE.services.heading, sub: SITE.services.sub, items: SERVICES.map((s) => ({ ...s })) }} />
         {/* the bridge from what was built to what can be built for the visitor (docs/22 §2) */}
         <Declaration
           view={{
@@ -144,54 +133,4 @@ export function Journey() {
       <JourneyClient initial={null} titles={{}} homeTitle={SITE.meta.title} />
     </>
   );
-}
-
-/**
- * A capability of the live index (docs/26 §C): its copy (Content Master 22) and its scene. Every
- * scene reuses the projects' own approved copy and real material — no metric, no invented result;
- * the few words a scene adds come from its capability's own statement.
- */
-function capabilityItem(c: (typeof CAPABILITIES)[number]): CapabilityItemView {
-  const key = c.evidence.variant === "element" ? c.evidence.element : "typographic";
-  return { index: c.index, name: c.name, statement: c.statement, group: c.group, attribution: c.attribution, scene: sceneData(SCENE_FOR[key], c.statement) };
-}
-
-function sceneData(id: SceneData["id"], statement: string): SceneData {
-  const ts = getProject("travelsuite360")!;
-  const chef = getProject("chef-arturo")!;
-  const santi = getProject("santi-nuca")!;
-  const fields = (["TS03.dest", "TS03.date", "TS03.pax"] as const).map((k) => splitField(ts.worldCopy[k]));
-  switch (id) {
-    case "product":
-      return {
-        id,
-        message: ts.worldCopy["TS01.message"],
-        interpreted: ts.worldCopy["TS03.label"],
-        fields,
-        quote: `${ts.worldCopy["TS04.q1"]} · ${ts.worldCopy["TS04.q2"]}`,
-        reservation: ts.worldCopy["TS07.reservation"],
-      };
-    case "engineering":
-      // Santi Nuca's real interface (its film's first frame) over the layers its statement names
-      return { id, poster: resolveAsset(santi.reel.loop).poster ?? resolveAsset(santi.reel.poster), layers: wordsFromStatement(statement, ["Front", "Back", "Datos"]) };
-    case "commerce": {
-      const { stepper, add, pay } = splitPurchaseLine(chef.worldCopy["C06.purchase"]);
-      const [product, price] = chef.worldCopy["C05.product"].split(" · ");
-      return { id, photo: resolveAsset("chef.product"), product: `${product} · ${price}`, stepper, add, pay };
-    }
-    case "ai":
-      return {
-        id,
-        message: ts.worldCopy["TS01.message"],
-        words: [
-          { word: TS_KEY_WORDS.dest, label: fields[0].label, value: fields[0].value },
-          { word: TS_KEY_WORDS.date, label: fields[1].label, value: fields[1].value },
-          { word: TS_KEY_WORDS.pax, label: fields[2].label, value: fields[2].value },
-        ],
-      };
-    case "interactive":
-      return { id, layers: RAYO_LAYERS.map((l) => ({ name: l.name, asset: resolveAsset(l.key), offset: l.offset })), aspect: RAYO_STACK.aspect };
-    case "growth":
-      return { id, stations: wordsFromStatement(statement, ["Negocios", "Personas", "Próximos clientes"]) };
-  }
 }

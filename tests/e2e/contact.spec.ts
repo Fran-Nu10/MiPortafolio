@@ -136,7 +136,7 @@ test.describe("transport failures (Spec §24, Phase 13)", () => {
       await expect(page.getByLabel("Nombre")).toHaveValue("Ana");
       await expect(page.getByLabel("¿Qué estamos construyendo?")).toHaveValue("Una tienda para mi pastelería.");
       // the journey is still there (not Next's error screen)
-      await expect(page.locator("#capacidades")).toHaveCount(1);
+      await expect(page.locator("#servicios")).toHaveCount(1);
       await context.setOffline(false);
       await page.unroute("**/*");
     }

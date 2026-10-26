@@ -178,7 +178,7 @@ export const PROJECTS: Project[] = [
       openLabel: "Abrir Chef Arturo en una pestaña nueva",
       worldSummary: [],
     },
-    next: "capacidades",
+    next: "servicios",
     meta: {
       title: "Chef Arturo — Franco Núñez",
       description: "Una pastelería que se vende por la foto y se cobra por Mercado Pago o WhatsApp.",

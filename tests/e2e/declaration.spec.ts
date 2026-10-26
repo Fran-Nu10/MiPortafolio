@@ -5,7 +5,7 @@ import { jump, scenesBuilt, settled } from "./scroll";
 
 /**
  * The commercial declaration (Content Master 20, docs/22): MOSTRAR → CONVENCER → CONVERTIR between
- * the capabilities and the profile. Pinned choreography on every tier with motion (its own drawing
+ * the services and the profile. Pinned choreography on every tier with motion (its own drawing
  * per variant), eight resting states forward and back, no jump in or out, the URL in step; a
  * static editorial page under reduced motion, on tiny viewports and without JavaScript.
  */
@@ -72,12 +72,12 @@ const look = (page: Page, sel: string) =>
   }, sel);
 
 test.describe("place in the journey", () => {
-  test("between the capabilities and the profile", async ({ page }) => {
+  test("between the services and the profile", async ({ page }) => {
     await open(page);
     // the home journey since THE SHIFT (docs/25): the worlds are their projects' cases
     const ids = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll<HTMLElement>("[data-section]")).map((e) => e.dataset.section))]);
-    // «Una sola visión» between THE SHIFT and the capabilities since docs/27 §3
-    expect(ids).toEqual(["inicio", "trabajo", "shift", "vision", "capacidades", "propuesta", "perfil", "contacto"]);
+    // «Una sola visión» between THE SHIFT and the services since docs/27 §3
+    expect(ids).toEqual(["inicio", "trabajo", "shift", "vision", "servicios", "propuesta", "perfil", "contacto"]);
     await expect(page.locator("#propuesta h2")).toHaveText("MOSTRAR. CONVENCER. CONVERTIR.");
     await expect(page.locator("#propuesta h3")).toHaveText(TITLES);
   });
@@ -177,7 +177,7 @@ test.describe("the choreography (pinned, with motion)", () => {
     expect(after.o).toBeGreaterThan(0.99);
   });
 
-  test("the address follows the visitor: capacidades → propuesta → perfil, without history entries", async ({ page }) => {
+  test("the address follows the visitor: servicios → propuesta → perfil, without history entries", async ({ page }) => {
     await open(page);
     test.skip(await tiny(page), "tiny viewports: covered by the static layout");
     const length = await page.evaluate(() => history.length);
@@ -186,8 +186,8 @@ test.describe("the choreography (pinned, with motion)", () => {
     await expect.poll(() => page.evaluate(() => location.hash)).toBe("#propuesta");
     await page.evaluate(() => document.getElementById("perfil")!.scrollIntoView({ behavior: "instant" }));
     await expect.poll(() => page.evaluate(() => location.hash)).toBe("#perfil");
-    await page.evaluate(() => document.getElementById("capacidades")!.scrollIntoView({ behavior: "instant" }));
-    await expect.poll(() => page.evaluate(() => location.hash)).toBe("#capacidades");
+    await page.evaluate(() => document.getElementById("servicios")!.scrollIntoView({ behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe("#servicios");
     expect(await page.evaluate(() => history.length)).toBe(length);
   });
 

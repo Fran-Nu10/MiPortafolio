@@ -11,7 +11,7 @@ import { anchorView, queueRefresh, scenesReady } from "@/lib/useScene";
 /**
  * Mounts once per journey (Spec §03, §20). Renders nothing.
  * - section tracking → store; store → URL and title (replaceState only)
- * - in-journey links (reel "Ver caso", "Siguiente →", header, capabilities) → pushState + jump,
+ * - in-journey links (reel "Ver caso", "Siguiente →", header, services) → pushState + jump,
  *   handled in the bubble phase so the reel (a drag is not a click) and the overlay can veto
  * - Back / Forward → the remembered position
  * - start: a deep link lands on its world's SCREEN state; a reload (or Back from another document)

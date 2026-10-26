@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { ASSETS } from "@/data/assets";
-import { CAPABILITIES } from "@/data/capabilities";
+import { SERVICES } from "@/data/services";
 import { PROFILE } from "@/data/profile";
 import { PROJECTS, getProject } from "@/data/projects";
 import { SITE } from "@/data/site";
@@ -56,7 +56,7 @@ function pendingValues(value: unknown, out: string[] = []): string[] {
 const SITE_STRINGS = [
   ...renderable(SITE, "SITE"),
   ...renderable(PROJECTS, "PROJECTS"),
-  ...renderable(CAPABILITIES, "CAPABILITIES"),
+  ...renderable(SERVICES, "SERVICES"),
   ...renderable(PROFILE, "PROFILE"),
   ...ASSETS.flatMap((a) => (a.alt ? [{ path: `ASSETS.${a.key}.alt`, text: a.alt }] : [])),
 ];
@@ -165,39 +165,14 @@ describe("rule 4 · Chef Arturo", () => {
   });
 });
 
-// ── rule 5 · capability 06 without metrics ──────────────────────────────────
+// ── rule 5 · services without metrics (the capabilities became Servicios, docs/28 §1) ──────────
 
-describe("rule 5 · capabilities", () => {
-  it("six capabilities, five core and one extended", () => {
-    expect(CAPABILITIES.map((c) => c.name)).toEqual([
-      "Producto",
-      "Ingeniería web",
-      "Comercio digital",
-      "IA y automatización",
-      "Experiencias interactivas",
-      "Meta Ads y crecimiento",
-    ]);
-    expect(CAPABILITIES.filter((c) => c.group === "core")).toHaveLength(5);
-    expect(CAPABILITIES[5].group).toBe("extended");
-  });
-
-  it("06 is «Meta Ads y crecimiento» (brief of 2026-10-21) with no numbers and no promised results", () => {
-    const c6 = CAPABILITIES[5];
-    expect(c6.statement).toBe(
-      "Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.",
-    );
-    expect(c6.evidence.variant).toBe("typographic");
-    expect(`${c6.name} ${c6.statement} ${c6.attribution.label}`).not.toMatch(/\d/);
-  });
-
-  it("any metric needs authorization and a source", () => {
-    for (const c of CAPABILITIES) {
-      if (c.evidence.variant !== "campaign") continue;
-      for (const m of c.evidence.metrics) {
-        expect(m.authorized, `${c.name}: ${m.label}`).toBe(true);
-        expect(m.source, `${c.name}: ${m.label}`).toBeTruthy();
-      }
-    }
+describe("rule 5 · services", () => {
+  it("eight services; Meta Ads is a service with no figure and no promised result", () => {
+    expect(SERVICES).toHaveLength(8);
+    const ads = SERVICES.find((s) => s.name === "Publicidad en Meta Ads")!;
+    expect(ads.line).toBe("Campañas en Instagram y Facebook para llegar a personas interesadas en tus productos o servicios.");
+    expect(`${ads.name} ${ads.line}`).not.toMatch(/\d|%|ventas|resultados/i);
   });
 
   it("no unconfirmed advertising claim anywhere", () => {
@@ -249,7 +224,7 @@ describe("the selection is open-ended (Content Master 21)", () => {
   const CLOSED = /cuatro (productos|proyectos|mundos)|los cuatro|el quint[oa]|la quint[oa]|quint[oa] (producto|proyecto)|en blanco|0?1\s?[–-]\s?0?4\b|\b1\s?[–-]\s?4\b/i;
   const RENDERED = [
     ...renderable(SITE, "SITE"),
-    ...renderable(CAPABILITIES, "CAPABILITIES"),
+    ...renderable(SERVICES, "SERVICES"),
     ...renderable(PROFILE, "PROFILE"),
     ...PROJECTS.flatMap((p) => renderable({ reelLine: p.reelLine, relationLine: p.relationLine, microCase: p.microCase, proofLine: p.proofLine, meta: p.meta }, `PROJECT.${p.id}`)),
   ];
@@ -266,9 +241,9 @@ describe("the selection is open-ended (Content Master 21)", () => {
     expect(SITE.reel.restHint(7)).toBe("arrastrá · ← → · 1–7");
   });
 
-  it("the heading and the capabilities kicker carry no number", () => {
+  it("the reel's and the services' headings carry no number", () => {
     expect(SITE.reel.heading).toBe("Proyectos que construí.");
-    expect(SITE.capabilities.kicker).toBe("Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.");
+    expect(SITE.services.heading).toBe("Lo que puedo crear para vos.");
   });
 });
 
@@ -357,7 +332,10 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
       ...SITE.vision.heading,
       ...SITE.vision.stages.flatMap((s) => [s.word, s.line]),
       SITE.vision.close,
-      ...CAPABILITIES.map((c) => c.statement),
+      // Servicios (Content Master 26): the headline, the subtitle, each service's name and line
+      SITE.services.heading,
+      SITE.services.sub,
+      ...SERVICES.flatMap((s) => [s.name, s.line]),
       // the profile (Content Master 21 and 25): the declaration, the explanation, its visuals' words, Meta Ads
       PROFILE.core,
       ...PROFILE.body,
@@ -401,7 +379,7 @@ describe.skipIf(!built)("rendered HTML · production build", () => {
     for (const m of must) expect(html, `trabajo/${id}.html misses «${m}»`).toContain(escapeHtml(m));
     // a case is one case: no other project's world, no home section
     for (const other of PROJECTS.filter((o) => o.id !== id)) expect(html).not.toContain(`id="${other.id}"`);
-    for (const section of ["inicio", "shift", "capacidades", "propuesta", "perfil", "contacto"]) expect(html).not.toContain(`id="${section}"`);
+    for (const section of ["inicio", "shift", "servicios", "propuesta", "perfil", "contacto"]) expect(html).not.toContain(`id="${section}"`);
   });
 });
 

@@ -6,7 +6,7 @@ import type { SectionId } from "./journey-store";
  * and each project's case (`/trabajo/{slug}`, its world and proof). The mapping is the same for both.
  *
  * - a world is the active section → `/trabajo/{slug}` (its own document)
- * - capacidades / propuesta / perfil / contacto → `/#{id}`
+ * - servicios / propuesta / perfil / contacto → `/#{id}` (the old `#capacidades` still lands on Servicios)
  * - anything else (opening, reel) → `/`
  *
  * Pure mapping, used on the server too. The history side (replaceState while scrolling,
@@ -14,7 +14,7 @@ import type { SectionId } from "./journey-store";
  */
 
 const PROJECT_SECTIONS: readonly ProjectSlug[] = ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"];
-const ANCHOR_SECTIONS = ["capacidades", "propuesta", "perfil", "contacto"] as const;
+const ANCHOR_SECTIONS = ["servicios", "propuesta", "perfil", "contacto"] as const;
 
 export function isProjectSection(s: SectionId): s is ProjectSlug {
   return (PROJECT_SECTIONS as readonly string[]).includes(s);
@@ -28,7 +28,8 @@ export function pathForSection(section: SectionId): string {
 
 export function sectionForLocation(pathname: string, hash = ""): SectionId | null {
   // an anchor wins over the path: "#perfil" means Perfil on every journey URL
-  const h = hash.replace(/^#/, "");
+  // the capabilities became Servicios (docs/28 §1): links shared with the old anchor keep landing there
+  const h = hash.replace(/^#/, "") === "capacidades" ? "servicios" : hash.replace(/^#/, "");
   if ((ANCHOR_SECTIONS as readonly string[]).includes(h)) return h as SectionId;
   if (h === "trabajo") return "trabajo";
   // any other fragment (the skip link, the no-JS "Ir a …") is the browser's

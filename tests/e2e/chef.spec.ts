@@ -6,7 +6,7 @@ import { jump } from "./scroll";
 /**
  * Phase 8 acceptance (Spec §26): C00–C07 + reduced motion · the image element is the same DOM
  * node from C02 to C06 · the DOM commerce UI has no focusable fake controls. Plus continuity
- * from Santi and toward Capacidades, tiers, reversal, the facts, accessibility and no-JS.
+ * from Santi and toward Servicios, tiers, reversal, the facts, accessibility and no-JS.
  */
 
 const U = 6.4;
@@ -182,13 +182,13 @@ test.describe("C00–C07 at the reference viewport", () => {
     expect(closeBox.y).toBeGreaterThanOrEqual(photo.y + photo.h - 1);
     await shot(page, "C07 CIERRE");
 
-    // the proof: the honest line, the role, "Siguiente → Capacidades"
+    // the proof: the honest line, the role, "Siguiente → Servicios"
     const proof = page.locator('[data-proof="chef-arturo"]');
     await proof.scrollIntoViewIfNeeded();
     await expect(proof.getByText("Tienda real, en línea.")).toBeVisible();
     await expect(proof.getByText("pagos en producción")).toHaveCount(0);
     await expect(proof.getByText("Producto, diseño y desarrollo")).toBeVisible();
-    await expect(proof.getByRole("link", { name: /Siguiente/ })).toHaveText(/Capacidades/);
+    await expect(proof.getByRole("link", { name: /Siguiente/ })).toHaveText(/Servicios/);
     expect(problems).toEqual([]);
   });
 
@@ -225,7 +225,7 @@ test.describe("C00–C07 at the reference viewport", () => {
     await expect.poll(async () => (await part(page, "object")).opacity).toBe(1);
   });
 
-  test("continuity inside the case: Chef's SCREEN, the cream arrives with the pull-back; the proof leads to Capacidades", async ({ page }, info) => {
+  test("continuity inside the case: Chef's SCREEN, the cream arrives with the pull-back; the proof leads to Servicios", async ({ page }, info) => {
     test.skip(info.project.name !== "xl-1440", "the reference viewport, once");
     // its own document since THE SHIFT (docs/25)
     await page.goto("/trabajo/chef-arturo", { waitUntil: "networkidle" });
@@ -249,12 +249,12 @@ test.describe("C00–C07 at the reference viewport", () => {
     // the document ends on the proof: its window in view, then the way back to the home journey
     await proofAt("chef-arturo", 0.95);
     await expect(page.locator('[data-proof="chef-arturo"] [data-part="window"]')).toBeInViewport();
-    // the last case returns to the home journey at Capacidades
+    // the last case returns to the home journey at Servicios
     const next = page.locator('[data-proof="chef-arturo"]').getByRole("link", { name: /Siguiente/ });
-    await expect(next).toHaveText("Siguiente → Capacidades");
+    await expect(next).toHaveText("Siguiente → Servicios");
     await next.click();
-    await expect(page).toHaveURL(/\/#capacidades$/);
-    await expect(page.locator("#capacidades")).toBeVisible();
+    await expect(page).toHaveURL(/\/#servicios$/);
+    await expect(page.locator("#servicios")).toBeVisible();
   });
 });
 

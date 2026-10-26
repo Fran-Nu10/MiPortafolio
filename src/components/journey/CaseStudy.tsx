@@ -27,7 +27,7 @@ import { headerView, openLink } from "./shared";
  * home journey; they are the evaluation now: one world and its proof per document, the same scenes,
  * copy and media as before (Spec §06–§11, Content Master 06–09), opened from the reel. The world
  * starts at the top (its SCREEN state: the reel's picture at the reel's rectangle), the proof ends
- * with «← Trabajo» (back to the reel) and «Siguiente →» (the next case; after the last, Capacidades
+ * with «← Trabajo» (back to the reel) and «Siguiente →» (the next case; after the last, Servicios
  * in the home journey). Every word is in the server HTML; motion is layered on top as before.
  */
 export function CaseStudy({ project }: { project: Project }) {
@@ -64,7 +64,7 @@ const worldFor = (p: Project): WorldView => ({
 });
 
 const proofFor = (p: Project): ProofView => {
-  const next = p.next === "capacidades" ? null : getProject(p.next);
+  const next = p.next === "servicios" ? null : getProject(p.next);
   return {
     id: p.id,
     name: p.name,
@@ -78,10 +78,10 @@ const proofFor = (p: Project): ProofView => {
     stack: stackLine(p, SITE.world.stackLabel),
     open: openLink(p),
     back: { href: REEL_HREF, label: SITE.world.back },
-    // the next case is another document; after the last one, the home journey resumes at Capacidades
+    // the next case is another document; after the last one, the home journey resumes at Servicios
     next: next
       ? { href: pathForSection(next.id), label: `${SITE.world.next} ${next.name}` }
-      : { href: pathForSection("capacidades"), label: `${SITE.world.next} ${SITE.world.capabilitiesName}` },
+      : { href: pathForSection("servicios"), label: `${SITE.world.next} ${SITE.world.servicesName}` },
     tone: p.theme.tone,
     aspect: p.reel.aspect,
     chapters: p.proof.chapters,

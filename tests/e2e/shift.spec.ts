@@ -5,7 +5,7 @@ import { watchConsole } from "./console";
 import { jump, scenesBuilt, settled } from "./scroll";
 
 /**
- * THE SHIFT (docs/25, Content Master 23): between the reel and the capabilities, how complexity
+ * THE SHIFT (docs/25, Content Master 23): between the reel and the services, how complexity
  * becomes product. Pinned on every tier with motion (its own drawing per variant), four resting
  * states forward and back, the fragments are the interface (FLIP: at rest they sit exactly where the
  * finished interface has them), one gesture works, no jump in or out; a static page under reduced
@@ -89,11 +89,11 @@ const drift = (page: Page) =>
   );
 
 test.describe("place in the journey", () => {
-  test("hero → reel → THE SHIFT → vision → capabilities → declaration → profile → contact; no world in the home", async ({ page }) => {
+  test("hero → reel → THE SHIFT → vision → services → declaration → profile → contact; no world in the home", async ({ page }) => {
     await open(page);
     const ids = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll<HTMLElement>("main [data-section]")).map((e) => e.dataset.section))]);
-    // «Una sola visión» between THE SHIFT and the capabilities since docs/27 §3
-    expect(ids).toEqual(["inicio", "trabajo", "shift", "vision", "capacidades", "propuesta", "perfil", "contacto"]);
+    // «Una sola visión» between THE SHIFT and the services since docs/27 §3
+    expect(ids).toEqual(["inicio", "trabajo", "shift", "vision", "servicios", "propuesta", "perfil", "contacto"]);
     for (const slug of ["travelsuite360", "rayo-smash", "santi-nuca", "chef-arturo"]) await expect(page.locator(`#${slug}`)).toHaveCount(0);
     // the title stays for screen readers; on screen the four lines carry the section (docs/27 §4)
     await expect(page.locator("#shift h2")).toHaveText("De la complejidad al producto.");

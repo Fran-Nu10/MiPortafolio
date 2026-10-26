@@ -60,7 +60,7 @@ const FIGS = [FigThink, FigDesign, FigBuild];
 
 /**
  * «Distintas disciplinas. Una sola visión.» (docs/27 §3, Content Master 25), between THE SHIFT and
- * the capabilities. It replaces the capabilities' opening line «Todo lo anterior pasó por las mismas
+ * the services (docs/28). It replaced the capabilities' opening line «Todo lo anterior pasó por las mismas
  * manos.» — which read as if every photograph and brand of the projects were Franco's: this says how
  * the work is done, not who made each asset. Three stages — Pensar → Diseñar → Construir — show one
  * figure in three states (lib/vision), joined by one accent conductor — a stretch from each stage

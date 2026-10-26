@@ -6,14 +6,14 @@ import { scenesBuilt, settled } from "./scroll";
  * Discovery and evaluation (docs/25): the home journey opens each project's case at its own
  * document, `/trabajo/{slug}` — the URLs the reel always used. Every card still opens its project;
  * a case starts with its world, ends with «← Trabajo» (back to the reel) and «Siguiente →» (the next
- * case; after the last, Capacidades); Back returns to where the visitor left the reel.
+ * case; after the last, Servicios); Back returns to where the visitor left the reel.
  */
 
 const CASES = [
   { slug: "travelsuite360", name: "TravelSuite360", next: "/trabajo/rayo-smash" },
   { slug: "rayo-smash", name: "Rayo Smash", next: "/trabajo/santi-nuca" },
   { slug: "santi-nuca", name: "Santi Nuca", next: "/trabajo/chef-arturo" },
-  { slug: "chef-arturo", name: "Chef Arturo", next: "/#capacidades" },
+  { slug: "chef-arturo", name: "Chef Arturo", next: "/#servicios" },
 ] as const;
 
 async function open(page: Page, url = "/") {
@@ -43,7 +43,7 @@ test.describe("from the reel to each case", () => {
       await expect(page.locator("main")).toHaveAttribute("data-started", "");
       // one case per document: its world and its proof, nothing of the home journey
       await expect(page.locator(`#${c.slug}`)).toHaveCount(1);
-      await expect(page.locator("#shift, #capacidades, #perfil, #contacto, #inicio")).toHaveCount(0);
+      await expect(page.locator("#shift, #servicios, #perfil, #contacto, #inicio")).toHaveCount(0);
       // the world starts at the top of the case
       await expect.poll(() => page.evaluate((id) => Math.round(document.getElementById(id)!.getBoundingClientRect().top), c.slug)).toBeLessThanOrEqual(4);
       // the header is there from the start (there is no opening to reveal it)
@@ -82,16 +82,16 @@ test.describe("inside a case", () => {
     expect(await reelTop(page)).toBeGreaterThan(-80);
   });
 
-  test("«Siguiente →» chains the cases, then returns to Capacidades", async ({ page }) => {
+  test("«Siguiente →» chains the cases, then returns to Servicios", async ({ page }) => {
     await open(page, "/trabajo/travelsuite360");
     for (const c of CASES) {
       await expect(page).toHaveURL(new RegExp(`/trabajo/${c.slug}$`));
       await page.locator(`[data-proof="${c.slug}"] .proof-links a`, { hasText: "Siguiente →" }).click();
     }
-    await expect(page).toHaveURL(/\/#capacidades$/);
+    await expect(page).toHaveURL(/\/#servicios$/);
     await expect(page.locator("main")).toHaveAttribute("data-started", "");
     await expect
-      .poll(() => page.evaluate(() => Math.round(document.getElementById("capacidades")!.getBoundingClientRect().top)), { timeout: 8000 })
+      .poll(() => page.evaluate(() => Math.round(document.getElementById("servicios")!.getBoundingClientRect().top)), { timeout: 8000 })
       .toBeLessThan(120);
   });
 

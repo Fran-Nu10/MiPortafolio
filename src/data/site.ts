@@ -94,8 +94,8 @@ export const SITE = {
     /** a case's way back to the reel of the home journey (docs/25) */
     back: "← Trabajo",
     stackLabel: "Stack",
-    /** the capabilities rail is the target after Chef Arturo */
-    capabilitiesName: "Capacidades",
+    /** after the last case the home journey resumes at Servicios */
+    servicesName: "Servicios",
   },
 
   /**
@@ -114,11 +114,11 @@ export const SITE = {
     close: "Una sola dirección, desde la primera decisión hasta el producto funcionando.",
   },
 
-  capabilities: {
-    /** the section's visible title since «Una sola visión» took the opening line (docs/27 §3) */
-    heading: "Capacidades",
-    kicker: "Cinco cosas que se repiten en todos los productos. Y una sexta, después de publicar.",
-    subKicker: "Después de publicar",
+  /** Servicios (Content Master 26, 2026-10-26): it replaces the capabilities index (docs/28 §1) */
+  services: {
+    label: "Servicios",
+    heading: "Lo que puedo crear para vos.",
+    sub: "De una página web a un sistema completo para tu negocio.",
   },
 
   /**

@@ -6,7 +6,7 @@ import { jump, scenesBuilt, settled } from "./scroll";
 
 /**
  * «Distintas disciplinas. Una sola visión.» (docs/27 §3, Content Master 25): between THE SHIFT and
- * the capabilities. Three stages — Pensar → Diseñar → Construir — show one figure in three states
+ * the services. Three stages — Pensar → Diseñar → Construir — show one figure in three states
  * joined by one accent conductor; the static page is the finished transformation, the scene plays it
  * with the scroll (scrubbed, reversible, no pin). Narrow screens: one column; wide: three.
  */
@@ -51,10 +51,10 @@ const figures = (page: Page) =>
   });
 
 test.describe("place and copy", () => {
-  test("THE SHIFT → Una sola visión → Capacidades; the title, three stages and the close, exact", async ({ page }) => {
+  test("THE SHIFT → Una sola visión → Servicios; the title, three stages and the close, exact", async ({ page }) => {
     await open(page);
     const order = await page.evaluate(() => Array.from(document.querySelectorAll("main > section[id]")).map((s) => s.id));
-    expect(order.slice(order.indexOf("shift"), order.indexOf("shift") + 3)).toEqual(["shift", "vision", "capacidades"]);
+    expect(order.slice(order.indexOf("shift"), order.indexOf("shift") + 3)).toEqual(["shift", "vision", "servicios"]);
     await expect(page.locator("#vision h2 .vision-title-line")).toHaveText(TITLE);
     await expect(page.locator("#vision h3")).toHaveText(WORDS);
     await expect(page.locator("#vision .vision-line")).toHaveText(LINES);

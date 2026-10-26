@@ -72,7 +72,9 @@ test.describe("without JavaScript", () => {
       "Una sola visión.",
       "Entender el problema, el negocio y las oportunidades.",
       "Una sola dirección, desde la primera decisión hasta el producto funcionando.",
-      "Un buen producto merece ser descubierto. Creo campañas para acercar negocios a las personas que pueden convertirse en sus próximos clientes.",
+      // Servicios (docs/28 §1)
+      "Lo que puedo crear para vos.",
+      "Publicidad en Meta Ads",
       "Ahora, el tuyo.",
     ]) {
       await expect(page.getByText(text, { exact: true }).filter({ visible: true }).first(), text).toBeVisible();

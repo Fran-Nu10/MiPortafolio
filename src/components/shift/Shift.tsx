@@ -97,7 +97,7 @@ function box(el: HTMLElement, space: HTMLElement) {
 
 /**
  * S2b · THE SHIFT (docs/25; Content Master 23): between the reel (what is built) and the
- * capabilities (which disciplines), how complexity becomes product. One sticky stage, scrub 0.6,
+ * vision (how the work is done), how complexity becomes product. One sticky stage, scrub 0.6,
  * label snap: DESORDEN → DIRECCION → EJECUCION → RESULTADO (lib/shift). Transforms and opacity only;
  * every fragment is laid out by CSS where the finished interface has it, and the disorder is the
  * inverse transform measured once per build (FLIP), so the fragments are the interface. Reduced

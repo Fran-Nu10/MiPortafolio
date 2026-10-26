@@ -65,32 +65,8 @@ export interface Project {
     /** sr-only summary of the visual-only world states (rendered once the world animates, Phase 5–8) */
     worldSummary: string[];
   };
-  next: ProjectSlug | "capacidades";
+  next: ProjectSlug | "servicios";
   meta: { title: string; description: string; ogImage: AssetKey };
-}
-
-/** Spec §12 · EvidenceSlot. `typographic` is the production state of capability 06. */
-export type EvidenceSlotVariant =
-  | { variant: "typographic"; tag: string }
-  | { variant: "verified-material"; media: AssetKey[]; source: string; caption?: string }
-  | {
-      variant: "campaign";
-      media: AssetKey[];
-      source: string;
-      metrics: { label: string; value: string; authorized: boolean; source: string }[];
-    };
-
-/** live evidence elements reused from the worlds (built in Phase 9) */
-export type EvidenceElement = { variant: "element"; element: "ts-flow" | "posters" | "chef-commerce" | "ts-extraction" | "rayo-layers" };
-
-export interface Capability {
-  index: 1 | 2 | 3 | 4 | 5 | 6;
-  name: string;
-  statement: string;
-  /** 06 = extended (sub-kicker "Después de publicar") */
-  group: "core" | "extended";
-  attribution: { label: string; href?: string };
-  evidence: EvidenceElement | EvidenceSlotVariant;
 }
 
 // ── asset contracts ────────────────────────────────────────────────────────────
