@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExter
 import { EASE, gsap, registerGsap, ScrollTrigger, usePrefersReducedMotion } from "@/lib/motion";
 import { isHere, navigate, rememberedReel, replaceOwnState, sectionForHref } from "@/lib/journey-nav";
 import { isSaveData } from "@/lib/media";
+import { TIER_QUERIES } from "@/lib/tiers";
 import {
   AXIS_LOCK,
   CLICK_SLOP,
@@ -57,7 +58,7 @@ export function ProjectReel({ heading, items, copy }: { heading: string; items: 
   const saveData = useSyncExternalStore(noop, isSaveData, () => false);
 
   const activeRef = useRef(0);
-  const geo = useRef<{ widths: number[]; gap: number; vw: number }>({ widths: [], gap: 0, vw: 0 });
+  const geo = useRef<{ widths: number[]; gap: number; vw: number; inset?: number }>({ widths: [], gap: 0, vw: 0 });
   const halfVisible = useRef(false);
   const rmRef = useRef(rm);
 
@@ -71,12 +72,14 @@ export function ProjectReel({ heading, items, copy }: { heading: string; items: 
       widths: lis.map((li) => li.getBoundingClientRect().width),
       gap: parseFloat(getComputedStyle(track).columnGap) || 0,
       vw: window.innerWidth,
+      // phones: the active card starts at the gutter, wide as the screen allows (docs/28 §2)
+      inset: window.matchMedia(TIER_QUERIES.sm).matches ? parseFloat(getComputedStyle(track).getPropertyValue("--reel-inset")) || 0 : undefined,
     };
   }, []);
 
   const offsetFor = useCallback((i: number) => {
     const g = geo.current;
-    return trackOffset(i, g.widths, g.vw, g.gap);
+    return trackOffset(i, g.widths, g.vw, g.gap, g.inset);
   }, []);
 
   /** move to piece `i` (one settle); `focus` moves focus to its "Ver caso" (keyboard inside the reel) */

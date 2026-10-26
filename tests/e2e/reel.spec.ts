@@ -25,7 +25,7 @@ async function toReel(page: Page) {
 const settle = (page: Page) => page.waitForTimeout(650);
 
 test.describe("geometry", () => {
-  test("heading and cards are one composition (docs/26 §A1): the title just above the film, the card centered", async ({ page }) => {
+  test("heading and cards are one composition (docs/26 §A1): the title just above the film; the card centered (phones: from the gutter, the usable width, docs/28 §2)", async ({ page }) => {
     await toReel(page);
     const g = await page.evaluate(() => {
       const f = document.querySelector('#trabajo .reel-item[data-active] [data-part="frame"]')!.getBoundingClientRect();
@@ -34,8 +34,14 @@ test.describe("geometry", () => {
       const st = document.querySelector('#trabajo [data-part="stage"]')!.getBoundingClientRect();
       return { vw: innerWidth, vh: innerHeight, f: [f.x, f.y, f.width, f.height], gap: f.top - h.bottom, metaBottom: m.bottom, stageBottom: st.bottom, headerTop: h.top };
     });
-    // the card centered across the viewport, the heading 16–40 px above it
-    expect(Math.abs(g.f[0] - (g.vw - g.f[2]) / 2)).toBeLessThan(1.5);
+    // tablets and up: the card centered across the viewport; phones: it starts at the gutter (16 px) and
+    // takes the usable width, a sliver of the next one left at the right — never a narrow centred card
+    if (g.vw >= 768) expect(Math.abs(g.f[0] - (g.vw - g.f[2]) / 2)).toBeLessThan(1.5);
+    else {
+      expect(Math.abs(g.f[0] - 16)).toBeLessThan(1.5);
+      expect(g.f[2]).toBeGreaterThanOrEqual(g.vw - 32 - 28);
+    }
+    // the heading 16–40 px above it
     expect(g.gap).toBeGreaterThanOrEqual(12);
     expect(g.gap).toBeLessThanOrEqual(40);
     // the stage ends with its meta: no block of black under it

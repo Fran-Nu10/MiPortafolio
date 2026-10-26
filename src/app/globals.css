@@ -1035,8 +1035,8 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
 }
 
 @media (max-width: 767.98px) {
-  /* phone: the frame stays at 18svh from the stage top (the shared geometry); the meta and the
-     marks follow it in flow, and the stage grows past 100svh on short screens instead of clipping */
+  /* phone: the heading, then the card right under it, then its meta and the marks, all in flow;
+     the stage grows past 100svh on short screens instead of clipping */
   html.js .reel[data-anim] .reel-stage {
     height: auto;
     display: flex;
@@ -1051,7 +1051,7 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   html.js .reel[data-anim] .reel-track {
     align-items: flex-start;
     height: auto;
-    padding-top: 18svh;
+    padding-top: 0;
   }
   html.js .reel[data-anim] .reel-meta {
     position: static;
@@ -1096,27 +1096,26 @@ html.js .reel[data-anim] .reel-controls :is(button, a) {
   }
 }
 
-/* phones: the heading in the stage's 18svh band, just above the card, where the screen is tall enough
-   for both; short phones keep it in flow above the stage */
+/* phones (docs/28 §2): the active card starts at the gutter and takes the screen's usable width (a
+   sliver of the next one shows at the right) — the film at its own aspect, never capped by height:
+   a narrow centred card left a black band at its left on real phones, where svh is short. The
+   heading sits in flow right above it, with room from the hero. Scoped to the reel: a case's SCREEN
+   keeps the shared rectangle. */
 @media (max-width: 767.98px) {
-  html.js .reel[data-anim] .reel-header {
-    left: var(--gutter);
-    top: calc(18svh - 16px);
-    width: calc(100vw - 2 * var(--gutter));
-  }
-}
-@media (max-width: 767.98px) and (max-height: 699.98px) {
   html.js .reel[data-anim] {
-    padding-top: 10svh;
+    --reel-inset: var(--gutter);
+    --reel-w: calc(100vw - 2 * var(--gutter) - 24px);
+    --reel-cap: 200svh;
+    padding-top: clamp(40px, 8svh, 72px);
+  }
+  html.js .reel[data-anim] .reel-track {
+    transform: translateX(var(--reel-inset));
   }
   html.js .reel[data-anim] .reel-header {
     position: static;
-    margin: 0 var(--gutter) 12px;
+    width: auto;
+    margin: 0 var(--gutter) 16px;
     transform: none;
-  }
-  /* short phones: the card follows the heading in flow, not the 18svh band */
-  html.js .reel[data-anim] .reel-track {
-    padding-top: 16px;
   }
 }
 /* the card's index («01 / 04») and the name are each one piece: on a narrow card the name moves under

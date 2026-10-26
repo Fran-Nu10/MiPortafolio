@@ -24,12 +24,13 @@ export const SETTLE = 0.42;
 
 /**
  * Track offset that centers item `index`: x(i) = (vw − Wᵢ)/2 − Σ_{j<i}(Wⱼ + gap).
- * Widths can differ per item (the 72svh height cap shrinks tall frames).
+ * Widths can differ per item (the 72svh height cap shrinks tall frames). With `inset` (phones,
+ * docs/28 §2) the item starts at that distance from the left edge instead: x(i) = inset − Σ.
  */
-export function trackOffset(index: number, widths: number[], viewportWidth: number, gap: number): number {
+export function trackOffset(index: number, widths: number[], viewportWidth: number, gap: number, inset?: number): number {
   let before = 0;
   for (let j = 0; j < index; j++) before += widths[j] + gap;
-  return (viewportWidth - widths[index]) / 2 - before;
+  return (inset ?? (viewportWidth - widths[index]) / 2) - before;
 }
 
 /** the track position while dragging: 1:1 inside, 35% past the ends */
